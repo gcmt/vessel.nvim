@@ -6,12 +6,12 @@ local Logger = {}
 Logger.__index = Logger
 
 --- Create new Logger instance
----@param _log_level integer
+---@param log_level integer
 ---@return Logger
-function Logger:new(_log_level)
+function Logger:new(log_level)
 	local logger = {}
 	setmetatable(logger, Logger)
-	logger._log_level = _log_level
+	logger._log_level = log_level
 	return logger
 end
 
