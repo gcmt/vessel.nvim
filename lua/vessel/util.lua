@@ -16,17 +16,10 @@ M.modes = {
 ---@param callback function
 ---@param opts table?
 function M.keymap(mode, lhs, callback, opts)
+	opts = vim.tbl_extend("force", { nowait = true, buffer = true, }, opts or {})
 	if type(lhs) == "table" then
 		for _, mapping in pairs(lhs) do
-			vim.keymap.set(
-				mode,
-				mapping,
-				callback,
-				vim.tbl_extend("force", {
-					nowait = true,
-					buffer = true,
-				}, opts or {})
-			)
+			vim.keymap.set( mode, mapping, callback, opts)
 		end
 	end
 end
