@@ -48,7 +48,6 @@ end
 ---@field _app App Reference to the main app
 ---@field _jumps table Jumps list (unfiltered)
 ---@field _curpos integer Current postion in the jumplist
----@field _invalid integer
 ---@field _filter_func function?
 local Jumplist = {}
 Jumplist.__index = Jumplist
@@ -65,7 +64,6 @@ function Jumplist:new(app, filter_func)
 	jumps._app = app
 	jumps._jumps = {}
 	jumps._curpos = 0
-	jumps._invalid = 0
 	jumps._filter_func = filter_func
 	return jumps
 end
@@ -73,7 +71,7 @@ end
 --- Initialize Jumplist
 ---@return Jumplist
 function Jumplist:init()
-	self._jumps, self._curpos, self._invalid = self:_get_jumps()
+	self._jumps, self._curpos = self:_get_jumps()
 	return self
 end
 
@@ -135,7 +133,7 @@ function Jumplist:_action_clear(map, bufnr)
 	end
 	vim.fn.win_execute(self._app.context.wininfo.winid, "clearjumps")
 	local line = vim.fn.line(".")
-	self._jumps, self._curpos, self._invalid = self:_get_jumps()
+	self._jumps, self._curpos = self:_get_jumps()
 	self:_render(bufnr)
 	util.vcursor(line, 1)
 end
@@ -175,9 +173,8 @@ end
 
 --- Retrun the jumplist and the last used jump position in the list
 --- Both list and position are reversed
----@return table, integer, integer
+---@return table, integer
 function Jumplist:_get_jumps()
-	local invalid = 0
 	local winid = self._app.context.wininfo.winid
 	local jumps = {}
 	local list, curpos = unpack(vim.fn.getjumplist(winid))
@@ -200,13 +197,13 @@ function Jumplist:_get_jumps()
 		-- :jumps or call getjumplist(), might as well load anyway
 		vim.fn.bufload(jump.bufnr)
 
-		-- returns empty table for invalid (out of bound) lines
+		-- getbufline() returns empty table for invalid (out of bound) lines
 		local line = vim.fn.getbufline(jump.bufnr, jump.lnum)
 		if #line == 1 then
 			jump.line = line[1]
-			table.insert(jumps, jump)
-		else
-			invalid = invalid + 1
+			if self:_filter(jump, self._app.context) or pos == jump.pos then
+				table.insert(jumps, jump)
+			end
 		end
 	end
 
@@ -215,7 +212,7 @@ function Jumplist:_get_jumps()
 		return a.pos < b.pos
 	end)
 
-	return jumps, pos, invalid
+	return jumps, pos
 end
 
 --- Filter a single jump
@@ -241,18 +238,7 @@ function Jumplist:_render(bufnr)
 	vim.cmd('sil! keepj norm! gg"_dG')
 	vim.api.nvim_buf_clear_namespace(bufnr, self._nsid, 1, -1)
 
-	local filtered = {}
-	local filtered_count = 0
-	for _, jump in ipairs(self._jumps) do
-		-- Note: current position in the jump list is always displayed
-		if self:_filter(jump, self._app.context) or self._curpos == jump.pos then
-			table.insert(filtered, jump)
-		else
-			filtered_count = filtered_count + 1
-		end
-	end
-
-	if #filtered == 0 then
+	if #self._jumps == 0 then
 		vim.fn.setbufline(bufnr, 1, self._app.config.jumps.not_found)
 		vim.fn.setbufvar(bufnr, "&modifiable", 0)
 		self:_setup_mappings({}, bufnr)
@@ -261,7 +247,7 @@ function Jumplist:_render(bufnr)
 	end
 
 	local paths = {}
-	for _, jump in pairs(filtered) do
+	for _, jump in pairs(self._jumps) do
 		table.insert(paths, jump.bufpath)
 	end
 
@@ -282,7 +268,7 @@ function Jumplist:_render(bufnr)
 	local max_basename
 	local max_lnum, max_col, max_rel
 
-	for _, jump in ipairs(filtered) do
+	for _, jump in ipairs(self._jumps) do
 		if not max_lnum or jump.lnum > max_lnum then
 			max_lnum = jump.lnum
 		end
@@ -299,7 +285,7 @@ function Jumplist:_render(bufnr)
 		end
 	end
 
-	for _, jump in ipairs(filtered) do
+	for _, jump in ipairs(self._jumps) do
 		local ok, line, matches = pcall(self._app.config.jumps.formatters.jump, {
 			max_lnum = max_lnum,
 			max_col = max_col,
