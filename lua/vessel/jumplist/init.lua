@@ -43,7 +43,6 @@ end
 --- even though getjumplist() returns the last jumplist index + 1, that is, len(getjumplist()).
 ---
 ---@class Jumplist
----@field buffer_name string Unique buffer name
 ---@field _nsid integer Namespace id for highlighting
 ---@field _app App Reference to the main app
 ---@field _jumps table Jumps list (unfiltered)
@@ -59,8 +58,7 @@ Jumplist.__index = Jumplist
 function Jumplist:new(app, filter_func)
 	local jumps = {}
 	setmetatable(jumps, Jumplist)
-	jumps.buffer_name = "__vessel_jumplist__"
-	jumps._nsid = vim.api.nvim_create_namespace(jumps.buffer_name)
+	jumps._nsid = vim.api.nvim_create_namespace("__vessel__")
 	jumps._app = app
 	jumps._jumps = {}
 	jumps._curpos = 0
@@ -78,7 +76,10 @@ end
 --- Open the window and render the content
 function Jumplist:open()
 	self:init()
-	self:_render(self._app:open_window(self))
+	local bufnr, ok = self._app:open_window(self)
+	if ok then
+		self:_render(bufnr)
+	end
 end
 
 --- Return total jumps count with filters applied

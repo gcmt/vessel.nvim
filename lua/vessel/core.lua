@@ -4,6 +4,7 @@ local Context = require("vessel.context")
 local Logger = require("vessel.logger")
 
 ---@class App
+---@field buffer_name string
 ---@field config table
 ---@field context Context
 ---@field bufnr integer
@@ -18,6 +19,7 @@ App.__index = App
 function App:new(config)
 	local app = {}
 	setmetatable(app, App)
+	app.buffer_name = "__vessel__"
 	app.config = config
 	app.context = Context:new()
 	app.logger = Logger:new(config.verbosity)
@@ -27,14 +29,15 @@ function App:new(config)
 end
 
 --- Create the window buffer
----@return integer
-function App:_create_buffer(buffer_name)
-	local bufnr = vim.fn.bufnr(buffer_name)
+---@return integer, boolean Whether the buffer was created
+function App:_create_buffer()
+	local bufnr = vim.fn.bufnr(self.buffer_name)
 	if bufnr == -1 then
 		bufnr = vim.api.nvim_create_buf(false, false)
-		vim.api.nvim_buf_set_name(bufnr, buffer_name)
+		vim.api.nvim_buf_set_name(bufnr, self.buffer_name)
+		return bufnr, true
 	end
-	return bufnr
+	return bufnr, false
 end
 
 --- Close the window
@@ -51,7 +54,7 @@ function App:_setup_window(winid)
 	local winnr = wininfo[1].winnr
 
 	vim.fn.setbufvar(bufnr, "&buftype", "nofile")
-	vim.fn.setbufvar(bufnr, "&bufhidden", "hide")
+	vim.fn.setbufvar(bufnr, "&bufhidden", "delete")
 	vim.fn.setbufvar(bufnr, "&buflisted", 0)
 	vim.fn.setwinvar(winnr, "&cursorcolumn", 0)
 	vim.fn.setwinvar(winnr, "&colorcolumn", 0)
@@ -108,13 +111,18 @@ end
 
 --- Open the popup window
 ---@param list Marklist|Jumplist
----@return integer
+---@return integer, boolean Whether the window was actually opened
 function App:open_window(list)
 	local popup_opts = self:_get_popup_options(list)
-	self.bufnr = self:_create_buffer(list.buffer_name)
-	self.winid = vim.api.nvim_open_win(self.bufnr, true, popup_opts)
-	self:_setup_window(self.winid)
-	return self.bufnr
+	self.bufnr = self:_create_buffer()
+	if vim.fn.bufwinid(self.bufnr) == -1 then
+		self.winid = vim.api.nvim_open_win(self.bufnr, true, popup_opts)
+		self:_setup_window(self.winid)
+	else
+		self.logger:info("vessel: window already open")
+		return self.bufnr, false
+	end
+	return self.bufnr, true
 end
 
 return App

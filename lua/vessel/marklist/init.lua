@@ -27,7 +27,6 @@ function Mark:new()
 end
 
 ---@class Marklist
----@field buffer_name string
 ---@field _nsid integer
 ---@field _app App
 ---@field _marks table Marks grouped by file
@@ -42,8 +41,7 @@ Marklist.__index = Marklist
 function Marklist:new(app, filter_func)
 	local marks = {}
 	setmetatable(marks, Marklist)
-	marks.buffer_name = "__vessel_marklist__"
-	marks._nsid = vim.api.nvim_create_namespace(marks.buffer_name)
+	marks._nsid = vim.api.nvim_create_namespace("__vessel__")
 	marks._app = app
 	marks._marks = {}
 	marks._filter_func = filter_func
@@ -60,7 +58,10 @@ end
 --- Open the window and render the content
 function Marklist:open()
 	self:init()
-	self:_render(self._app:open_window(self))
+	local bufnr, ok = self._app:open_window(self)
+	if ok then
+		self:_render(bufnr)
+	end
 end
 
 --- Return total marks and groups count
