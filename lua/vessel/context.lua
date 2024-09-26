@@ -1,6 +1,7 @@
 ---@module "context"
 
 ---@class Context
+---@field bufpath string
 ---@field bufnr integer
 ---@field wininfo table
 ---@field curpos table

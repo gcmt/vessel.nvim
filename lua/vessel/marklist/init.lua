@@ -82,7 +82,7 @@ end
 function Marklist:set_mark(global)
 	local bufnr = self._app.context.bufnr
 	local lnum = self._app.context.curpos[2]
-	local bufpath = vim.fn.fnamemodify(vim.fn.bufname(bufnr), ":p")
+	local bufpath = self._app.context.bufpath
 
 	local marks = {}
 	for _, group in pairs(self._marks) do
@@ -205,7 +205,7 @@ function Marklist:_set_cursor(map)
 
 	local header_line, first_line
 	local closest_line, closest_distance
-	local bufpath = vim.fn.fnamemodify(vim.fn.bufname(self._app.context.bufnr), ":p")
+	local bufpath = self._app.context.bufpath
 
 	for i, item in pairs(map) do
 		if not header_line and type(item) == "string" and item == bufpath then
@@ -396,7 +396,6 @@ function Marklist:_render(bufnr)
 	end
 
 	local _, groups_count = self:get_count()
-	local bufpath = vim.fn.fnamemodify(vim.fn.bufname(self._app.context.bufnr), ":p")
 
 	local paths = vim.tbl_keys(self._marks)
 	table.sort(paths, function(a, b)
@@ -411,7 +410,7 @@ function Marklist:_render(bufnr)
 
 		local ok, line, matches = pcall(self._app.config.marks.formatters.header, {
 			file = path,
-			cur_bufpath = bufpath,
+			cur_bufpath = self._app.context.bufpath,
 			groups_count = groups_count,
 		}, self._app.config)
 		if not ok then
@@ -445,7 +444,7 @@ function Marklist:_render(bufnr)
 				mark = mark,
 				pos = k,
 				is_last = k == #group,
-				cur_bufpath = bufpath,
+				cur_bufpath = self._app.context.bufpath,
 				groups_count = groups_count,
 				max_group_lnum = max_lnum,
 				max_group_col = max_col,
