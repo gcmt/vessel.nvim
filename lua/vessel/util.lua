@@ -153,12 +153,9 @@ function M.find_uniques(paths)
 		for newbase, dirnames in pairs(groups) do
 			if #dirnames == 1 then
 				local fullpath = vim.fs.joinpath(dirnames[1], newbase, base)
-				uniques[M.trim_path(fullpath)] =
-					M.trim_path(vim.fs.joinpath(newbase, base))
+				uniques[M.trim_path(fullpath)] = M.trim_path(vim.fs.joinpath(newbase, base))
 			else
-				for fullpath, unique in
-					pairs(_uniques(vim.fs.joinpath(newbase, base), dirnames))
-				do
+				for fullpath, unique in pairs(_uniques(vim.fs.joinpath(newbase, base), dirnames)) do
 					uniques[fullpath] = unique
 				end
 			end
@@ -219,10 +216,7 @@ function M.format(fmt, ...)
 			if type(repl[i]) == "table" then
 				local start = #ret + 1
 				ret = ret .. repl[i][1]
-				table.insert(
-					matches,
-					{ startpos = start, endpos = #ret, hlgroup = repl[i][2] }
-				)
+				table.insert(matches, { startpos = start, endpos = #ret, hlgroup = repl[i][2] })
 			else
 				ret = ret .. repl[i]
 			end

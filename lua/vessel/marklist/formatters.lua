@@ -9,7 +9,11 @@ local M = {}
 ---@param config table
 ---@return string
 local function get_prefix(ctx, config)
-	if ctx.groups_count == 1 and not config.marks.force_header and ctx.mark.file == ctx.cur_bufpath then
+	if
+		ctx.groups_count == 1
+		and not config.marks.force_header
+		and ctx.mark.file == ctx.cur_bufpath
+	then
 		return " "
 	end
 	local decorations = config.marks.decorations
