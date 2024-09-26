@@ -188,7 +188,7 @@ function Jumplist:_get_jumps()
 	local bufcache = {}
 	for i, j in ipairs(list) do
 		if not bufcache[j.bufnr] then
-			bufcache[j.bufnr] = vim.fn.fnamemodify(vim.fn.bufname(j.bufnr), ":p")
+			bufcache[j.bufnr] = vim.api.nvim_buf_get_name(j.bufnr)
 		end
 
 		local jump = Jump:new()

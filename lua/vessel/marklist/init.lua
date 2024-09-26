@@ -136,7 +136,7 @@ end
 ---@param bufnr integer
 local function getmarklist(bufnr)
 	local marks = {}
-	local bufpath = vim.fn.fnamemodify(vim.fn.bufname(bufnr), ":p")
+	local bufpath = vim.api.nvim_buf_get_name(bufnr)
 	for _, mark in pairs(vim.list_extend(vim.fn.getmarklist(), vim.fn.getmarklist(bufnr))) do
 		if string.match(mark.mark, "%a") then
 			mark.mark = string.sub(mark.mark, 2) -- remove leading '
