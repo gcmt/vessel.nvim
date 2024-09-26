@@ -31,20 +31,22 @@ end
 ---@field _nsid integer
 ---@field _app App
 ---@field _marks table Marks grouped by file
----@field MODES table
+---@field _filter_func function?
 local Marklist = {}
 Marklist.__index = Marklist
 
 --- Return a new Marklist instance
 ---@param app App
+---@param filter_func function?
 ---@return Marklist
-function Marklist:new(app)
+function Marklist:new(app, filter_func)
 	local marks = {}
 	setmetatable(marks, Marklist)
 	marks.buffer_name = "__vessel_marklist__"
 	marks._nsid = vim.api.nvim_create_namespace(marks.buffer_name)
 	marks._app = app
 	marks._marks = {}
+	marks._filter_func = filter_func
 	return marks
 end
 
@@ -149,7 +151,19 @@ local function getmarklist(bufnr)
 	return marks
 end
 
+--- Filter a single mark
+---@param mark Mark
+---@param context Context
+---@return boolean
+function Marklist:_filter(mark, context)
+	if self._filter_func and not self._filter_func(mark, context) then
+		return false
+	end
+	return true
+end
+
 --- Return marks grouped by the file they belong to
+--- Retrieve the filtered mark list
 ---@param bufnr integer
 ---@return table
 function Marklist:_get_marks(bufnr)
@@ -172,10 +186,12 @@ function Marklist:_get_marks(bufnr)
 		if mark.loaded then
 			mark.line = vim.fn.getbufoneline(mark.file, mark.lnum)
 		end
-		if not groups[mark.file] then
-			groups[mark.file] = {}
+		if self:_filter(mark, self._app.context) then
+			if not groups[mark.file] then
+				groups[mark.file] = {}
+			end
+			table.insert(groups[mark.file], mark)
 		end
-		table.insert(groups[mark.file], mark)
 	end
 	return sort_groups(groups, self._app.config.marks.sort_field)
 end
@@ -371,7 +387,7 @@ function Marklist:_render(bufnr)
 	vim.cmd('sil! keepj norm! gg"_dG')
 	vim.api.nvim_buf_clear_namespace(bufnr, self._nsid, 1, -1)
 
-	if not self._marks or next(self._marks) == nil then
+	if next(self._marks) == nil then
 		vim.fn.setbufline(bufnr, 1, self._app.config.marks.not_found)
 		vim.fn.setbufvar(bufnr, "&modifiable", 0)
 		self:_setup_mappings({}, bufnr)

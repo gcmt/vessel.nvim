@@ -28,12 +28,21 @@ function M.set_global_mark(opts)
 end
 
 --- Open the mark list window
----@param opts table? Config overrides
-function M.view_marks(opts)
-	local config = require("vessel.config").get(opts or {})
+---@param opts table Config overrides
+---@param filter_func function?
+function M.view_marks(opts, filter_func)
+	local config = require("vessel.config").get(opts)
 	local app = require("vessel.core"):new(config)
-	local marklist = require("vessel.marklist"):new(app)
+	local marklist = require("vessel.marklist"):new(app, filter_func)
 	marklist:open()
+end
+
+--- Open the mark list window with only entries belonging to the current buffer
+---@param opts table? Config overrides
+function M.view_local_marks(opts)
+	M.view_marks(opts or {}, function(mark, context)
+		return mark.file == context.bufpath
+	end)
 end
 
 --- Open the jump list window
@@ -80,6 +89,10 @@ end
 
 vim.keymap.set("n", "<plug>(VesselViewMarks)", function()
 	M.view_marks({})
+end)
+
+vim.keymap.set("n", "<plug>(VesselViewLocalMarks)", function()
+	M.view_local_marks({})
 end)
 
 vim.keymap.set("n", "<plug>(VesselSetLocalMark)", function()

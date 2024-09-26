@@ -19,6 +19,7 @@ function Context:new(winid)
 	setmetatable(ctx, Context)
 	local id = winid or vim.api.nvim_get_current_win()
 	local wininfo = vim.fn.getwininfo(id)[1]
+	ctx.bufpath = vim.api.nvim_buf_get_name(wininfo.bufnr)
 	ctx.bufnr = wininfo.bufnr
 	ctx.wininfo = wininfo
 	ctx.curpos = vim.fn.getcurpos(id)
