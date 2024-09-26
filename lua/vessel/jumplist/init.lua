@@ -185,17 +185,12 @@ function Jumplist:_get_jumps()
 	-- when outside jumplist, #len == pos
 	local pos = math.max(len - curpos, 1)
 
-	local bufcache = {}
 	for i, j in ipairs(list) do
-		if not bufcache[j.bufnr] then
-			bufcache[j.bufnr] = vim.api.nvim_buf_get_name(j.bufnr)
-		end
-
 		local jump = Jump:new()
 		jump.pos = len + 1 - i
 		jump.rel = len == curpos and -jump.pos or pos - jump.pos
 		jump.bufnr = j.bufnr
-		jump.bufpath = bufcache[j.bufnr]
+		jump.bufpath = vim.api.nvim_buf_get_name(j.bufnr)
 		jump.line = ""
 		jump.lnum = j.lnum
 		jump.col = j.col
