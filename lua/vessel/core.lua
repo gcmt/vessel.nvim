@@ -75,6 +75,7 @@ function App:_setup_window(winid)
 		desc = "Close the window when switching to another buffer",
 		buffer = bufnr,
 		callback = function()
+			vim.api.nvim_buf_delete(self.bufnr, {})
 			self:_close_window()
 		end,
 		once = true,
