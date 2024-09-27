@@ -177,7 +177,8 @@ function Marklist:_get_marks(bufnr)
 		mark.file = item.file
 		mark.loaded = true
 		if vim.fn.bufloaded(mark.file) == 0 then
-			if not self._app.config.lazy_load_buffers then
+			-- If the buffer is in the buffer list, load it anyway
+			if not self._app.config.lazy_load_buffers or vim.fn.buflisted(mark.file) == 1 then
 				vim.fn.bufload(vim.fn.bufadd(mark.file))
 				mark.loaded = true
 			else
@@ -312,10 +313,7 @@ function Marklist:_action_delete(map, bufnr)
 		delmark(selected.mark)
 	end
 
-	local line = vim.fn.line(".")
-	self._marks = self:_get_marks(self._app.context.bufnr)
-	self:_render(bufnr)
-	util.vcursor(line, 1)
+	self:_refresh(bufnr)
 end
 
 --- Move to next/prev mark group
@@ -331,6 +329,37 @@ function Marklist:_action_next_group(map, backwards)
 			util.cursor(i, 1)
 			break
 		end
+	end
+end
+
+--- Change mark on the current line
+---@param map table
+---@param mark string
+---@param bufnr integer
+function Marklist:_action_change_mark(map, mark, bufnr)
+	local selected = map[vim.fn.line(".")]
+	if not selected or type(selected) == "string" then
+		return
+	end
+	for _, group in pairs(self._marks) do
+		for _, m in pairs(group) do
+			if m.mark == mark then
+				self._app.logger:err("vessel: mark already set, delete it first")
+				return
+			end
+		end
+	end
+	if selected.loaded then
+		local mark_bufnr = vim.fn.bufnr(selected.file)
+		if string.match(mark, "%l") and mark_bufnr ~= self._app.context.bufnr then
+			self._app.logger:err("vessel: local marks can be set only for the current buffer")
+			return
+		end
+		vim.fn.win_execute(self._app.context.wininfo.winid, "delmarks " .. selected.mark)
+		vim.api.nvim_buf_set_mark(mark_bufnr, mark, selected.lnum, selected.col, {})
+		self:_refresh(bufnr)
+	else
+		self._app.logger:err("vessel: cannot change mark, buffer not loaded")
 	end
 end
 
@@ -377,6 +406,24 @@ function Marklist:_setup_mappings(map, bufnr)
 	util.keymap("n", self._app.config.marks.mappings.keepj_vsplit, function()
 		self:_action_jump(util.modes.VSPLIT, map, true, close_handler)
 	end)
+
+	local marks = self._app.config.marks.globals .. self._app.config.marks.locals
+	for _, mark in pairs(vim.split(marks, "")) do
+		util.keymap("n", "m" .. mark, function()
+			self:_action_change_mark(map, mark, bufnr)
+		end)
+	end
+end
+
+--- Re-render the buffer with new marks
+---@param bufnr integer
+---@return table
+function Marklist:_refresh(bufnr)
+	local line = vim.fn.line(".")
+	self:init()
+	local map = self:_render(bufnr)
+	util.vcursor(line, 1)
+	return map
 end
 
 --- Render the marks

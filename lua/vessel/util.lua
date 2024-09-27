@@ -12,14 +12,16 @@ M.modes = {
 
 --- Create multiple mappings for the same function handler
 ---@param mode string
----@param lhs table
+---@param lhs table|string
 ---@param callback function
 ---@param opts table?
 function M.keymap(mode, lhs, callback, opts)
 	opts = vim.tbl_extend("force", { nowait = true, buffer = true, }, opts or {})
-	if type(lhs) == "table" then
+	if type(lhs) == "string" then
+		vim.keymap.set(mode, lhs, callback, opts)
+	elseif type(lhs) == "table" then
 		for _, mapping in pairs(lhs) do
-			vim.keymap.set( mode, mapping, callback, opts)
+			vim.keymap.set(mode, mapping, callback, opts)
 		end
 	end
 end
