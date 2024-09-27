@@ -301,7 +301,8 @@ function Jumplist:_render()
 		}, self._app.config)
 		if not ok then
 			self._app:_close_window()
-			self._app.logger:err(line)
+			local msg = string.gsub(tostring(line), "^.*:%s+", "")
+			self._app.logger:err("vessel: jump formatter error: " .. msg)
 			return {}
 		end
 		if line then

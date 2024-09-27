@@ -508,7 +508,8 @@ function Marklist:_render()
 		}, self._app.config)
 		if not ok then
 			self._app:_close_window()
-			self._app.logger:err(line)
+			local msg = string.gsub(tostring(line), "^.*:%s+", "")
+			self._app.logger:err("vessel: header formatter error: " .. msg)
 			return {}
 		end
 		if line then
@@ -544,7 +545,8 @@ function Marklist:_render()
 			}, self._app.config)
 			if not ok then
 				self._app:_close_window()
-				self._app.logger:err(line)
+				local msg = string.gsub(tostring(line), "^.*:%s+", "")
+				self._app.logger:err("vessel: mark formatter error: " .. msg)
 				return {}
 			end
 			if line then
