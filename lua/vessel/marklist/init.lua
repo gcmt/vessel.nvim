@@ -200,6 +200,20 @@ function Marklist:_get_marks(bufnr)
 	return sort_groups(groups, self._app.config.marks.sort_field)
 end
 
+---Check that a mark has been already set
+---@param mark string
+---@return boolean
+function Marklist:_mark_exists(mark)
+	for _, group in pairs(self._marks) do
+		for _, m in pairs(group) do
+			if m.mark == mark then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 --- Move the cursor to the first mark of the current buffer or the the closest mark, if any
 ---@param map table
 function Marklist:_set_cursor(map)
@@ -366,13 +380,9 @@ function Marklist:_action_change_mark(map, mark)
 	if not selected or type(selected) == "string" then
 		return
 	end
-	for _, group in pairs(self._marks) do
-		for _, m in pairs(group) do
-			if m.mark == mark then
-				self._app.logger:err("vessel: mark already set, delete it first")
-				return
-			end
-		end
+	if self:_mark_exists(mark) then
+		self._app.logger:err(string.format("vessel: mark '%s' already set, delete it first", mark))
+		return
 	end
 	if selected.loaded then
 		local mark_bufnr = vim.fn.bufnr(selected.file)
