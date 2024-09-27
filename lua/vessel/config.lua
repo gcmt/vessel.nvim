@@ -24,6 +24,22 @@ M.get = function(opts)
 	return vim.tbl_deep_extend("force", M._opts, opts or {})
 end
 
+--- Function used to sort marks
+---@param a Mark
+---@param b Mark
+---@return boolean
+local function sort_marks(a, b)
+	return a.lnum < b.lnum
+end
+
+--- Function used to sort mark groups
+---@param a string Path
+---@param b string Path
+---@return boolean
+local function sort_groups(a, b)
+	return a > b
+end
+
 --- Compute the 'height' of the popup
 --- This function should return an estimate only. This is needed only for correct
 --- positioning on the screen. The actual height will adjust to the content later
@@ -122,10 +138,11 @@ M.defaults = {
 	marks = {
 		locals = "abcdefghijklmnopqrstuvwxyz",
 		globals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+		sort_marks = sort_marks,
+		sort_groups = sort_groups,
 		toggle_mark = true,
 		use_backtick = false,
 		not_found = "No marks found",
-		sort_field = "lnum",
 		move_to_first_mark = true,
 		move_to_closest_mark = true,
 		proximity_threshold = 50,

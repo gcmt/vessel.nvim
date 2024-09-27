@@ -123,15 +123,12 @@ end
 
 --- Sort marks by the given field
 ---@param groups table
----@param field string
+---@param func function
 ---@return table
-local function sort_groups(groups, field)
+local function sort_marks(groups, func)
 	for _, group in pairs(groups) do
-		table.sort(group, function(a, b)
-			return a[field] < b[field]
-		end)
+		table.sort(group, func)
 	end
-	return groups
 end
 
 --- Return the list of both global and local marks
@@ -197,7 +194,13 @@ function Marklist:_get_marks(bufnr)
 			table.insert(groups[mark.file], mark)
 		end
 	end
-	return sort_groups(groups, self._app.config.marks.sort_field)
+	local ok, err = pcall(sort_marks, groups, self._app.config.marks.sort_marks)
+	if not ok then
+		local msg = string.gsub(tostring(err), "^.*:%s+", "")
+		self._app.logger:err("vessel: error while sorting marks: " .. msg)
+		return {}
+	end
+	return groups
 end
 
 ---Check that a mark has been already set
@@ -484,9 +487,13 @@ function Marklist:_render()
 	local _, groups_count = self:get_count()
 
 	local paths = vim.tbl_keys(self._marks)
-	table.sort(paths, function(a, b)
-		return a > b
-	end)
+	local ok, err = pcall(table.sort, paths, self._app.config.marks.sort_groups)
+	if not ok then
+		local msg = string.gsub(tostring(err), "^.*:%s+", "")
+		self._app.logger:err("vessel: error while sorting groups: " .. msg)
+		self._app:_close_window()
+		return {}
+	end
 
 	local i = 0
 	local map = {}
