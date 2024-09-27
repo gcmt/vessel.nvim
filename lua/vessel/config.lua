@@ -181,15 +181,16 @@ M.defaults = {
 
 	--- jumplist-related options
 	jumps = {
+		rel_virtual = true,
 		strip_lines = false,
 		filter_empty_lines = true,
 		not_found = "Jump list empty",
 		indicator = { "  > ", "    " },
 		show_colnr = false,
+		ctrl_o = "<c-o>",
+		ctrl_i = "<c-i>",
 		mappings = {
 			jump = { "l", "<cr>" },
-			ctrl_o = { "<c-o>" },
-			ctrl_i = { "<c-i>" },
 			close = { "q", "<esc>" },
 			clear = { "C" },
 		},

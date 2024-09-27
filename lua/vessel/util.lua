@@ -18,10 +18,10 @@ M.modes = {
 function M.keymap(mode, lhs, callback, opts)
 	opts = vim.tbl_extend("force", { nowait = true, buffer = true, }, opts or {})
 	if type(lhs) == "string" then
-		vim.keymap.set(mode, lhs, callback, opts)
+		vim.keymap.set(mode, lhs, function() callback(lhs) end, opts)
 	elseif type(lhs) == "table" then
 		for _, mapping in pairs(lhs) do
-			vim.keymap.set(mode, mapping, callback, opts)
+			vim.keymap.set(mode, mapping, function() callback(mapping) end, opts)
 		end
 	end
 end

@@ -23,8 +23,14 @@ function M.jump_formatter(jump, meta, context, config)
 		hl_pos = config.jumps.highlights.pos
 	end
 
-	local rel_fmt = "%" .. #tostring(meta.max_rel) .. "s"
-	local jump_rel = string.format(rel_fmt, math.abs(jump.rel))
+	local rel_fmt, jump_rel
+	if config.jumps.rel_virtual then
+		rel_fmt = "%" .. #tostring(meta.max_index) .. "s"
+		jump_rel = string.format(rel_fmt, math.abs(meta.current_index-meta.curpos_index))
+	else
+		rel_fmt = "%" .. #tostring(meta.max_rel) .. "s"
+		jump_rel = string.format(rel_fmt, math.abs(jump.rel))
+	end
 
 	local lnum_fmt = "%" .. #tostring(meta.max_lnum) .. "s"
 	local lnum = string.format(lnum_fmt, jump.lnum)

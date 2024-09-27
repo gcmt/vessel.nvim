@@ -131,15 +131,51 @@ function Jumplist:_action_clear(map)
 	self:_refresh()
 end
 
+--- Return the real count
+--- When config.rel_virtual == true, the count relative to the current position
+--- is translated to the actual position in the jump list of the targeted jump
+---@param map table
+---@param count integer
+---@param mapping string
+---@return integer
+function Jumplist:_get_real_count(map, count, mapping)
+	local line = 0
+	for i = 1, vim.fn.line("$") do
+		if map[i] and map[i].current then
+			line = i
+			break
+		end
+	end
+	mapping = string.gsub(mapping, "\\", "")
+	if mapping == self._app.config.jumps.ctrl_o then
+		line = line + count
+	elseif mapping == self._app.config.jumps.ctrl_i then
+		line = line - count
+	end
+	if line < 1 or line > vim.fn.line("$") then
+		error(string.format("invalid count (out of bound): %s", count), 2)
+	end
+	return math.abs(map[line].rel)
+end
+
 --- Execute a mapping in the context of the calling window.
 --- Why: executing <c-o> and <c-i> from the jumplist window does not work as
 --- expected as a new jump is being added to the jumplist due to the fact that
 --- we opened a new floating window with a new buffer
----
+---@param map table
 ---@param mapping string
-function Jumplist:_action_passthrough(mapping)
+function Jumplist:_action_passthrough(map, mapping)
+	local count = vim.v.count1
+	if self._app.config.jumps.rel_virtual then
+		local ok, val = pcall(Jumplist._get_real_count, self, map, count, mapping)
+		if not ok then
+			self._app.logger:warn(val)
+			return
+		end
+		count = val
+	end
 	self:_action_close()
-	local cmd = string.format('execute "normal! %s%s"', vim.v.count1, mapping)
+	local cmd = string.format('execute "normal! %s%s"', count, mapping)
 	vim.fn.win_execute(self._app.context.wininfo.winid, cmd)
 end
 
@@ -152,11 +188,13 @@ function Jumplist:_setup_mappings(map)
 	util.keymap("n", self._app.config.jumps.mappings.clear, function()
 		self:_action_clear(map)
 	end)
-	util.keymap("n", self._app.config.jumps.mappings.ctrl_o, function()
-		self:_action_passthrough("\\<c-o>")
+	util.keymap("n", self._app.config.jumps.ctrl_o, function(mapping)
+		local ctrl_o = string.gsub(mapping, "%b<>", "\\%1")
+		self:_action_passthrough(map, ctrl_o)
 	end)
-	util.keymap("n", self._app.config.jumps.mappings.ctrl_i, function()
-		self:_action_passthrough("\\<c-i>")
+	util.keymap("n", self._app.config.jumps.ctrl_i, function(mapping)
+		local ctrl_i = string.gsub(mapping, "%b<>", "\\%1")
+		self:_action_passthrough(map, ctrl_i)
 	end)
 	util.keymap("n", self._app.config.jumps.mappings.jump, function()
 		self:_action_jump(util.modes.BUFFER, map)
@@ -270,15 +308,19 @@ function Jumplist:_render()
 		end
 	end
 
-	local i = 0
 	local map = {}
 	local cursor_line = 1
 	local jump_formatter = self._app.config.jumps.formatters.jump
-
+	local max_index = #self._jumps
+	local curpos_index
 	local max_basename
 	local max_lnum, max_col, max_rel
 
-	for _, jump in ipairs(self._jumps) do
+	for i, jump in ipairs(self._jumps) do
+		if jump.current then
+			-- FIXME: lines can be skipped afterwards
+			curpos_index = i
+		end
 		if not max_lnum or jump.lnum > max_lnum then
 			max_lnum = jump.lnum
 		end
@@ -295,8 +337,12 @@ function Jumplist:_render()
 		end
 	end
 
+	local i = 0
 	for _, jump in ipairs(self._jumps) do
 		local ok, line, matches = pcall(jump_formatter, jump, {
+			current_index = i+1,
+			curpos_index = curpos_index,
+			max_index = max_index,
 			max_lnum = max_lnum,
 			max_col = max_col,
 			max_rel = max_rel,
