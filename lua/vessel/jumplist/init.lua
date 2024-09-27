@@ -3,6 +3,7 @@
 local util = require("vessel.util")
 
 ---@class Jump
+---@field current boolean
 ---@field pos integer
 ---@field rel integer
 ---@field bufnr integer
@@ -10,7 +11,6 @@ local util = require("vessel.util")
 ---@field lnum integer
 ---@field col integer
 ---@field line string
----@field loaded boolean
 local Jump = {}
 Jump.__index = Jump
 
@@ -19,6 +19,7 @@ Jump.__index = Jump
 function Jump:new()
 	local jump = {}
 	setmetatable(jump, Jump)
+	jump.current = false
 	jump.pos = 0
 	jump.rel = 0
 	jump.bufnr = -1
@@ -26,7 +27,6 @@ function Jump:new()
 	jump.lnum = 0
 	jump.col = 0
 	jump.line = ""
-	jump.loaded = false
 	return jump
 end
 
@@ -47,7 +47,6 @@ end
 ---@field _app App Reference to the main app
 ---@field _bufnr integer Where jumps will be rendered
 ---@field _jumps table Jumps list (unfiltered)
----@field _curpos integer Current postion in the jumplist
 ---@field _filter_func function?
 local Jumplist = {}
 Jumplist.__index = Jumplist
@@ -63,7 +62,6 @@ function Jumplist:new(app, filter_func)
 	jumps._app = app
 	jumps._bufnr = -1
 	jumps._jumps = {}
-	jumps._curpos = 0
 	jumps._filter_func = filter_func
 	return jumps
 end
@@ -71,7 +69,7 @@ end
 --- Initialize Jumplist
 ---@return Jumplist
 function Jumplist:init()
-	self._jumps, self._curpos = self:_get_jumps()
+	self._jumps = self:_get_jumps()
 	return self
 end
 
@@ -165,26 +163,27 @@ function Jumplist:_setup_mappings(map)
 	end)
 end
 
---- Retrun the jumplist and the last used jump position in the list
---- Both list and position are reversed
----@return table, integer
+--- Retrieve the jump list (reversed)
+---@return table
 function Jumplist:_get_jumps()
-	local winid = self._app.context.wininfo.winid
 	local jumps = {}
-	local list, curpos = unpack(vim.fn.getjumplist(winid))
+	-- when not currently traversing th jump,list with ctrl-o or ctrl-i,
+	-- #len == _curpos, otherwise '_curpos' is a valid 'list' index
+	local list, _curpos = unpack(vim.fn.getjumplist(self._app.context.wininfo.winid))
 	local len = #list
-	-- when outside jumplist, #len == pos
-	local pos = math.max(len - curpos, 1)
+	local curpos = math.max(len - _curpos, 1)
 
 	for i, j in ipairs(list) do
 		local jump = Jump:new()
+		jump.current = len - i + 1 == curpos
+		-- jump.pos is the position in the real jumplist
 		jump.pos = len + 1 - i
-		jump.rel = len == curpos and -jump.pos or pos - jump.pos
+		-- position relative to the current jump position
+		jump.rel = len == _curpos and -jump.pos or curpos - jump.pos
 		jump.bufnr = j.bufnr
 		jump.line = ""
 		jump.lnum = j.lnum
 		jump.col = j.col
-		jump.loaded = true
 
 		-- both nvim_buf_get_name() and bufload() fail if buffer does not exist
 		if vim.fn.bufexists(j.bufnr) == 0 then
@@ -200,7 +199,7 @@ function Jumplist:_get_jumps()
 		local line = vim.fn.getbufline(jump.bufnr, jump.lnum)
 		if #line == 1 then
 			jump.line = line[1]
-			if self:_filter(jump, self._app.context) or pos == jump.pos then
+			if self:_filter(jump, self._app.context) or curpos == jump.pos then
 				table.insert(jumps, jump)
 			end
 		end
@@ -213,7 +212,7 @@ function Jumplist:_get_jumps()
 		return a.pos < b.pos
 	end)
 
-	return jumps, pos
+	return jumps
 end
 
 --- Filter a single jump
@@ -304,7 +303,6 @@ function Jumplist:_render()
 			max_basename = max_basename,
 			max_unique = max_unique,
 			uniques = uniques,
-			current_pos = self._curpos,
 		}, self._app.context, self._app.config)
 		if not ok then
 			self._app:_close_window()
@@ -319,7 +317,7 @@ function Jumplist:_render()
 			if matches then
 				util.set_matches(matches, i, self._bufnr, self._nsid)
 			end
-			if self._curpos == jump.pos then
+			if jump.current then
 				cursor_line = i
 			end
 		end

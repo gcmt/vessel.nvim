@@ -15,7 +15,7 @@ function M.jump_formatter(jump, meta, context, config)
 	local indicator = ""
 	local hl_pos = ""
 
-	if jump.pos == meta.current_pos then
+	if jump.current then
 		indicator = config.jumps.indicator[1]
 		hl_pos = config.jumps.highlights.current_pos
 	else
