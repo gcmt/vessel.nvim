@@ -30,7 +30,6 @@ end
 ---@return string?, table?
 function M.mark_formatter(ctx, config)
 	local prefix = get_prefix(ctx, config)
-	local line = string.gsub(ctx.mark.line, "^%s+", "")
 
 	local lnum_fmt = "%" .. #tostring(ctx.max_group_lnum) .. "s"
 	local lnum = string.format(lnum_fmt, ctx.mark.lnum)
@@ -41,6 +40,10 @@ function M.mark_formatter(ctx, config)
 		col = " " .. string.format(col_fmt, ctx.mark.col)
 	end
 
+	local line = ctx.mark.line
+	if config.marks.strip_lines then
+		line = string.gsub(line, "^%s+", "")
+	end
 	local line_hl = { line, config.marks.highlights.line }
 	if not ctx.mark.loaded then
 		line = util.prettify_path(ctx.mark.file)

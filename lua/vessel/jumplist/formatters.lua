@@ -36,7 +36,10 @@ function M.jump_formatter(ctx, config)
 	local path_fmt = "%-" .. ctx.max_unique .. "s"
 	local path = string.format(path_fmt, ctx.uniques[ctx.jump.bufpath])
 
-	local line = string.gsub(ctx.jump.line, "^%s+", "")
+	local line = ctx.jump.line
+	if config.jumps.strip_lines then
+		line = string.gsub(line, "^%s+", "")
+	end
 
 	return util.format(
 		"%s%s  %s  %s%s  %s",

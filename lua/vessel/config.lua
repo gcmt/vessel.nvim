@@ -132,6 +132,7 @@ M.defaults = {
 		force_header = false,
 		decorations = { "├ ", "└ " },
 		show_colnr = false,
+		strip_lines = true,
 		formatters = {
 			mark = marks_formatters.mark_formatter,
 			header = marks_formatters.header_formatter,
@@ -163,6 +164,7 @@ M.defaults = {
 
 	--- jumplist-related options
 	jumps = {
+		strip_lines = false,
 		filter_empty_lines = true,
 		not_found = "Jump list empty",
 		indicator = { "  > ", "    " },
