@@ -79,6 +79,14 @@ function M.view_local_jumps(opts)
 	end)
 end
 
+--- Open the jump list window with only entries outside the current buffer
+---@param opts table? Config overrides
+function M.view_external_jumps(opts)
+	M.view_jumps(opts, function(jump, context)
+		return jump.bufnr ~= context.bufnr
+	end)
+end
+
 --- Main setup funtion. Loads user options
 --- Any option passed to this function can still be overridden afterwards by
 --- passing options to api functions
@@ -124,6 +132,10 @@ end)
 
 vim.keymap.set("n", "<plug>(VesselViewLocalJumps)", function()
 	M.view_local_jumps()
+end)
+
+vim.keymap.set("n", "<plug>(VesselViewExternalJumps)", function()
+	M.view_external_jumps()
 end)
 
 return M
