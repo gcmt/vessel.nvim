@@ -45,6 +45,22 @@ function M.view_local_marks(opts)
 	end)
 end
 
+--- Open the mark list window with only global marks
+---@param opts table? Config overrides
+function M.view_global_marks(opts)
+	M.view_marks(opts, function(mark, context)
+		return string.match(mark.mark, "%u")
+	end)
+end
+
+--- Open the mark list window with only external marks
+---@param opts table? Config overrides
+function M.view_external_marks(opts)
+	M.view_marks(opts, function(mark, context)
+		return mark.file ~= context.bufpath
+	end)
+end
+
 --- Open the jump list window
 ---@param opts table? Config overrides
 ---@param filter_func function?
@@ -84,6 +100,14 @@ end)
 
 vim.keymap.set("n", "<plug>(VesselViewLocalMarks)", function()
 	M.view_local_marks()
+end)
+
+vim.keymap.set("n", "<plug>(VesselViewGlobalMarks)", function()
+	M.view_global_marks()
+end)
+
+vim.keymap.set("n", "<plug>(VesselViewExternalMarks)", function()
+	M.view_external_marks()
 end)
 
 vim.keymap.set("n", "<plug>(VesselSetLocalMark)", function()
