@@ -48,7 +48,7 @@ function M.mark_formatter(ctx, config)
 	end
 
 	return util.format(
-		"%s%s  %s%s  %s",
+		" %s%s  %s%s  %s",
 		{ prefix, config.marks.highlights.decorations },
 		{ ctx.mark.mark, config.marks.highlights.mark },
 		{ lnum, config.marks.highlights.lnum },
@@ -66,7 +66,7 @@ function M.header_formatter(ctx, config)
 	if ctx.groups_count == 1 and not config.marks.force_header and ctx.file == ctx.cur_bufpath then
 		return nil
 	end
-	return util.format("%s", { util.prettify_path(ctx.file), config.marks.highlights.path })
+	return util.format(" %s", { util.prettify_path(ctx.file), config.marks.highlights.path })
 end
 
 return M
