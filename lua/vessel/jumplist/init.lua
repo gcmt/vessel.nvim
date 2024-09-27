@@ -181,15 +181,20 @@ function Jumplist:_get_jumps()
 		jump.pos = len + 1 - i
 		jump.rel = len == curpos and -jump.pos or pos - jump.pos
 		jump.bufnr = j.bufnr
-		jump.bufpath = vim.api.nvim_buf_get_name(j.bufnr)
 		jump.line = ""
 		jump.lnum = j.lnum
 		jump.col = j.col
 		jump.loaded = true
 
+		-- both nvim_buf_get_name() and bufload() fail if buffer does not exist
+		if vim.fn.bufexists(j.bufnr) == 0 then
+			goto continue
+		end
+
 		-- buffers are already added to the buffer list as soon as you execute
 		-- :jumps or call getjumplist(), might as well load anyway
 		vim.fn.bufload(jump.bufnr)
+		jump.bufpath = vim.api.nvim_buf_get_name(j.bufnr)
 
 		-- getbufline() returns empty table for invalid (out of bound) lines
 		local line = vim.fn.getbufline(jump.bufnr, jump.lnum)
@@ -199,6 +204,8 @@ function Jumplist:_get_jumps()
 				table.insert(jumps, jump)
 			end
 		end
+
+		::continue::
 	end
 
 	-- most recent first
