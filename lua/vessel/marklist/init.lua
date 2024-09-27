@@ -333,6 +333,31 @@ function Marklist:_action_next_group(map, backwards)
 	end
 end
 
+--- Execute a mapping in the context of the "calling" window.
+---@param mapping string
+function Marklist:_action_passthrough(mapping)
+	self:_action_close()
+	local cmd = string.format('execute "normal! %s%s"', vim.v.count1, mapping)
+	vim.fn.win_execute(self._app.context.wininfo.winid, cmd)
+end
+
+--- Allow jumping to marks with the classic '
+--- Jumping to UPPERCASE marks would work without this function,
+--- but for lowercase marks we need to execute the mapping in the context of the
+--- current buffer
+---@param map table
+---@param typ string
+---@param mark string
+function Marklist:_action_jump_passthrough(map, typ, mark)
+	for _, entry in pairs(map) do
+		if type(entry) == "table" then
+			if entry.mark == mark then
+				self:_action_passthrough(typ .. entry.mark)
+			end
+		end
+	end
+end
+
 --- Change mark on the current line
 ---@param map table
 ---@param mark string
@@ -410,6 +435,12 @@ function Marklist:_setup_mappings(map)
 	for _, mark in pairs(vim.split(marks, "")) do
 		util.keymap("n", "m" .. mark, function()
 			self:_action_change_mark(map, mark)
+		end)
+		util.keymap("n", "'" .. mark, function()
+			self:_action_jump_passthrough(map, "'", mark)
+		end)
+		util.keymap("n", "`" .. mark, function()
+			self:_action_jump_passthrough(map, "`", mark)
 		end)
 	end
 end
