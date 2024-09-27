@@ -5,55 +5,59 @@ local util = require("vessel.util")
 local M = {}
 
 --- Return line prefix
----@param ctx table
----@param config table
+---@param mark Mark The mark entry being formatted
+---@param meta table Information about the mark or other mark entries
+---@param context table Information the current buffer/window
+---@param config table Configuration
 ---@return string
-local function get_prefix(ctx, config)
+local function get_prefix(mark, meta, context, config)
 	if
-		ctx.groups_count == 1
+		meta.groups_count == 1
 		and not config.marks.force_header
-		and ctx.mark.file == ctx.cur_bufpath
+		and mark.file == context.bufpath
 	then
 		return " "
 	end
 	local decorations = config.marks.decorations
 	if decorations and #decorations == 2 then
-		return ctx.is_last and decorations[2] or decorations[1]
+		return meta.is_last and decorations[2] or decorations[1]
 	end
 	return ""
 end
 
 --- Default formatter for a single mark line
 --- Return nil to skip rendering the line
----@param ctx table
----@param config table
+---@param mark Mark The mark entry being formatted
+---@param meta table Information about the mark or other mark entries
+---@param context table Information the current buffer/window
+---@param config table Configuration
 ---@return string?, table?
-function M.mark_formatter(ctx, config)
-	local prefix = get_prefix(ctx, config)
+function M.mark_formatter(mark, meta, context, config)
+	local prefix = get_prefix(mark, meta, context, config)
 
-	local lnum_fmt = "%" .. #tostring(ctx.max_group_lnum) .. "s"
-	local lnum = string.format(lnum_fmt, ctx.mark.lnum)
+	local lnum_fmt = "%" .. #tostring(meta.max_group_lnum) .. "s"
+	local lnum = string.format(lnum_fmt, mark.lnum)
 
 	local col = ""
 	if config.marks.show_colnr then
-		local col_fmt = "%" .. #tostring(ctx.max_group_col) .. "s"
-		col = " " .. string.format(col_fmt, ctx.mark.col)
+		local col_fmt = "%" .. #tostring(meta.max_group_col) .. "s"
+		col = " " .. string.format(col_fmt, mark.col)
 	end
 
-	local line = ctx.mark.line
+	local line = mark.line
 	if config.marks.strip_lines then
 		line = string.gsub(line, "^%s+", "")
 	end
 	local line_hl = { line, config.marks.highlights.line }
-	if not ctx.mark.loaded then
-		line = util.prettify_path(ctx.mark.file)
+	if not mark.loaded then
+		line = util.prettify_path(mark.file)
 		line_hl = { line, config.marks.highlights.not_loaded }
 	end
 
 	return util.format(
 		" %s%s  %s%s  %s",
 		{ prefix, config.marks.highlights.decorations },
-		{ ctx.mark.mark, config.marks.highlights.mark },
+		{ mark.mark, config.marks.highlights.mark },
 		{ lnum, config.marks.highlights.lnum },
 		{ col, config.marks.highlights.col },
 		line_hl
@@ -62,14 +66,16 @@ end
 
 --- Default formatter for a group header line (mark file path)
 --- Return nil to skip rendering the line
----@param ctx table
----@param config table
+---@param path string The header file path
+---@param meta table Information about marks in the group or other groups
+---@param context table Information the current buffer/window
+---@param config table Configuration
 ---@return string?, table?
-function M.header_formatter(ctx, config)
-	if ctx.groups_count == 1 and not config.marks.force_header and ctx.file == ctx.cur_bufpath then
+function M.header_formatter(path, meta, context, config)
+	if meta.groups_count == 1 and not config.marks.force_header and path == context.bufpath then
 		return nil
 	end
-	return util.format(" %s", { util.prettify_path(ctx.file), config.marks.highlights.path })
+	return util.format(" %s", { util.prettify_path(path), config.marks.highlights.path })
 end
 
 return M

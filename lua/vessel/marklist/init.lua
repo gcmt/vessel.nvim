@@ -494,14 +494,15 @@ function Marklist:_render()
 	local i = 0
 	local map = {}
 
+	local mark_formatter = self._app.config.marks.formatters.mark
+	local header_formatter = self._app.config.marks.formatters.header
+
 	for _, path in pairs(paths) do
 		local group = self._marks[path]
 
-		local ok, line, matches = pcall(self._app.config.marks.formatters.header, {
-			file = path,
-			cur_bufpath = self._app.context.bufpath,
+		local ok, line, matches = pcall(header_formatter, path, {
 			groups_count = groups_count,
-		}, self._app.config)
+		}, self._app.context, self._app.config)
 		if not ok then
 			self._app:_close_window()
 			local msg = string.gsub(tostring(line), "^.*:%s+", "")
@@ -530,15 +531,13 @@ function Marklist:_render()
 		local k = 0
 		for _, mark in ipairs(group) do
 			k = k + 1
-			ok, line, matches = pcall(self._app.config.marks.formatters.mark, {
-				mark = mark,
+			ok, line, matches = pcall(mark_formatter, mark, {
 				pos = k,
 				is_last = k == #group,
-				cur_bufpath = self._app.context.bufpath,
 				groups_count = groups_count,
 				max_group_lnum = max_lnum,
 				max_group_col = max_col,
-			}, self._app.config)
+			}, self._app.context, self._app.config)
 			if not ok then
 				self._app:_close_window()
 				local msg = string.gsub(tostring(line), "^.*:%s+", "")

@@ -6,14 +6,16 @@ local M = {}
 
 --- Default formatter for a single jump item
 --- Return nil to skip rendering the line
----@param ctx table
----@param config table
+---@param jump Jump The jump entry being formatted
+---@param meta table Meta nformation about the jump or other jump entries
+---@param context table Information the current buffer/window
+---@param config table Configuration
 ---@return string?, table?
-function M.jump_formatter(ctx, config)
+function M.jump_formatter(jump, meta, context, config)
 	local indicator = ""
 	local hl_pos = ""
 
-	if ctx.jump.pos == ctx.current_pos then
+	if jump.pos == meta.current_pos then
 		indicator = config.jumps.indicator[1]
 		hl_pos = config.jumps.highlights.current_pos
 	else
@@ -21,22 +23,22 @@ function M.jump_formatter(ctx, config)
 		hl_pos = config.jumps.highlights.pos
 	end
 
-	local rel_fmt = "%" .. #tostring(ctx.max_rel) .. "s"
-	local jump_rel = string.format(rel_fmt, math.abs(ctx.jump.rel))
+	local rel_fmt = "%" .. #tostring(meta.max_rel) .. "s"
+	local jump_rel = string.format(rel_fmt, math.abs(jump.rel))
 
-	local lnum_fmt = "%" .. #tostring(ctx.max_lnum) .. "s"
-	local lnum = string.format(lnum_fmt, ctx.jump.lnum)
+	local lnum_fmt = "%" .. #tostring(meta.max_lnum) .. "s"
+	local lnum = string.format(lnum_fmt, jump.lnum)
 
 	local col = ""
 	if config.jumps.show_colnr then
-		local col_fmt = "%" .. #tostring(ctx.max_col) .. "s"
-		col = "  " .. string.format(col_fmt, ctx.jump.col)
+		local col_fmt = "%" .. #tostring(meta.max_col) .. "s"
+		col = "  " .. string.format(col_fmt, jump.col)
 	end
 
-	local path_fmt = "%-" .. ctx.max_unique .. "s"
-	local path = string.format(path_fmt, ctx.uniques[ctx.jump.bufpath])
+	local path_fmt = "%-" .. meta.max_unique .. "s"
+	local path = string.format(path_fmt, meta.uniques[jump.bufpath])
 
-	local line = ctx.jump.line
+	local line = jump.line
 	if config.jumps.strip_lines then
 		line = string.gsub(line, "^%s+", "")
 	end

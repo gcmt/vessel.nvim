@@ -267,6 +267,7 @@ function Jumplist:_render()
 	local i = 0
 	local map = {}
 	local cursor_line = 1
+	local jump_formatter = self._app.config.jumps.formatters.jump
 
 	local max_basename
 	local max_lnum, max_col, max_rel
@@ -289,7 +290,7 @@ function Jumplist:_render()
 	end
 
 	for _, jump in ipairs(self._jumps) do
-		local ok, line, matches = pcall(self._app.config.jumps.formatters.jump, {
+		local ok, line, matches = pcall(jump_formatter, jump, {
 			max_lnum = max_lnum,
 			max_col = max_col,
 			max_rel = max_rel,
@@ -297,8 +298,7 @@ function Jumplist:_render()
 			max_unique = max_unique,
 			uniques = uniques,
 			current_pos = self._curpos,
-			jump = jump,
-		}, self._app.config)
+		}, self._app.context, self._app.config)
 		if not ok then
 			self._app:_close_window()
 			local msg = string.gsub(tostring(line), "^.*:%s+", "")
