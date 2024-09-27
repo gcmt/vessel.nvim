@@ -82,16 +82,10 @@ function Jumplist:open()
 	end
 end
 
---- Return total jumps count with filters applied
+--- Return total jumps count
 ---@return integer, integer
 function Jumplist:get_count()
-	local count = 0
-	for _, jump in pairs(self._jumps) do
-		if self:_filter(jump, self._app.context) then
-			count = count + 1
-		end
-	end
-	return count, 1
+	return #self._jumps, 1
 end
 
 --- Close the jump list window
