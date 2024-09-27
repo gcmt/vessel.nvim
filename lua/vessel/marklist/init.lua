@@ -269,14 +269,13 @@ end
 ---@param mode integer
 ---@param map table
 ---@param keepjumps boolean
----@param close_handler function
-function Marklist:_action_jump(mode, map, keepjumps, close_handler)
+function Marklist:_action_jump(mode, map, keepjumps)
 	local selected = map[vim.fn.line(".")]
 	if not selected then
 		return
 	end
 
-	close_handler()
+	self:_action_close()
 
 	local keepj = keepjumps and "keepj " or ""
 
@@ -404,9 +403,6 @@ end
 --- Setup mappings for the mark window
 ---@param map table
 function Marklist:_setup_mappings(map)
-	local close_handler = function()
-		return self:_action_close()
-	end
 	util.keymap("n", self._app.config.marks.mappings.close, function()
 		self:_action_close()
 	end)
@@ -420,28 +416,28 @@ function Marklist:_setup_mappings(map)
 		self:_action_next_group(map, true)
 	end)
 	util.keymap("n", self._app.config.marks.mappings.jump, function()
-		self:_action_jump(util.modes.BUFFER, map, false, close_handler)
+		self:_action_jump(util.modes.BUFFER, map, false)
 	end)
 	util.keymap("n", self._app.config.marks.mappings.keepj_jump, function()
-		self:_action_jump(util.modes.BUFFER, map, true, close_handler)
+		self:_action_jump(util.modes.BUFFER, map, true)
 	end)
 	util.keymap("n", self._app.config.marks.mappings.tab, function()
-		self:_action_jump(util.modes.TAB, map, false, close_handler)
+		self:_action_jump(util.modes.TAB, map, false)
 	end)
 	util.keymap("n", self._app.config.marks.mappings.keepj_tab, function()
-		self:_action_jump(util.modes.TAB, map, true, close_handler)
+		self:_action_jump(util.modes.TAB, map, true)
 	end)
 	util.keymap("n", self._app.config.marks.mappings.split, function()
-		self:_action_jump(util.modes.SPLIT, map, false, close_handler)
+		self:_action_jump(util.modes.SPLIT, map, false)
 	end)
 	util.keymap("n", self._app.config.marks.mappings.keepj_split, function()
-		self:_action_jump(util.modes.SPLIT, map, true, close_handler)
+		self:_action_jump(util.modes.SPLIT, map, true)
 	end)
 	util.keymap("n", self._app.config.marks.mappings.vsplit, function()
-		self:_action_jump(util.modes.VSPLIT, map, false, close_handler)
+		self:_action_jump(util.modes.VSPLIT, map, false)
 	end)
 	util.keymap("n", self._app.config.marks.mappings.keepj_vsplit, function()
-		self:_action_jump(util.modes.VSPLIT, map, true, close_handler)
+		self:_action_jump(util.modes.VSPLIT, map, true)
 	end)
 
 	local marks = self._app.config.marks.globals .. self._app.config.marks.locals
