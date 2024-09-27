@@ -130,10 +130,7 @@ function Jumplist:_action_clear(map)
 		return
 	end
 	vim.fn.win_execute(self._app.context.wininfo.winid, "clearjumps")
-	local line = vim.fn.line(".")
-	self._jumps, self._curpos = self:_get_jumps()
-	self:_render()
-	util.vcursor(line, 1)
+	self:_refresh()
 end
 
 --- Execute a mapping in the context of the calling window.
@@ -224,6 +221,16 @@ function Jumplist:_filter(jump, context)
 		return false
 	end
 	return true
+end
+
+--- Re-render the buffer with new jumps
+---@return table
+function Jumplist:_refresh()
+	local line = vim.fn.line(".")
+	self:init()
+	local map = self:_render()
+	util.vcursor(line, 1)
+	return map
 end
 
 --- Render the jump list in the given buffer
