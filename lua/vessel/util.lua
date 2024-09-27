@@ -191,7 +191,7 @@ function M.format(fmt, ...)
 	local splits = vim.split(fmt, "%%s", { trimempty = false })
 	local repl = { ... }
 	if #repl < #splits - 1 then
-		local msg = "vessel: format(): got %d arguments, expected at least %d"
+		local msg = "format(): got %d arguments, expected at least %d"
 		error(string.format(msg, #repl, #splits - 1), 2)
 		return "", nil
 	end

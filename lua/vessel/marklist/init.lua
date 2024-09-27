@@ -117,7 +117,7 @@ function Marklist:set_mark(global)
 		end
 	end
 
-	self._app.logger:warn("Vessel: no more available marks")
+	self._app.logger:warn("no more available marks")
 	return false
 end
 
@@ -197,7 +197,7 @@ function Marklist:_get_marks(bufnr)
 	local ok, err = pcall(sort_marks, groups, self._app.config.marks.sort_marks)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
-		self._app.logger:err("vessel: error while sorting marks: " .. msg)
+		self._app.logger:err("error while sorting marks: " .. msg)
 		return {}
 	end
 	return groups
@@ -384,20 +384,20 @@ function Marklist:_action_change_mark(map, mark)
 		return
 	end
 	if self:_mark_exists(mark) then
-		self._app.logger:err(string.format("vessel: mark '%s' already set, delete it first", mark))
+		self._app.logger:err(string.format("mark '%s' already set, delete it first", mark))
 		return
 	end
 	if selected.loaded then
 		local mark_bufnr = vim.fn.bufnr(selected.file)
 		if string.match(mark, "%l") and mark_bufnr ~= self._app.context.bufnr then
-			self._app.logger:err("vessel: local marks can be set only for the current buffer")
+			self._app.logger:err("local marks can be set only for the current buffer")
 			return
 		end
 		vim.fn.win_execute(self._app.context.wininfo.winid, "delmarks " .. selected.mark)
 		vim.api.nvim_buf_set_mark(mark_bufnr, mark, selected.lnum, selected.col, {})
 		self:_refresh()
 	else
-		self._app.logger:err("vessel: cannot change mark, buffer not loaded")
+		self._app.logger:err("cannot change mark, buffer not loaded")
 	end
 end
 
@@ -490,7 +490,7 @@ function Marklist:_render()
 	local ok, err = pcall(table.sort, paths, self._app.config.marks.sort_groups)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
-		self._app.logger:err("vessel: error while sorting groups: " .. msg)
+		self._app.logger:err("error while sorting groups: " .. msg)
 		self._app:_close_window()
 		return {}
 	end
@@ -509,7 +509,7 @@ function Marklist:_render()
 		if not ok then
 			self._app:_close_window()
 			local msg = string.gsub(tostring(line), "^.*:%s+", "")
-			self._app.logger:err("vessel: header formatter error: " .. msg)
+			self._app.logger:err("header formatter error: " .. msg)
 			return {}
 		end
 		if line then
@@ -546,7 +546,7 @@ function Marklist:_render()
 			if not ok then
 				self._app:_close_window()
 				local msg = string.gsub(tostring(line), "^.*:%s+", "")
-				self._app.logger:err("vessel: mark formatter error: " .. msg)
+				self._app.logger:err("mark formatter error: " .. msg)
 				return {}
 			end
 			if line then

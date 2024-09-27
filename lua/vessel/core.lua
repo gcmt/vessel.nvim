@@ -23,6 +23,7 @@ function App:new(config)
 	app.config = config
 	app.context = Context:new()
 	app.logger = Logger:new(config.verbosity)
+	app.logger:set_prefixes({ err = "vessel: "})
 	app.bufnr = -1
 	app.winid = -1
 	return app
@@ -119,7 +120,7 @@ function App:open_window(list)
 		self.winid = vim.api.nvim_open_win(self.bufnr, true, popup_opts)
 		self:_setup_window(self.winid)
 	else
-		self.logger:info("vessel: window already open")
+		self.logger:warn("window already open")
 		return self.bufnr, false
 	end
 	return self.bufnr, true
