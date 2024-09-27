@@ -8,23 +8,15 @@ In order to create commands and potentially override any default option you can 
 
 Calling the `setup` function is not required for using the plugin as internal `<Plug>` mappings are automatically created and *api* functions are lazily defined and ready to be used.
 
-**Commands are not automatically created for you**. In order to create them, you can override the `create_commands` option. As you can see, you can even decide the commands names.
+**Commands are not automatically created**. In order to create them, you can override the `create_commands` option. As you can see, you can even decide the commands names.
 
 ```lua
 require("vessel").setup({
   ...
-  marks = {
     create_commands = true,
     commands = {
-      view = "Marks",
-      set_local = "Mark"
-      set_global = "Markg"
-    },
-  },
-  jumps = {
-    create_commands = true,
-    commands = {
-      view = "Jumps",
+      view_marks = "Marks",
+      view_jumps = "Jumps"
     },
   },
   ...
@@ -58,21 +50,19 @@ vim.keymap.set("n", "m,", require('vessel').set_global_mark)
 
 #### Setting a buffer-local mark
 
-- `:Mark` (customizable via `{ marks = { commands = { set_local = "Mark" } } }`)
 - `require("vessel").set_local_mark(opts)`
 
 Automatically set a local mark (lowercase) on the current line. Local marks are only visible inside the current buffer. If you call the function (or execute the command) again on a marked line, the mark will be removed. Takes a single optional `opts` table argument if you want to override the default options or and every option you provided to the `setup` function.
 
 #### Setting a global mark
 
-- `:Markg` (customizable via `{ marks = { commands = { set_global = "Markg" } } }`)
 - `require("vessel").set_global_mark(opts)`
 
 Automatically set a gloabl mark (uppercase) on the current line. Global marks are also visible outside the current buffers. If you call the function (or execute the command) again on a marked line, the mark will be removed. Takes a single optional `opts` table argument if you want to override the default options or the ones you passd to the `setup` function.
 
 #### View marks
 
-- `:Marks` (customizable via: `{ marks = { commands = { view = "Marks" } } }`)
+- `:Marks` (customizable via: `{ commands = { view_marks = "Marks" } }`)
 - `require("vessel").view_marks(opts)`
 
 Open a nicely formatted window with all defined `[a-z][A-Z]` marks. By default, you can:
@@ -110,7 +100,7 @@ vim.keymap.set("n", "gL", require('vessel').view_local_jumps)
 
 #### Viewing the jump list
 
-- `:Jumps` (customizable via: `{ jumps = { commands = { view = "Jumps" } } }`)
+- `:Jumps` (customizable via: `{ commands = { view_jumps = "Jumps" } }`)
 - `require("vessel").view_jumps(opts, filter_func)`
 
 Open a nicely formatted window with the jumlist for the current window. By default jumps to empty lines are hidden and so are invalid jump entries. Jumps are displayed top to bottom, most recent on top.

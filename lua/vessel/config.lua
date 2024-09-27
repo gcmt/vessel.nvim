@@ -111,6 +111,13 @@ M.defaults = {
 		},
 	},
 
+	-- default commands
+	create_commands = false,
+	commands = {
+		view_marks = "Marks",
+		view_jumps = "Jumps",
+	},
+
 	--- marklist-related options
 	marks = {
 		locals = "abcdefghijklmnopqrstuvwxyz",
@@ -122,15 +129,9 @@ M.defaults = {
 		move_to_first_mark = true,
 		move_to_closest_mark = true,
 		proximity_threshold = 50,
-		create_commands = false,
 		force_header = false,
 		decorations = { "├ ", "└ " },
 		show_colnr = false,
-		commands = {
-			view = "Marks",
-			set_local = "Mark",
-			set_global = "Markg",
-		},
 		formatters = {
 			mark = marks_formatters.mark_formatter,
 			header = marks_formatters.header_formatter,
@@ -166,10 +167,6 @@ M.defaults = {
 		not_found = "Jump list empty",
 		indicator = { "  > ", "    " },
 		show_colnr = false,
-		create_commands = false,
-		commands = {
-			view = "Jumps",
-		},
 		mappings = {
 			jump = { "l", "<cr>" },
 			ctrl_o = { "<c-o>" },

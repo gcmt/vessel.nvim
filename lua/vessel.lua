@@ -68,21 +68,11 @@ end
 --- passing options to api functions
 function M.setup(opts)
 	local config = require("vessel.config").load(opts)
-
-	if config.marks.create_commands then
-		vim.api.nvim_create_user_command(config.marks.commands.view, function(_)
+	if config.create_commands then
+		vim.api.nvim_create_user_command(config.commands.view_marks, function(_)
 			M.view_marks()
 		end, { nargs = 0 })
-		vim.api.nvim_create_user_command(config.marks.commands.set_local, function(_)
-			M.set_local_mark()
-		end, { nargs = 0 })
-		vim.api.nvim_create_user_command(config.marks.commands.set_global, function(_)
-			M.set_global_mark()
-		end, { nargs = 0 })
-	end
-
-	if config.jumps.create_commands then
-		vim.api.nvim_create_user_command(config.jumps.commands.view, function(_)
+		vim.api.nvim_create_user_command(config.commands.view_jumps, function(_)
 			M.view_jumps()
 		end, { nargs = 0 })
 	end
@@ -108,7 +98,6 @@ vim.keymap.set("n", "<plug>(VesselViewJumps)", function()
 	M.view_jumps()
 end)
 
---- Filter out jumps not belonging to the current buffer
 vim.keymap.set("n", "<plug>(VesselViewLocalJumps)", function()
 	M.view_local_jumps()
 end)
