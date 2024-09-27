@@ -45,6 +45,7 @@ end
 ---@class Jumplist
 ---@field _nsid integer Namespace id for highlighting
 ---@field _app App Reference to the main app
+---@field _bufnr integer Where jumps will be rendered
 ---@field _jumps table Jumps list (unfiltered)
 ---@field _curpos integer Current postion in the jumplist
 ---@field _filter_func function?
@@ -60,6 +61,7 @@ function Jumplist:new(app, filter_func)
 	setmetatable(jumps, Jumplist)
 	jumps._nsid = vim.api.nvim_create_namespace("__vessel__")
 	jumps._app = app
+	jumps._bufnr = -1
 	jumps._jumps = {}
 	jumps._curpos = 0
 	jumps._filter_func = filter_func
@@ -76,9 +78,10 @@ end
 --- Open the window and render the content
 function Jumplist:open()
 	self:init()
-	local bufnr, ok = self._app:open_window(self)
+	local ok
+	self._bufnr, ok = self._app:open_window(self)
 	if ok then
-		self:_render(bufnr)
+		self:_render()
 	end
 end
 
@@ -121,7 +124,7 @@ function Jumplist:_action_jump(mode, map)
 end
 
 --- Clear all jumps for the current window
-function Jumplist:_action_clear(map, bufnr)
+function Jumplist:_action_clear(map)
 	local selected = map[vim.fn.line(".")]
 	if not selected then
 		return
@@ -129,7 +132,7 @@ function Jumplist:_action_clear(map, bufnr)
 	vim.fn.win_execute(self._app.context.wininfo.winid, "clearjumps")
 	local line = vim.fn.line(".")
 	self._jumps, self._curpos = self:_get_jumps()
-	self:_render(bufnr)
+	self:_render()
 	util.vcursor(line, 1)
 end
 
@@ -147,13 +150,12 @@ end
 
 --- Setup mappings for the jumplist window
 ---@param map table
----@param bufnr integer
-function Jumplist:_setup_mappings(map, bufnr)
+function Jumplist:_setup_mappings(map)
 	util.keymap("n", self._app.config.jumps.mappings.close, function()
 		self:_action_close()
 	end)
 	util.keymap("n", self._app.config.jumps.mappings.clear, function()
-		self:_action_clear(map, bufnr)
+		self:_action_clear(map)
 	end)
 	util.keymap("n", self._app.config.jumps.mappings.ctrl_o, function()
 		self:_action_passthrough("\\<c-o>")
@@ -225,18 +227,17 @@ function Jumplist:_filter(jump, context)
 end
 
 --- Render the jump list in the given buffer
----@params bufnr integer
 ---@return table Table mapping each line to the jump displayed on it
-function Jumplist:_render(bufnr)
-	vim.fn.setbufvar(bufnr, "&modifiable", 1)
-	-- Note: vim.fn.deletebufline(bufnr, 1, "$") produces an unwanted message
+function Jumplist:_render()
+	vim.fn.setbufvar(self._bufnr, "&modifiable", 1)
+	-- Note: vim.fn.deletebufline(self._bufnr, 1, "$") produces an unwanted message
 	vim.cmd('sil! keepj norm! gg"_dG')
-	vim.api.nvim_buf_clear_namespace(bufnr, self._nsid, 1, -1)
+	vim.api.nvim_buf_clear_namespace(self._bufnr, self._nsid, 1, -1)
 
 	if #self._jumps == 0 then
-		vim.fn.setbufline(bufnr, 1, self._app.config.jumps.not_found)
-		vim.fn.setbufvar(bufnr, "&modifiable", 0)
-		self:_setup_mappings({}, bufnr)
+		vim.fn.setbufline(self._bufnr, 1, self._app.config.jumps.not_found)
+		vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
+		self:_setup_mappings({})
 		util.fit_content(self._app.config.window.max_height)
 		return {}
 	end
@@ -299,9 +300,9 @@ function Jumplist:_render(bufnr)
 		if line then
 			i = i + 1
 			map[i] = jump
-			vim.fn.setbufline(bufnr, i, line)
+			vim.fn.setbufline(self._bufnr, i, line)
 			if matches then
-				util.set_matches(matches, i, bufnr, self._nsid)
+				util.set_matches(matches, i, self._bufnr, self._nsid)
 			end
 			if self._curpos == jump.pos then
 				cursor_line = i
@@ -309,9 +310,9 @@ function Jumplist:_render(bufnr)
 		end
 	end
 
-	vim.fn.setbufvar(bufnr, "&modifiable", 0)
+	vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
 
-	self:_setup_mappings(map, bufnr)
+	self:_setup_mappings(map)
 	util.fit_content(self._app.config.window.max_height)
 	util.cursor(cursor_line)
 

@@ -30,6 +30,7 @@ end
 ---@field _nsid integer
 ---@field _app App
 ---@field _marks table Marks grouped by file
+---@field _bufnr integer
 ---@field _filter_func function?
 local Marklist = {}
 Marklist.__index = Marklist
@@ -44,6 +45,7 @@ function Marklist:new(app, filter_func)
 	marks._nsid = vim.api.nvim_create_namespace("__vessel__")
 	marks._app = app
 	marks._marks = {}
+	marks._bufnr = -1
 	marks._filter_func = filter_func
 	return marks
 end
@@ -58,9 +60,10 @@ end
 --- Open the window and render the content
 function Marklist:open()
 	self:init()
-	local bufnr, ok = self._app:open_window(self)
+	local ok
+	self._bufnr, ok = self._app:open_window(self)
 	if ok then
-		self:_render(bufnr)
+		self:_render()
 	end
 end
 
@@ -81,7 +84,6 @@ end
 ---@param global boolean Whether or not the mark should be global
 ---@return boolean
 function Marklist:set_mark(global)
-	local bufnr = self._app.context.bufnr
 	local lnum = self._app.context.curpos[2]
 	local bufpath = self._app.context.bufpath
 
@@ -291,8 +293,7 @@ end
 
 --- Unset the mark on the current line
 ---@param map table
----@param bufnr integer
-function Marklist:_action_delete(map, bufnr)
+function Marklist:_action_delete(map)
 	local selected = map[vim.fn.line(".")]
 	if not selected then
 		return
@@ -313,7 +314,7 @@ function Marklist:_action_delete(map, bufnr)
 		delmark(selected.mark)
 	end
 
-	self:_refresh(bufnr)
+	self:_refresh()
 end
 
 --- Move to next/prev mark group
@@ -335,8 +336,7 @@ end
 --- Change mark on the current line
 ---@param map table
 ---@param mark string
----@param bufnr integer
-function Marklist:_action_change_mark(map, mark, bufnr)
+function Marklist:_action_change_mark(map, mark)
 	local selected = map[vim.fn.line(".")]
 	if not selected or type(selected) == "string" then
 		return
@@ -357,7 +357,7 @@ function Marklist:_action_change_mark(map, mark, bufnr)
 		end
 		vim.fn.win_execute(self._app.context.wininfo.winid, "delmarks " .. selected.mark)
 		vim.api.nvim_buf_set_mark(mark_bufnr, mark, selected.lnum, selected.col, {})
-		self:_refresh(bufnr)
+		self:_refresh()
 	else
 		self._app.logger:err("vessel: cannot change mark, buffer not loaded")
 	end
@@ -365,8 +365,7 @@ end
 
 --- Setup mappings for the mark window
 ---@param map table
----@param bufnr integer
-function Marklist:_setup_mappings(map, bufnr)
+function Marklist:_setup_mappings(map)
 	local close_handler = function()
 		return self:_action_close()
 	end
@@ -374,7 +373,7 @@ function Marklist:_setup_mappings(map, bufnr)
 		self:_action_close()
 	end)
 	util.keymap("n", self._app.config.marks.mappings.delete, function()
-		self:_action_delete(map, bufnr)
+		self:_action_delete(map)
 	end)
 	util.keymap("n", self._app.config.marks.mappings.next_group, function()
 		self:_action_next_group(map, false)
@@ -410,35 +409,33 @@ function Marklist:_setup_mappings(map, bufnr)
 	local marks = self._app.config.marks.globals .. self._app.config.marks.locals
 	for _, mark in pairs(vim.split(marks, "")) do
 		util.keymap("n", "m" .. mark, function()
-			self:_action_change_mark(map, mark, bufnr)
+			self:_action_change_mark(map, mark)
 		end)
 	end
 end
 
 --- Re-render the buffer with new marks
----@param bufnr integer
 ---@return table
-function Marklist:_refresh(bufnr)
+function Marklist:_refresh()
 	local line = vim.fn.line(".")
 	self:init()
-	local map = self:_render(bufnr)
+	local map = self:_render()
 	util.vcursor(line, 1)
 	return map
 end
 
 --- Render the marks
----@params bufnr integer
 ---@return table Table mapping each line to the mark displayed on it
-function Marklist:_render(bufnr)
-	vim.fn.setbufvar(bufnr, "&modifiable", 1)
-	-- Note: vim.fn.deletebufline(bufnr, 1, "$") produces an unwanted message
+function Marklist:_render()
+	vim.fn.setbufvar(self._bufnr, "&modifiable", 1)
+	-- Note: vim.fn.deletebufline(self._bufnr, 1, "$") produces an unwanted message
 	vim.cmd('sil! keepj norm! gg"_dG')
-	vim.api.nvim_buf_clear_namespace(bufnr, self._nsid, 1, -1)
+	vim.api.nvim_buf_clear_namespace(self._bufnr, self._nsid, 1, -1)
 
 	if next(self._marks) == nil then
-		vim.fn.setbufline(bufnr, 1, self._app.config.marks.not_found)
-		vim.fn.setbufvar(bufnr, "&modifiable", 0)
-		self:_setup_mappings({}, bufnr)
+		vim.fn.setbufline(self._bufnr, 1, self._app.config.marks.not_found)
+		vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
+		self:_setup_mappings({})
 		util.fit_content(self._app.config.window.max_height)
 		return {}
 	end
@@ -469,9 +466,9 @@ function Marklist:_render(bufnr)
 		if line then
 			i = i + 1
 			map[i] = path
-			vim.fn.setbufline(bufnr, i, line)
+			vim.fn.setbufline(self._bufnr, i, line)
 			if matches then
-				util.set_matches(matches, i, bufnr, self._nsid)
+				util.set_matches(matches, i, self._bufnr, self._nsid)
 			end
 		end
 
@@ -505,17 +502,17 @@ function Marklist:_render(bufnr)
 			if line then
 				i = i + 1
 				map[i] = mark
-				vim.fn.setbufline(bufnr, i, line)
+				vim.fn.setbufline(self._bufnr, i, line)
 				if matches then
-					util.set_matches(matches, i, bufnr, self._nsid)
+					util.set_matches(matches, i, self._bufnr, self._nsid)
 				end
 			end
 		end
 	end
 
-	vim.fn.setbufvar(bufnr, "&modifiable", 0)
+	vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
 
-	self:_setup_mappings(map, bufnr)
+	self:_setup_mappings(map)
 	util.fit_content(self._app.config.window.max_height)
 	self:_set_cursor(map)
 
