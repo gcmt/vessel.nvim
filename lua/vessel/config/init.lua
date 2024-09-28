@@ -2,45 +2,12 @@
 
 local jumps_formatters = require("vessel.jumplist.formatters")
 local marks_formatters = require("vessel.marklist.formatters")
+local config_proxy = require("vessel.config.proxy")
+local schema = require("vessel.config.schema")
 local util = require("vessel.util")
 local validate = require("vessel.config.validate")
-local schema = require("vessel.config.schema")
 
 local M = {}
-
---- Validate the given options
----@param opts table?
----@return boolean
-local function valid(opts)
-	local ok, errors = validate.validate_partial(opts or {}, schema)
-	if not ok then
-		for _, err in pairs(errors) do
-			vim.notify("vessel config error: " .. err, vim.log.levels.WARN)
-		end
-		return false
-	end
-	return true
-end
-
---- Load the config by merging the user-provided config and the default config.
----@param opts table?
----@return table
-M.load = function(opts)
-	if valid(opts) then
-		M.opt = vim.tbl_deep_extend("force", M.opt, opts or {})
-	end
-	return M.opt
-end
-
---- Return the current config, overridden by any options passed as argument
----@param opts table?
----@return table
-M.get = function(opts)
-	if valid(opts) then
-		return vim.tbl_deep_extend("force", M.opt, opts or {})
-	end
-	return M.opt
-end
 
 --- Function used to sort marks
 ---@param a Mark
@@ -117,7 +84,7 @@ local function jump_callback(mode, context)
 end
 
 --- Default plugin options
-M.opt = {
+local _opt = {
 
 	--- generic options
 	verbosity = vim.log.levels.INFO,
@@ -226,5 +193,41 @@ M.opt = {
 		},
 	},
 }
+
+--- Validate the given options
+---@param opts table?
+---@return boolean
+local function check_options(opts)
+	local ok, err = pcall(validate.validate_partial, opts or {}, schema)
+	if not ok then
+		local msg = string.gsub(tostring(err), "^.-:%d+:%s+", "")
+		vim.notify("vessel validation error: " .. msg, vim.log.levels.WARN)
+		return false
+	end
+	return true
+end
+
+--- Load the config by merging the user-provided config and the default config.
+---@param opts table?
+---@return table
+M.load = function(opts)
+	if check_options(opts) then
+		_opt = vim.tbl_deep_extend("force", _opt, opts or {})
+	end
+	return _opt
+end
+
+--- Return the current config, overridden by any options passed as argument
+---@param opts table?
+---@return table
+M.get = function(opts)
+	if check_options(opts) then
+		return vim.tbl_deep_extend("force", _opt, opts or {})
+	end
+	return _opt
+end
+
+--- Proxy object to allow setting options safely
+M.opt = config_proxy.new(_opt, check_options)
 
 return M
