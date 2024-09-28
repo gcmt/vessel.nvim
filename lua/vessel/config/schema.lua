@@ -5,6 +5,9 @@
 ---@return function
 local function listof(typ)
 	return function(t)
+		if type(t) ~= "table" then
+			return false
+		end
 		for _, v in pairs(t) do
 			if type(v) ~= typ then
 				return false
