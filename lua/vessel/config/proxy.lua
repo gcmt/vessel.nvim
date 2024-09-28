@@ -1,5 +1,7 @@
 ---@module "proxy"
 
+local logger = require("vessel.logger")
+
 local M = {}
 
 --- Proxy to validate options as soon as they are set
@@ -14,8 +16,7 @@ local function ConfigProxy(path, node, wrapped, validate_func)
 	meta.__index = function(_, key)
 		if not node[key] then
 			local fullpath = path ~= "" and path .. "." .. key or key
-			local msg = string.format("%s: unknown option", fullpath)
-			vim.notify("vessel config error: " .. msg, vim.log.levels.WARN)
+			logger.err("option validation error: %s: unknown option", fullpath)
 			return nil
 		end
 		local metatable = getmetatable(node[key])
@@ -29,8 +30,7 @@ local function ConfigProxy(path, node, wrapped, validate_func)
 	meta.__newindex = function (_, key, val)
 		if not node[key] then
 			local fullpath = path ~= "" and path .. "." .. key or key
-			local msg = string.format("%s: unknown option", fullpath)
-			vim.notify("vessel config error: " .. msg, vim.log.levels.WARN)
+			logger.err("option validation error: %s: unknown option", fullpath)
 			return
 		end
 		-- Build nested table structure just to validate this single option

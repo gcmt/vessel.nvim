@@ -1,6 +1,7 @@
 ---@module "jumplist"
 
 local util = require("vessel.util")
+local logger = require("vessel.logger")
 
 ---@class Jump
 ---@field current boolean
@@ -169,7 +170,7 @@ function Jumplist:_action_passthrough(map, mapping)
 	if self._app.config.jumps.rel_virtual then
 		local ok, val = pcall(Jumplist._get_real_count, self, map, count, mapping)
 		if not ok then
-			self._app.logger:warn(val)
+			logger.warn(val)
 			return
 		end
 		count = val
@@ -353,7 +354,7 @@ function Jumplist:_render()
 		if not ok then
 			self._app:_close_window()
 			local msg = string.gsub(tostring(line), "^.*:%s+", "")
-			self._app.logger:err("jump formatter error: " .. msg)
+			logger.err("jump formatter error: %s", msg)
 			return {}
 		end
 		if line then

@@ -1,61 +1,52 @@
 ---@module "logger"
 
----@class Logger
----@field _log_level integer
----@field _prefixes table
-local Logger = {}
-Logger.__index = Logger
+local M = {}
 
---- Create new Logger instance
----@param log_level integer
----@return Logger
-function Logger:new(log_level)
-	local logger = {}
-	setmetatable(logger, Logger)
-	logger._log_level = log_level
-	logger._prefixes = {}
-	return logger
-end
+M.log_level = vim.log.levels.INFO
+M.prefixes = {
+	err = "vessel: ",
+	warn = "vessel: ",
+}
 
----Set notification prefixes
+--- Set notification prefixes
 ---@param prefixes table
-function Logger:set_prefixes(prefixes)
-	self._prefixes = vim.tbl_extend("force", self._prefixes, prefixes)
+function M.set_prefixes(prefixes)
+	M.prefixes = vim.tbl_extend("force", M.prefixes, prefixes)
 end
 
----Return prefixe for the given log level
+--- Return prefixe for the given log level
 ---@param level string
 ---@return string
-function Logger:_get_prefix(level)
-	return self._prefixes[level] or self._prefixes.all or ""
+local function _get_prefix(level)
+	return M.prefixes[level] or M.prefixes.all or ""
 end
 
-function Logger:err(fmt, ...)
-	if self._log_level <= vim.log.levels.ERROR then
-		local prefix = self:_get_prefix("err")
+function M.err(fmt, ...)
+	if M.log_level <= vim.log.levels.ERROR then
+		local prefix = _get_prefix("err")
 		vim.notify(prefix .. string.format(fmt, ...), vim.log.levels.ERROR)
 	end
 end
 
-function Logger:warn(fmt, ...)
-	if self._log_level <= vim.log.levels.WARN then
-		local prefix = self:_get_prefix("warn")
+function M.warn(fmt, ...)
+	if M.log_level <= vim.log.levels.WARN then
+		local prefix = _get_prefix("warn")
 		vim.notify(prefix .. string.format(fmt, ...), vim.log.levels.WARN)
 	end
 end
 
-function Logger:info(fmt, ...)
-	if self._log_level <= vim.log.levels.INFO then
-		local prefix = self:_get_prefix("info")
+function M.info(fmt, ...)
+	if M.log_level <= vim.log.levels.INFO then
+		local prefix = _get_prefix("info")
 		vim.notify(prefix .. string.format(fmt, ...), vim.log.levels.INFO)
 	end
 end
 
-function Logger:debug(fmt, ...)
-	if self._log_level <= vim.log.levels.DEBUG then
-		local prefix = self:_get_prefix("debug")
+function M.debug(fmt, ...)
+	if M.log_level <= vim.log.levels.DEBUG then
+		local prefix = _get_prefix("debug")
 		vim.notify(prefix .. string.format(fmt, ...), vim.log.levels.DEBUG)
 	end
 end
 
-return Logger
+return M

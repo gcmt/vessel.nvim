@@ -1,7 +1,7 @@
 ---@module "core"
 
 local Context = require("vessel.context")
-local Logger = require("vessel.logger")
+local logger = require("vessel.logger")
 
 ---@class App
 ---@field buffer_name string
@@ -9,7 +9,6 @@ local Logger = require("vessel.logger")
 ---@field context Context
 ---@field bufnr integer
 ---@field winid integer?
----@field logger Logger
 local App = {}
 App.__index = App
 
@@ -22,10 +21,9 @@ function App:new(config)
 	app.buffer_name = "__vessel__"
 	app.config = config
 	app.context = Context:new()
-	app.logger = Logger:new(config.verbosity)
-	app.logger:set_prefixes({ err = "vessel: "})
 	app.bufnr = -1
 	app.winid = -1
+	logger.log_level = config.verbosity
 	return app
 end
 
@@ -121,7 +119,7 @@ function App:open_window(list)
 		self.winid = vim.api.nvim_open_win(self.bufnr, true, popup_opts)
 		self:_setup_window(self.winid)
 	else
-		self.logger:warn("window already open")
+		logger.warn("window already open")
 		return self.bufnr, false
 	end
 	return self.bufnr, true

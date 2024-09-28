@@ -1,6 +1,7 @@
 ---@module "marklist"
 
 local util = require("vessel.util")
+local logger = require("vessel.logger")
 
 ---@class Mark
 ---@field mark string Mark letter
@@ -98,11 +99,11 @@ function Marklist:set_mark(global)
 	for _, mark in pairs(marks) do
 		if mark.file == bufpath and mark.lnum == lnum then
 			if not self._app.config.marks.toggle_mark then
-				self._app.logger:info('line "%s" already marked with [%s]', lnum, mark.mark)
+				logger.info('line "%s" already marked with [%s]', lnum, mark.mark)
 				return false
 			end
 			vim.cmd.delmarks(mark.mark)
-			self._app.logger:info('line "%s" unmarked [%s]', lnum, mark.mark)
+			logger.info('line "%s" unmarked [%s]', lnum, mark.mark)
 			return true
 		end
 	end
@@ -112,12 +113,12 @@ function Marklist:set_mark(global)
 	for _, c in pairs(vim.split(chars, "")) do
 		if not marks[c] then
 			vim.cmd.mark(c)
-			self._app.logger:info('line "%s" marked with [%s]', vim.fn.line("."), c)
+			logger.info('line "%s" marked with [%s]', vim.fn.line("."), c)
 			return true
 		end
 	end
 
-	self._app.logger:warn("no more available marks")
+	logger.warn("no more available marks")
 	return false
 end
 
@@ -197,7 +198,7 @@ function Marklist:_get_marks(bufnr)
 	local ok, err = pcall(sort_marks, groups, self._app.config.marks.sort_marks)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
-		self._app.logger:err("error while sorting marks: " .. msg)
+		logger.err("error while sorting marks: %s", msg)
 		return {}
 	end
 	return groups
@@ -383,20 +384,20 @@ function Marklist:_action_change_mark(map, mark)
 		return
 	end
 	if self:_mark_exists(mark) then
-		self._app.logger:err(string.format("mark '%s' already set, delete it first", mark))
+		logger.err("mark '%s' already set, delete it first", mark)
 		return
 	end
 	if selected.loaded then
 		local mark_bufnr = vim.fn.bufnr(selected.file)
 		if string.match(mark, "%l") and mark_bufnr ~= self._app.context.bufnr then
-			self._app.logger:err("local marks can be set only for the current buffer")
+			logger.err("local marks can be set only for the current buffer")
 			return
 		end
 		vim.fn.win_execute(self._app.context.wininfo.winid, "delmarks " .. selected.mark)
 		vim.api.nvim_buf_set_mark(mark_bufnr, mark, selected.lnum, selected.col, {})
 		self:_refresh()
 	else
-		self._app.logger:err("cannot change mark, buffer not loaded")
+		logger.err("cannot change mark, buffer not loaded")
 	end
 end
 
@@ -486,7 +487,7 @@ function Marklist:_render()
 	local ok, err = pcall(table.sort, paths, self._app.config.marks.sort_groups)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
-		self._app.logger:err("error while sorting groups: " .. msg)
+		logger.err("error while sorting groups: %s", msg)
 		self._app:_close_window()
 		return {}
 	end
@@ -506,7 +507,7 @@ function Marklist:_render()
 		if not ok then
 			self._app:_close_window()
 			local msg = string.gsub(tostring(line), "^.*:%s+", "")
-			self._app.logger:err("header formatter error: " .. msg)
+			logger.err("header formatter error: %s", msg)
 			return {}
 		end
 		if line then
@@ -541,7 +542,7 @@ function Marklist:_render()
 			if not ok then
 				self._app:_close_window()
 				local msg = string.gsub(tostring(line), "^.*:%s+", "")
-				self._app.logger:err("mark formatter error: " .. msg)
+				logger.err("mark formatter error: %s", msg)
 				return {}
 			end
 			if line then

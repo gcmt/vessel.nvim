@@ -5,6 +5,7 @@ local marks_formatters = require("vessel.marklist.formatters")
 local config_proxy = require("vessel.config.proxy")
 local schema = require("vessel.config.schema")
 local util = require("vessel.util")
+local logger = require("vessel.logger")
 local validate = require("vessel.config.validate")
 
 local M = {}
@@ -201,7 +202,7 @@ local function check_options(opts)
 	local ok, err = pcall(validate.validate_partial, opts or {}, schema)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.-:%d+:%s+", "")
-		vim.notify("vessel validation error: " .. msg, vim.log.levels.WARN)
+		logger.err("option validation error: %s", msg)
 		return false
 	end
 	return true
