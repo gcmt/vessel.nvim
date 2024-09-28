@@ -8,7 +8,6 @@ local M = {}
 ---@param config table
 ---@param schema table
 ---@param ignore_unknown boolean? Ignore keys not in the schema
----@return boolean, table
 function M.validate_partial(config, schema, ignore_unknown)
 	local function validate(schema_key, config, schema)
 		for key, val in pairs(config) do
