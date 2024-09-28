@@ -16,6 +16,15 @@ end
 
 M.config = lazy_require("vessel.config")
 
+local lazy_opt = {
+	__index = function(_, key)
+		return require("vessel.config").opt[key]
+	end
+}
+
+M.opt = {}
+setmetatable(M.opt, lazy_opt)
+
 --- Set/Unset a mark on the current line
 ---@param global boolean Whether the mark should be global or not
 ---@param opts table?  Config table
