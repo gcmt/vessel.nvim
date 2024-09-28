@@ -102,40 +102,45 @@ function M.setup(opts)
 	end
 end
 
-vim.keymap.set("n", "<plug>(VesselViewMarks)", function()
-	M.view_marks()
-end)
+--- Setup default <plug> mappings
+function M.setup_mappings()
+	vim.keymap.set("n", "<plug>(VesselViewMarks)", function()
+		M.view_marks()
+	end)
 
-vim.keymap.set("n", "<plug>(VesselViewLocalMarks)", function()
-	M.view_local_marks()
-end)
+	vim.keymap.set("n", "<plug>(VesselViewLocalMarks)", function()
+		M.view_local_marks()
+	end)
 
-vim.keymap.set("n", "<plug>(VesselViewGlobalMarks)", function()
-	M.view_global_marks()
-end)
+	vim.keymap.set("n", "<plug>(VesselViewGlobalMarks)", function()
+		M.view_global_marks()
+	end)
 
-vim.keymap.set("n", "<plug>(VesselViewExternalMarks)", function()
-	M.view_external_marks()
-end)
+	vim.keymap.set("n", "<plug>(VesselViewExternalMarks)", function()
+		M.view_external_marks()
+	end)
 
-vim.keymap.set("n", "<plug>(VesselSetLocalMark)", function()
-	M.set_local_mark()
-end)
+	vim.keymap.set("n", "<plug>(VesselSetLocalMark)", function()
+		M.set_local_mark()
+	end)
 
-vim.keymap.set("n", "<plug>(VesselSetGlobalMark)", function()
-	M.set_global_mark()
-end)
+	vim.keymap.set("n", "<plug>(VesselSetGlobalMark)", function()
+		M.set_global_mark()
+	end)
 
-vim.keymap.set("n", "<plug>(VesselViewJumps)", function()
-	M.view_jumps()
-end)
+	vim.keymap.set("n", "<plug>(VesselViewJumps)", function()
+		M.view_jumps()
+	end)
 
-vim.keymap.set("n", "<plug>(VesselViewLocalJumps)", function()
-	M.view_local_jumps()
-end)
+	vim.keymap.set("n", "<plug>(VesselViewLocalJumps)", function()
+		M.view_local_jumps()
+	end)
 
-vim.keymap.set("n", "<plug>(VesselViewExternalJumps)", function()
-	M.view_external_jumps()
-end)
+	vim.keymap.set("n", "<plug>(VesselViewExternalJumps)", function()
+		M.view_external_jumps()
+	end)
+end
+
+M.setup_mappings()
 
 return M
