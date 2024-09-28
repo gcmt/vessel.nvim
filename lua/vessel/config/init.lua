@@ -214,6 +214,7 @@ end
 M.load = function(opts)
 	if check_options(opts) then
 		_opt = vim.tbl_deep_extend("force", _opt, opts or {})
+		M.opt = config_proxy.new(_opt, check_options)
 	end
 	return _opt
 end
