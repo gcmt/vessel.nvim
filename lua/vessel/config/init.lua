@@ -8,12 +8,26 @@ local schema = require("vessel.config.schema")
 
 local M = {}
 
+--- Validate the given options
+---@param opts table?
+local function valid(opts)
+	local ok, errors = validate.validate_partial(opts or {}, schema)
+	if not ok then
+		for _, err in pairs(errors) do
+			vim.notify("vessel config error: " .. err, vim.log.levels.WARN)
+		end
+		return false
+	end
+	return true
+end
+
 --- Load the config by merging the user-provided config and the default config.
 ---@param opts table?
 ---@return table
 M.load = function(opts)
-	validate.validate_partial(opts or {}, schema)
-	M.opt = vim.tbl_deep_extend("force", M.opt, opts or {})
+	if valid(opts) then
+		M.opt = vim.tbl_deep_extend("force", M.opt, opts or {})
+	end
 	return M.opt
 end
 
@@ -21,8 +35,10 @@ end
 ---@param opts table?
 ---@return table
 M.get = function(opts)
-	validate.validate_partial(opts or {}, schema)
-	return vim.tbl_deep_extend("force", M.opt, opts or {})
+	if valid(opts) then
+		return vim.tbl_deep_extend("force", M.opt, opts or {})
+	end
+	return M.opt
 end
 
 --- Function used to sort marks
