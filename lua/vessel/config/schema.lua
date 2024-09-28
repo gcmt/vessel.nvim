@@ -2,16 +2,22 @@
 
 --- Check if a list contains only values of the given type
 ---@param typ string
+---@param len integer?
 ---@return function
-local function listof(typ)
+local function listof(typ, len)
 	return function(t)
 		if type(t) ~= "table" then
 			return false
 		end
+		local count = 0
 		for _, v in pairs(t) do
 			if type(v) ~= typ then
 				return false
 			end
+			count = count + 1
+		end
+		if len and len ~= count then
+			return false
 		end
 		return true
 	end
@@ -57,7 +63,7 @@ return {
 	["marks.move_to_closest_mark"] = {"boolean"},
 	["marks.proximity_threshold"] = {"number"},
 	["marks.force_header"] = {"boolean"},
-	["marks.decorations"] = {listof("string"), "list of strings"},
+	["marks.decorations"] = {listof("string", 2), "list of 2 strings"},
 	["marks.show_colnr"] = {"boolean"},
 	["marks.strip_lines"] = {"boolean"},
 	["marks.formatters"] = {"table"},
@@ -90,7 +96,7 @@ return {
 	["jumps.strip_lines"] = {"boolean"},
 	["jumps.filter_empty_lines"] = {"boolean"},
 	["jumps.not_found"] = {"string"},
-	["jumps.indicator"] = {listof("string"), "list of strings"},
+	["jumps.indicator"] = {listof("string", 2), "list of 2 strings"},
 	["jumps.show_colnr"] = {"boolean"},
 	["jumps.ctrl_o"] = {"string"},
 	["jumps.ctrl_i"] = {"string"},
