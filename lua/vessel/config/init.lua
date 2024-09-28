@@ -10,6 +10,7 @@ local M = {}
 
 --- Validate the given options
 ---@param opts table?
+---@return boolean
 local function valid(opts)
 	local ok, errors = validate.validate_partial(opts or {}, schema)
 	if not ok then
