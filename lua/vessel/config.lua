@@ -6,22 +6,19 @@ local util = require("vessel.util")
 
 local M = {}
 
--- Stores anything passed to the setup function
-M._opts = {}
-
 --- Load the config by merging the user-provided config and the default config.
 ---@param opts table?
 ---@return table
 M.load = function(opts)
-	M._opts = vim.tbl_deep_extend("force", M.defaults, opts or {})
-	return M._opts
+	M.opt = vim.tbl_deep_extend("force", M.opt, opts or {})
+	return M.opt
 end
 
 --- Return the current config, overridden by any options passed as argument
 ---@param opts table?
 ---@return table
 M.get = function(opts)
-	return vim.tbl_deep_extend("force", M._opts, opts or {})
+	return vim.tbl_deep_extend("force", M.opt, opts or {})
 end
 
 --- Function used to sort marks
@@ -99,7 +96,7 @@ local function jump_callback(mode, context)
 end
 
 --- Default plugin options
-M.defaults = {
+M.opt = {
 
 	--- generic options
 	verbosity = vim.log.levels.INFO,
