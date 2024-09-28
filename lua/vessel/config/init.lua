@@ -3,6 +3,8 @@
 local jumps_formatters = require("vessel.jumplist.formatters")
 local marks_formatters = require("vessel.marklist.formatters")
 local util = require("vessel.util")
+local validate = require("vessel.config.validate")
+local schema = require("vessel.config.schema")
 
 local M = {}
 
@@ -10,6 +12,7 @@ local M = {}
 ---@param opts table?
 ---@return table
 M.load = function(opts)
+	validate.validate_partial(opts or {}, schema)
 	M.opt = vim.tbl_deep_extend("force", M.opt, opts or {})
 	return M.opt
 end
@@ -18,6 +21,7 @@ end
 ---@param opts table?
 ---@return table
 M.get = function(opts)
+	validate.validate_partial(opts or {}, schema)
 	return vim.tbl_deep_extend("force", M.opt, opts or {})
 end
 

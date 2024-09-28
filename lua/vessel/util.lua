@@ -10,6 +10,21 @@ M.modes = {
 	TAB = 4,
 }
 
+--- Join arguments with the given separator
+---@param sep string
+---@param ... any
+function M.join(sep, ...)
+	local ret = ""
+	for i = 1, select("#", ...) do
+		if i == 1 then
+			ret = tostring(select(i, ...))
+		else
+			ret = ret .. sep .. tostring(select(i, ...))
+		end
+	end
+	return ret
+end
+
 --- Create multiple mappings for the same function handler
 ---@param mode string
 ---@param lhs table|string
