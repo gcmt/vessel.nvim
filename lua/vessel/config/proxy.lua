@@ -66,8 +66,7 @@ function M.new(t, validate_func)
 		end
 		return ConfigProxy(path, node, tree, validate_func)
 	end
-	local proxy = _make_proxy("", t)
-	return proxy
+	return _make_proxy("", t)
 end
 
 return M
