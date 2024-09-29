@@ -1,36 +1,28 @@
 ---@module "vessel"
 
-
 local M = {}
 
--- Require module only when accessing t
-local function lazy_require(module)
+local function lazy_opt()
 	local t = {}
 	setmetatable(t, {
 		__index = function(_, key)
-			return require(module)[key]
+			return require("vessel.config").opt[key]
+		end,
+		__newindex = function(_, key, val)
+			require("vessel.config").opt[key] = val
 		end
 	})
 	return t
 end
 
-M.config = lazy_require("vessel.config")
-
-local lazy_opt = {
-	__index = function(_, key)
-		return require("vessel.config").opt[key]
-	end
-}
-
-M.opt = {}
-setmetatable(M.opt, lazy_opt)
+M.opt = lazy_opt()
 
 --- Set/Unset a mark on the current line
 ---@param global boolean Whether the mark should be global or not
 ---@param opts table?  Config table
 ---@return boolean If the mark has been successfully set
 local function set_mark(global, opts)
-	local app = require("vessel.core"):new(M.config.get(opts))
+	local app = require("vessel.core"):new(require("vessel.config").get(opts))
 	local marklist = require("vessel.marklist"):new(app):init()
 	return marklist:set_mark(global)
 end
@@ -53,7 +45,7 @@ end
 ---@param opts table? Config overrides
 ---@param filter_func function?
 function M.view_marks(opts, filter_func)
-	local app = require("vessel.core"):new(M.config.get(opts))
+	local app = require("vessel.core"):new(require("vessel.config").get(opts))
 	local marklist = require("vessel.marklist"):new(app, filter_func)
 	marklist:open()
 end
@@ -86,7 +78,7 @@ end
 ---@param opts table? Config overrides
 ---@param filter_func function?
 function M.view_jumps(opts, filter_func)
-	local app = require("vessel.core"):new(M.config.get(opts))
+	local app = require("vessel.core"):new(require("vessel.config").get(opts))
 	local jumplist = require("vessel.jumplist"):new(app, filter_func)
 	jumplist:open()
 end
@@ -111,7 +103,7 @@ end
 --- Any option passed to this function can still be overridden afterwards by
 --- passing options to api functions
 function M.setup(opts)
-	local config = M.config.load(opts)
+	local config = require("vessel.config").load(opts)
 	if config.create_commands then
 		vim.api.nvim_create_user_command(config.commands.view_marks, function(_)
 			M.view_marks()
