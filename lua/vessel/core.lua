@@ -97,8 +97,8 @@ function App:_get_popup_options(list)
 		return opts[field]
 	end
 
-	opts.width = get("width")
-	opts.height = get("height", list)
+	opts.width = get("width", self.config)
+	opts.height = get("height", list, self.config)
 	opts.row = get("row", opts.width, opts.height)
 	opts.col = get("col", opts.width, opts.height)
 

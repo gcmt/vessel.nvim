@@ -32,17 +32,16 @@ end
 --- up to the max_height option
 ---@param list Marklist|Jumplist
 ---@return integer Number of lines
-local function popup_height(list)
-	local max_height = list._app.config.window.max_height
+local function popup_height(list, config)
 	local item_count, group_count = list:get_count()
 	local max_lines = item_count + group_count
-	local max = math.floor(vim.o.lines * max_height / 100)
+	local max = math.floor(vim.o.lines * config.window.max_height / 100)
 	return math.min(max_lines, max)
 end
 
 --- Compute the 'width' of the popup window as a percentage of the nvim window
 ---@return integer
-local function popup_width()
+local function popup_width(config)
 	local ui = vim.api.nvim_list_uis()[1]
 	return math.floor(ui.width * (ui.width < 120 and 90 or 70) / 100)
 end
