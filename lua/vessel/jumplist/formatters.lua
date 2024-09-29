@@ -24,12 +24,12 @@ function M.jump_formatter(jump, meta, context, config)
 	end
 
 	local rel_fmt, jump_rel
-	if config.jumps.rel_virtual then
-		rel_fmt = "%" .. #tostring(meta.max_index) .. "s"
-		jump_rel = string.format(rel_fmt, math.abs(meta.current_index-meta.curpos_index))
-	else
+	if config.jumps.real_position then
 		rel_fmt = "%" .. #tostring(meta.max_rel) .. "s"
 		jump_rel = string.format(rel_fmt, math.abs(jump.rel))
+	else
+		rel_fmt = "%" .. #tostring(meta.max_index) .. "s"
+		jump_rel = string.format(rel_fmt, math.abs(meta.current_index-meta.curpos_index))
 	end
 
 	local lnum_fmt = "%" .. #tostring(meta.max_lnum) .. "s"

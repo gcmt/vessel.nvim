@@ -92,7 +92,7 @@ return {
 	["marks.mappings.keepj_vsplit"] = {listof("string"), "list of strings"},
 
 	["jumps"] = {"table"},
-	["jumps.rel_virtual"] = {"boolean"},
+	["jumps.real_positions"] = {"boolean"},
 	["jumps.strip_lines"] = {"boolean"},
 	["jumps.filter_empty_lines"] = {"boolean"},
 	["jumps.not_found"] = {"string"},

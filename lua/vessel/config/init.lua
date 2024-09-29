@@ -167,7 +167,7 @@ local _opt = {
 
 	--- jumplist-related options
 	jumps = {
-		rel_virtual = true,
+		real_positions = false,
 		strip_lines = false,
 		filter_empty_lines = true,
 		not_found = "Jump list empty",

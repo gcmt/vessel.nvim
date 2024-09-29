@@ -133,7 +133,7 @@ function Jumplist:_action_clear(map)
 end
 
 --- Return the real count
---- When config.rel_virtual == true, the count relative to the current position
+--- When config.real_positions == false, the count relative to the current position
 --- is translated to the actual position in the jump list of the targeted jump
 ---@param map table
 ---@param count integer
@@ -167,7 +167,7 @@ end
 ---@param mapping string
 function Jumplist:_action_passthrough(map, mapping)
 	local count = vim.v.count1
-	if self._app.config.jumps.rel_virtual then
+	if not self._app.config.jumps.real_positions then
 		local ok, val = pcall(Jumplist._get_real_count, self, map, count, mapping)
 		if not ok then
 			logger.warn(val)
