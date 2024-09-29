@@ -492,6 +492,16 @@ function Marklist:_render()
 		return {}
 	end
 
+	-- find for each path the shortest unique suffix
+	local suffixes = util.unique_suffixes(paths)
+	local max_suffix
+	for _, suffix in pairs(suffixes) do
+		local suffix_len = vim.fn.strchars(suffix)
+		if not max_suffix or suffix_len > max_suffix then
+			max_suffix = suffix_len
+		end
+	end
+
 	local i = 0
 	local map = {}
 
@@ -503,6 +513,8 @@ function Marklist:_render()
 
 		local ok, line, matches = pcall(header_formatter, path, {
 			groups_count = groups_count,
+			suffixes = suffixes,
+			max_suffix = max_suffix
 		}, self._app.context, self._app.config)
 		if not ok then
 			self._app:_close_window()
@@ -538,6 +550,8 @@ function Marklist:_render()
 				groups_count = groups_count,
 				max_group_lnum = max_lnum,
 				max_group_col = max_col,
+				suffixes = suffixes,
+				max_suffix = max_suffix
 			}, self._app.context, self._app.config)
 			if not ok then
 				self._app:_close_window()
