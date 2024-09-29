@@ -39,9 +39,11 @@ function oneof(choices)
 	end
 end
 
+local log_levels = vim.tbl_values(vim.log.levels)
+
 return {
 
-	["verbosity"] = {oneof(vim.log.levels), "one of " .. util.tbl_join("|", vim.tbl_values(vim.log.levels))},
+	["verbosity"] = {oneof(log_levels), "one of " .. util.tbl_join("|", log_levels)},
 	["lazy_load_buffers"] = {"boolean"},
 	["highlight_on_jump"] = {"boolean"},
 	["highlight_timeout"] = {"number"},
