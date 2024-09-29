@@ -1,6 +1,10 @@
 ## vessel.nvim
 
-Interactive **mark** and **jump** lists floating window. Simple interactive wrapper around `:marks` and `:jumps` commands that does not try to re-imagine native *Vim* functionality. Also provides useful shortcuts for **setting marks automatically** without having to pick a letter by yourself.
+Interactive **mark** and **jump** lists floating window.
+
+Simple interactive wrapper around `:marks` and `:jumps` commands that does not try to re-imagine native *Vim* functionality.
+
+Also provides useful shortcuts for **setting marks automatically** without having to pick a letter by yourself.
 
 ![Marklist](assets/marks.png "Mark list preview.")
 
