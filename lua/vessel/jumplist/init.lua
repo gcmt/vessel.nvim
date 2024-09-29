@@ -148,9 +148,9 @@ function Jumplist:_get_real_count(map, count, mapping)
 		end
 	end
 	mapping = string.gsub(mapping, "\\", "")
-	if mapping == self._app.config.jumps.ctrl_o then
+	if mapping == self._app.config.jumps.mappings.ctrl_o then
 		line = line + count
-	elseif mapping == self._app.config.jumps.ctrl_i then
+	elseif mapping == self._app.config.jumps.mappings.ctrl_i then
 		line = line - count
 	end
 	if line < 1 or line > vim.fn.line("$") then
@@ -189,11 +189,11 @@ function Jumplist:_setup_mappings(map)
 	util.keymap("n", self._app.config.jumps.mappings.clear, function()
 		self:_action_clear(map)
 	end)
-	util.keymap("n", self._app.config.jumps.ctrl_o, function(mapping)
+	util.keymap("n", self._app.config.jumps.mappings.ctrl_o, function(mapping)
 		local ctrl_o = string.gsub(mapping, "%b<>", "\\%1")
 		self:_action_passthrough(map, ctrl_o)
 	end)
-	util.keymap("n", self._app.config.jumps.ctrl_i, function(mapping)
+	util.keymap("n", self._app.config.jumps.mappings.ctrl_i, function(mapping)
 		local ctrl_i = string.gsub(mapping, "%b<>", "\\%1")
 		self:_action_passthrough(map, ctrl_i)
 	end)
