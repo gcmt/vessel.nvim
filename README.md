@@ -319,7 +319,8 @@ vessel.opt.commands.view_jumps = "Jumps"
 ```lua
 local vessel = require("vessel")
 
--- The pool of marks the plugin chooses from when automatically picking the letter for you
+-- The pool of marks the plugin chooses from when automatically
+-- picking the letter for you
 vessel.opt.marks.locals = "abcdefghijklmnopqrstuvwxyz"
 vessel.opt.marks.globals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -327,7 +328,8 @@ vessel.opt.marks.globals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 -- Default: function(a, b) return a > b end
 vessel.opt.marks.sort_groups = <function>
 
--- Function used to sort marks in the each groups. By default marks are sorted by line number.
+-- Function used to sort marks in the each groups.
+-- By default marks are sorted by line number.
 -- Default: function(a, b) return a.lnum < b.lnum end
 -- Use this to sort marks alphabetically: function(a, b) return a.mark > b.mark end
 vessel.opt.marks.sort_marks = <function>
@@ -352,7 +354,8 @@ vessel.opt.marks.not_found = "No marks found"
 vessel.opt.marks.move_to_first_mark = true
 
 -- Position the cursor on the closest mark relative to the current position in the buffer.
--- If a mark is farther from the cursor than 'proximity_threshold' lines, it won't be considered
+-- If a mark is farther from the cursor than 'proximity_threshold' lines,
+-- it won't be considered
 vessel.opt.marks.move_to_closest_mark = true
 vessel.opt.marks.proximity_threshold = 50
 
@@ -414,13 +417,15 @@ vessel.opt.marks.mappings.keepj_tab = { "T" }
 -- Open the mark under cursor in a horizontal
 vessel.opt.marks.mappings.split = { "s" }
 
--- Open the mark under cursor in a horizontal split (does not change the jump list)
+-- Open the mark under cursor in a horizontal split
+-- Does not change the jump list
 vessel.opt.marks.mappings.keepj_split = { "S" }
 
 -- Open the mark under cursor in a vertical split
 vessel.opt.marks.mappings.vsplit = { "v" }
 
--- Open the mark under cursor in a vertical split with (does not change the jump list)
+-- Open the mark under cursor in a vertical split with
+-- Does not change the jump list
 vessel.opt.marks.mappings.keepj_vsplit = { "V" }
 ```
 
@@ -455,10 +460,12 @@ vessel.opt.jumps.show_colnr = false
 -- See "Formatters" section for more info
 vessel.opt.jumps.formatters.jump = <function>
 
--- Mapping used to move backwards in the jump list (to the bottom of the window). Takes a count.
+-- Mapping used to move backwards in the jump list (to the bottom of the window).
+-- Takes a count.
 vessel.opt.jumps.mappings.ctrl_o = "<c-o>"
 
--- Mapping used to move forwards in the jump list (to the top of the window). Takes a count.
+-- Mapping used to move forwards in the jump list (to the top of the window).
+-- Takes a count.
 vessel.opt.jumps.mappings.ctrl_i = "<c-i>"
 
 -- Jump to the entry under cursor
@@ -510,7 +517,8 @@ foo : bar baz
 ```lua
 local util = require("vessel.util")
 
--- Note: You can return nil from a header formatter to prevent the line from being addded to the list
+-- Note: You can return nil from a header formatter to prevent
+-- the line from being displayed in the list
 local function header_formatter(path, meta, context, config)
     local path = meta.suffixes[path]
     return util.format("# %s", {path, "Directory"})
