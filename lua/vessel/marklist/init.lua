@@ -553,19 +553,22 @@ function Marklist:_render()
 				suffixes = suffixes,
 				max_suffix = max_suffix
 			}, self._app.context, self._app.config)
-			if not ok then
+			if not ok or not line then
+				local msg
+				if not line then
+					msg = string.format("line %s: string expected, got nil", i)
+				else
+					msg = string.gsub(tostring(line), "^.*:%s+", "")
+				end
 				self._app:_close_window()
-				local msg = string.gsub(tostring(line), "^.*:%s+", "")
-				logger.err("mark formatter error: %s", msg)
+				logger.err("formatter error: %s", msg)
 				return {}
 			end
-			if line then
-				i = i + 1
-				map[i] = mark
-				vim.fn.setbufline(self._bufnr, i, line)
-				if matches then
-					util.set_matches(matches, i, self._bufnr, self._nsid)
-				end
+			i = i + 1
+			map[i] = mark
+			vim.fn.setbufline(self._bufnr, i, line)
+			if matches then
+				util.set_matches(matches, i, self._bufnr, self._nsid)
 			end
 		end
 	end
