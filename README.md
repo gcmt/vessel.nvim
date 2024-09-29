@@ -2,7 +2,9 @@
 
 Interactive `marks` and `jumps` lists popup window.
 
-![Preview](assets/marks.png "Preview.")
+![Marklist](assets/marks.png "Mark list preview.")
+
+![Jumplist](assets/jumps.png "Jump list preview.")
 
 ## Setup
 
