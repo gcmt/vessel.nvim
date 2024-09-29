@@ -1,6 +1,6 @@
 ## vessel.nvim
 
-Interactive `marks` and `jumps` lists popup window.
+Interactive **mark** and **jump** lists floating window. Simple interactive wrapper around `:marks` and `:jumps` commands that does not try to re-imagine native *Vim* functionality. Also provides useful shortcuts for **setting marks automatically** without having to pick a letter by yourself.
 
 ![Marklist](assets/marks.png "Mark list preview.")
 
@@ -8,9 +8,11 @@ Interactive `marks` and `jumps` lists popup window.
 
 ## Setup
 
-In order to create commands and potentially override any default option you can call the usual `setup` function by passing one single optional `table` as argument.
+You can install the plugin with your favorite plugin manager.
 
-**Commands are not automatically created**. In order to create them, you need to set the `create_commands` option. As you can see, you can even decide the commands names.
+In order to create commands and potentially override any default option, you can call the usual `setup` function by passing a single `table` argument.
+
+**Commands are not automatically created**. To create them you need to call the `setup` function and set the `create_commands` option.
 
 ```lua
 require("vessel").setup({ create_commands = true })
@@ -20,12 +22,12 @@ Calling the `setup` function is not required for using the plugin as internal `<
 
 ### Mark list mappings
 
-- `<plug>(VesselViewMarks)` Show all global (uppercase) and local marks (lowercase) grouped by file
-- `<plug>(VesselViewLocalMarks)` Show only local marks (lowercase)
-- `<plug>(VesselViewGlobalMarks)` Show only global marks (uppercase)
-- `<plug>(VesselViewExternalMarks)` Show only global marks belonging to different files
-- `<plug>(VesselSetLocalMark)` Set/unset a *local* mark on the current line by automatically choosing the mark for you
-- `<plug>(VesselSetGlobalMark)` Set/unset a *global* mark on the current line by automatically choosing the mark for you
+- `<plug>(VesselViewMarks)` Show all *global* (uppercase) and local *marks* (lowercase) grouped by file.
+- `<plug>(VesselViewLocalMarks)` Show only *local* marks.
+- `<plug>(VesselViewGlobalMarks)` Show only *global* marks.
+- `<plug>(VesselViewExternalMarks)` Show only *global* marks belonging to other files.
+- `<plug>(VesselSetLocalMark)` Automatically set/unset a *local* mark on the current line.
+- `<plug>(VesselSetGlobalMark)` Automatically set/unset a *global* mark on the current linea.
 
 ### Jump list mappings
 
@@ -39,7 +41,7 @@ Here how to use `<plug>` mappings in lua
 
 ```lua
 vim.keymap.set("n", "gl", "<Plug>(VesselViewLocalJumps)")
-vim.keymap.set("n", "gL", "<Plug>(VesselViewJumps)")
+vim.keymap.set("n", "gL", "<Plug>(VesselViewExternalJumps)")
 ```
 
 and vimscript
@@ -51,9 +53,9 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 
 ### Mark list window
 
-The `:Marks`  command opens a popup window with all global and local marks grouped by the file they belong to. Once inside the window the following mappings are available:
+The `:Marks` command opens up a floating window with all global and local marks grouped by the file they belong to. Once inside the window the following mappings are available:
 
-- `q`, `<ESC>` Close the popup window
+- `q`, `<ESC>` Close the floating window
 - `<C-J>` Move to the next mark group (path header)
 - `<C-K>` Move to the previous mark group (path header)
 - `d` Delete the mark on the current line
@@ -70,30 +72,30 @@ The `:Marks`  command opens a popup window with all global and local marks group
 
 ### Jump list window
 
-The `:Jumps` command opens a popup window showing the entire jump list. Jumps are displayed top to bottom, with most recent jump being on top. The cursor is automatically placed on the current position in the jump list. Once inside the window the following mappings are available:
+The `:Jumps` command opens up a floating window showing the entire jump list. Jumps are displayed top to bottom, with the most recent jump being on top. The cursor is automatically placed on the current position in the jump list. Once inside the window the following mappings are available:
 
-- `l`, `<CR>` Jump to the line under cursor
-- `q`, `<ESC>` Close the popup window
-- `C` Clear the entire jump list
-- `<C-O>` Move backwards in the jump list (towards the bottom). As a `count`, you can use the relative number displayed on the left column
-- `<C-I>` Move forward in the jump list (towards the top). As a `count`, you can use the relative number displayed on the left column
+- `l`, `<CR>` Jump to the line under cursor.
+- `q`, `<ESC>` Close the floating window.
+- `C` Clear the entire jump list.
+- `<C-O>` Move backwards in the jump list (towards the bottom). As a `count`, you can use the relative number displayed on the left column.
+- `<C-I>` Move forward in the jump list (towards the top). As a `count`, you can use the relative number displayed on the left column.
 
 ## API
 
-All API functions take a single optional `opts` table argument if you want to override the default options or and every option you provided to the `setup` function.
+All *API* functions take a single optional `opts` table argument if you want to override the default options or every option you passed to the `setup` function.
 
 ### Mark list API
 
-- `vessel.view_marks(opts, filter_func)` Show all global (uppercase) and local marks (lowercase)
-- `vessel.view_local_marks(opts)` Show only local marks (lowercase)
-- `vessel.view_global_marks(opts)` Show only global marks (uppercase)
-- `vessel.view_external_marks(opts)` Show only global marks belonging to different files
-- `vessel.set_local_mark(opts)` Set/unset a *local* mark on the current line by automatically choosing the mark for you
-- `vessel.set_global_mark(opts)` Set/unset a *global* mark on the current line by automatically choosing the mark for you
+- `vessel.view_marks(opts, filter_func)` Show all *global* (uppercase) and *local* marks (lowercase).
+- `vessel.view_local_marks(opts)` Show only *local* marks.
+- `vessel.view_global_marks(opts)` Show only *global* marks.
+- `vessel.view_external_marks(opts)` Show only *global* marks belonging to different files.
+- `vessel.set_local_mark(opts)` Automatically set/unset a *local* mark on the current line.
+- `vessel.set_global_mark(opts)` Automatically set/unset a *global* mark on the current line.
 
-`filter_func` is a function used to filter out entries in the mark list. If the function returns `false`, the mark is removed from the list. The function takes two arguments:
+`filter_func` is a function used to filter out entries in the mark list. If the function returns `false`, the mark won't be displayed. The function takes two arguments:
 
-- [`mark`](#mark-object) *table* parameter representing the mark currently being filtered
+- [`mark`](#mark-object) *table* parameter representing the mark currently being filtered.
 - [`context`](#context-object) *table* parameter that contains information about the current window/buffer.
 
 ```lua
@@ -106,13 +108,13 @@ end)
 ```
 ### Jump list API
 
-- `vessel.view_jumps(opts, filter_func)` Show the whole jump list
-- `vessel.view_local_jumps(opts)` Show only jumps inside the current file
-- `vessel.view_external_jumps(opts)` Show only jumps outside the current file
+- `vessel.view_jumps(opts, filter_func)` Show the whole jump list.
+- `vessel.view_local_jumps(opts)` Show only jumps inside the current file.
+- `vessel.view_external_jumps(opts)` Show only jumps outside the current file.
 
-`filter_func` is a function used to filter out entries in the jump list. If the function returns `false`, the entry is removed from the list. The function takes two arguments:
+`filter_func` is a function used to filter out entries in the jump list. If the function returns `false`, the entry won't be displayed. The function takes two arguments:
 
-- [`jump`](#jump-object) *table* parameter representing the jump entry currently being filtered
+- [`jump`](#jump-object) *table* parameter representing the jump entry currently being filtered.
 - [`context`](#context-object) *table* parameter that contains information about the current window/buffer.
 
 ```lua
@@ -140,7 +142,7 @@ The `Mark` object is `table` with the following keys:
 - `mark` Mark letter
 - `lnum` Mark line number
 - `col` Mark column number
-- `line` Line content on which the mark is positioned
+- `line` Line on which the mark is positioned
 - `file` File the mark belongs to
 - `loaded` Whether the file is actually loaded in memory
 
@@ -148,14 +150,14 @@ The `Mark` object is `table` with the following keys:
 
 The `Jump` object is `table` with the following keys:
 
-- `current` Whether this jump occupy the current position in the jump list
+- `current` Whether this jump is the current position in the jump list
 - `pos` Position of the jump in the jump list
 - `relpos` Position of the jump relative to the current position in the jump list
 - `bufnr` Buffer number
 - `bufpath` Buffer full path
 - `lnum` Jump line number
 - `col` Jump column number
-- `line` Line content on which the jump is positioned
+- `line` Line on which the jump is positioned
 
 ### Modes
 
@@ -169,7 +171,6 @@ util.modes = {
   VSPLIT = 3,
   TAB = 4,
 }
-
 ```
 
 ## Configuration
@@ -183,13 +184,15 @@ require("vessel").setup({
     view_marks = "Marks", -- you can customize each command name
     view_jumps = "Jumps"
   },
+  ...
   window = {
     relativenumber = true
   }
+  ...
 })
 ```
 
-The plugin also offers a more succinct way of setting options by providing a `opt` interface object
+The plugin also offers a more succinct way of setting options by providing an `opt` interface object
 
 ```lua
 local vessel = require("vessel")
@@ -198,7 +201,7 @@ vessel.opt.window.max_height = 50
 vessel.opt.marks.mappings.close = { "Q" }
 ```
 
-The third way of setting options is by directly passing and option `table`  argument to *API* functions. This options will override anything you set previously via the `setup` function or `opt` interface object.
+The third way of setting options is by directly passing and option `table` argument to *API* functions. This options will override anything you passed previously to the `setup` function set via the `opt` interface object.
 
 ```lua
 vim.keymap.set("n", "g", function()
@@ -489,11 +492,11 @@ vessel.opt.jumps.highlights.line = "Normal"
 
 ## Formatters
 
-Formatters are functions that let you customize how each line of the popup window is going to look.
+Formatters are functions that let you customize how each line of the floating window is going to look.
 
-All formatter functions take four arguments: the object being rendered, the [context object](#context-oject), a `meta` table object, and a `config` table object. They all should return a `string` and an optional `table` for setting up highlighting.
+All formatter functions take four arguments: the object being formatted, the [context object](#context-oject), a `meta` table object, and a `config` table object. They all should return a `string` and an optional special `table` used by the plugin for setting up highlighting.
 
-Most of the time you'll want to highlight specific parts of the formatted line. To make things easier the plugin provides a special `format` function to call in order to automatically generate the correct return values. This utility function is very similar to the lua native `string.format()` but the unlike the lua function, our format function only accepts `%s` placeholders.
+Most of the time you'll want to highlight specific parts of the formatted line. To make things easier the plugin provides a special `format` function you can call in order to automatically generate the correct return values. This utility function is very similar to the lua native `string.format()`, but the unlike it, our format function only accepts `%s` placeholders.
 
 ```lua
 > format = require("vessel.util").format
@@ -587,7 +590,7 @@ Controls how each line of the jump list is formatted. Takes the following four a
 - `config` Table containing the complete configuration.
 - `meta` Table containing additional contextual information. It has the following keys:
   - `jumps_count` Total number of jumps.
-  - `current_line` Line number of the jump being rendered.
+  - `current_line` Line number of the jump being formatted.
   - `current_jump_line` Line number of the current jump position.
   - `max_lnum` Max line number among all jumps.
   - `max_col` Max column number among all jumps.
