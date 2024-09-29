@@ -20,7 +20,7 @@ Calling the `setup` function is not required for using the plugin as internal `<
 
 ### Mark list mappings
 
-- `<plug>(VesselViewMarks)` Show all global (uppercase) and local marks (lowercase)
+- `<plug>(VesselViewMarks)` Show all global (uppercase) and local marks (lowercase) grouped by file
 - `<plug>(VesselViewLocalMarks)` Show only local marks (lowercase)
 - `<plug>(VesselViewGlobalMarks)` Show only global marks (uppercase)
 - `<plug>(VesselViewExternalMarks)` Show only global marks belonging to different files
@@ -472,3 +472,67 @@ vessel.opt.jumps.highlights.lnum = "LineNr"
 vessel.opt.jumps.highlights.col = "LineNr"
 vessel.opt.jumps.highlights.line = "Normal"
 ```
+
+## Formatters
+
+Formatters are functions that let you customize how each line of the mark and jump list is going to look. Below the options you need to redefine to set your own formatter functions:
+
+All formatter functions take four arguments: the object being rendered, the [context object](#context-oject), a `meta` table object, and a `config` table object. They all must should return a `string` and an optional `table` for setting up highlighting. See more at [Making your own formatter function](#making-your-own-formatter-function)
+
+### marks.formatters.header
+
+```lua
+vessel.opt.marks.formatters.header = <function>
+```
+
+Controls how each group header (file path) in the mark list is formatted. Takes the following four arguments:
+
+- `path` The full path being formatted.
+- `context` Table containing information about the current window/buffer. See [context object](#context-oject) section.
+- `config` Table containing the complete configuration.
+- `meta` Table containing additional contextual information. It has the following keys:
+  - `groups_count` Total number of groups.
+  - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
+  - `max_suffix` Maximum length among all suffixes above.
+
+### marks.formatters.mark
+
+```lua
+vessel.opt.marks.formatters.mark = <function>
+```
+
+Controls how each mark in the mark list is formatted. Takes the following four arguments:
+
+- `mark` The mark being formatted. See the [mark object](#mark-object) section.
+- `context` Table containing information about the current window/buffer. See [context object](#context-oject) section.
+- `config` Table containing the complete configuration
+- `meta` Table containing additional contextual information. It has the following keys:
+  - `pos` Position of the mark being formatted in its group.
+  - `is_last` Whether the mark being formated is last in its group.
+  - `groups_count` Total number of groups.
+  - `max_group_lnum` Highest line number in the current group.
+  - `max_group_col` Highest column number in the group.
+  - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
+  - `max_suffix` Max string length among all suffixes above.
+
+### jumps.formatters.jump
+
+```lua
+vessel.opt.jumps.formatters.jump = <function>
+```
+
+Controls how each line of the jump list is formatted. Takes the following four arguments:
+
+- `jump` The jump being formatted. See the [jump object](#jump-object) section.
+- `context` Table containing information about the current window/buffer. See [context object](#context-oject) section.
+- `config` Table containing the complete configuration.
+- `meta` Table containing additional contextual information. It has the following keys:
+  - `jumps_count` Total number of jumps.
+  - `current_line` Line number of the jump being rendered.
+  - `curpos_line` Line number of the current jump position.
+  - `max_lnum` Max line number among all jumps.
+  - `max_col` Max column number among all jumps.
+  - `max_rel` Max relative number among all jumps.
+  - `max_basename` Max basename length among all jumps paths.
+  - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
+  - `max_suffix` Max string length among all suffixes above.
