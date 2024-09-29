@@ -272,32 +272,31 @@ vessel.opt.window.options.col = popup_col
 
 ```lua
 ---@param list Marklist|Jumplist
-local function popup_height(list)
-	local max_height = list.app.config.window.max_height
-	 -- list:get_count() returns the number of entries + the number of groups
-    -- (always 1 for the jump list)
-	local item_count, group_count = list:get_count()
-	local max_lines = item_count + group_count
-	local max = math.floor(vim.o.lines * max_height / 100)
-	return math.min(max_lines, max)
+local function popup_height(list, config)
+  -- list:get_count() returns the number of entries + the number of groups
+  -- (always 1 for the jump list)
+  local item_count, group_count = list:get_count()
+  local max_lines = item_count + group_count
+  local max = math.floor(vim.o.lines * config.window.max_height / 100)
+  return math.min(max_lines, max)
 end
 
-local function popup_width()
-	local ui = vim.api.nvim_list_uis()[1]
-	return math.floor(ui.width * (ui.width < 120 and 90 or 70) / 100)
+local function popup_width(config)
+  local ui = vim.api.nvim_list_uis()[1]
+  return math.floor(ui.width * (ui.width < 120 and 90 or 70) / 100)
 end
 
 ---@param width integer The 'width' previously computed
 ---@param height integer The 'height' previously computed
 local function popup_row(width, height)
-	return math.floor((vim.o.lines / 2) - ((height + 2) / 2)) - 1
+  return math.floor((vim.o.lines / 2) - ((height + 2) / 2)) - 1
 end
 
 ---@param width integer The 'width' previously computed
 ---@param height integer The 'height' previously computed
 local function popup_col(width, height)
-	local ui = vim.api.nvim_list_uis()[1]
-	return math.floor((ui.width / 2) - (width / 2))
+  local ui = vim.api.nvim_list_uis()[1]
+  return math.floor((ui.width / 2) - (width / 2))
 end
 
 ```
