@@ -148,7 +148,7 @@ end
 --- For each path find the shortest unique suffix among all paths
 ---
 --- Example:
---- u = find_uniques({"a/b/c.vim", "/d/e/c.vim", "/f.vim"})
+--- u = unique_suffixes({"a/b/c.vim", "/d/e/c.vim", "/f.vim"})
 --- print(vim.inspect(u))
 --- {
 ---   ["/a/b/c.vim"] = "b/c.vim",
@@ -158,7 +158,7 @@ end
 ---
 ---@param paths table
 ---@retrun table
-function M.find_uniques(paths)
+function M.unique_suffixes(paths)
 	local function _uniques(base, paths)
 		local seen = {} -- to avoid issues with duplicate paths
 		local groups = {}

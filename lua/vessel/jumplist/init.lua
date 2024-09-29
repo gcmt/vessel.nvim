@@ -300,12 +300,12 @@ function Jumplist:_render()
 	end
 
 	-- find for each path the shortest unique suffix
-	local uniques = util.find_uniques(paths)
-	local max_unique
-	for _, unique in pairs(uniques) do
-		local unique_len = vim.fn.strchars(unique)
-		if not max_unique or unique_len > max_unique then
-			max_unique = unique_len
+	local suffixes = util.unique_suffixes(paths)
+	local max_suffix
+	for _, suffix in pairs(suffixes) do
+		local suffix_len = vim.fn.strchars(suffix)
+		if not max_suffix or suffix_len > max_suffix then
+			max_suffix = suffix_len
 		end
 	end
 
@@ -348,8 +348,8 @@ function Jumplist:_render()
 			max_col = max_col,
 			max_rel = max_rel,
 			max_basename = max_basename,
-			max_unique = max_unique,
-			uniques = uniques,
+			max_suffix = max_suffix,
+			suffixes = suffixes,
 		}, self._app.context, self._app.config)
 		if not ok then
 			self._app:_close_window()

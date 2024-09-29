@@ -41,8 +41,8 @@ function M.jump_formatter(jump, meta, context, config)
 		col = "  " .. string.format(col_fmt, jump.col)
 	end
 
-	local path_fmt = "%-" .. meta.max_unique .. "s"
-	local path = string.format(path_fmt, meta.uniques[jump.bufpath])
+	local path_fmt = "%-" .. meta.max_suffix .. "s"
+	local path = string.format(path_fmt, meta.suffixes[jump.bufpath])
 
 	local line = jump.line
 	if config.jumps.strip_lines then
