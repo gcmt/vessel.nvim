@@ -6,7 +6,7 @@ local logger = require("vessel.logger")
 ---@class Jump
 ---@field current boolean
 ---@field pos integer
----@field rel integer
+---@field relpos integer
 ---@field bufnr integer
 ---@field bufpath string
 ---@field lnum integer
@@ -22,7 +22,7 @@ function Jump:new()
 	setmetatable(jump, Jump)
 	jump.current = false
 	jump.pos = 0
-	jump.rel = 0
+	jump.relpos = 0
 	jump.bufnr = -1
 	jump.bufpath = ""
 	jump.lnum = 0
@@ -106,12 +106,12 @@ function Jumplist:_action_jump(mode, map)
 
 	self:_action_close()
 
-	if selected.rel == 0 then
+	if selected.relpos == 0 then
 		vim.cmd("keepj buffer " .. selected.bufnr)
 		util.vcursor(selected.lnum, selected.col)
 	else
-		local cmd = selected.rel < 0 and "\\<c-o>" or "\\<c-i>"
-		vim.cmd(string.format('exec "norm! %s%s"', math.abs(selected.rel), cmd))
+		local cmd = selected.relpos < 0 and "\\<c-o>" or "\\<c-i>"
+		vim.cmd(string.format('exec "norm! %s%s"', math.abs(selected.relpos), cmd))
 	end
 
 	if self._app.config.jump_callback then
@@ -156,7 +156,7 @@ function Jumplist:_get_real_count(map, count, mapping)
 	if line < 1 or line > vim.fn.line("$") then
 		error(string.format("invalid count (out of bound): %s", count), 2)
 	end
-	return math.abs(map[line].rel)
+	return math.abs(map[line].relpos)
 end
 
 --- Execute a mapping in the context of the calling window.
@@ -218,7 +218,7 @@ function Jumplist:_get_jumps()
 		-- jump.pos is the position in the real jumplist
 		jump.pos = len + 1 - i
 		-- position relative to the current jump position
-		jump.rel = len == _curpos and -jump.pos or curpos - jump.pos
+		jump.relpos = len == _curpos and -jump.pos or curpos - jump.pos
 		jump.bufnr = j.bufnr
 		jump.line = ""
 		jump.lnum = j.lnum
@@ -282,7 +282,6 @@ end
 ---@return table Table mapping each line to the jump displayed on it
 function Jumplist:_render()
 	vim.fn.setbufvar(self._bufnr, "&modifiable", 1)
-	-- Note: vim.fn.deletebufline(self._bufnr, 1, "$") produces an unwanted message
 	vim.cmd('sil! keepj norm! gg"_dG')
 	vim.api.nvim_buf_clear_namespace(self._bufnr, self._nsid, 1, -1)
 
@@ -294,6 +293,16 @@ function Jumplist:_render()
 		return {}
 	end
 
+	local map = {}
+	local jump_formatter = self._app.config.jumps.formatters.jump
+	local jumps_count = #self._jumps
+	local current_jump_line
+	local max_basename
+	local max_suffix
+	local max_lnum
+	local max_col
+	local max_relpos
+
 	local paths = {}
 	for _, jump in pairs(self._jumps) do
 		table.insert(paths, jump.bufpath)
@@ -301,7 +310,6 @@ function Jumplist:_render()
 
 	-- find for each path the shortest unique suffix
 	local suffixes = util.unique_suffixes(paths)
-	local max_suffix
 	for _, suffix in pairs(suffixes) do
 		local suffix_len = vim.fn.strchars(suffix)
 		if not max_suffix or suffix_len > max_suffix then
@@ -309,18 +317,9 @@ function Jumplist:_render()
 		end
 	end
 
-	local map = {}
-	local cursor_line = 1
-	local jump_formatter = self._app.config.jumps.formatters.jump
-	local jumps_count = #self._jumps
-	local curpos_line
-	local max_basename
-	local max_lnum, max_col, max_rel
-
 	for i, jump in ipairs(self._jumps) do
 		if jump.current then
-			-- FIXME: lines can be skipped afterwards
-			curpos_line = i
+			current_jump_line = i
 		end
 		if not max_lnum or jump.lnum > max_lnum then
 			max_lnum = jump.lnum
@@ -328,9 +327,9 @@ function Jumplist:_render()
 		if not max_col or jump.col > max_col then
 			max_col = jump.col
 		end
-		local rel = math.abs(jump.rel)
-		if not max_rel or rel > max_rel then
-			max_rel = rel
+		local rel = math.abs(jump.relpos)
+		if not max_relpos or rel > max_relpos then
+			max_relpos = rel
 		end
 		local basename = vim.fn.strchars(vim.fs.basename(jump.bufpath))
 		if not max_basename or basename > max_basename then
@@ -340,13 +339,14 @@ function Jumplist:_render()
 
 	local i = 0
 	for _, jump in ipairs(self._jumps) do
+		i = i + 1
 		local ok, line, matches = pcall(jump_formatter, jump, {
-			current_line = i+1,
-			curpos_line = curpos_line,
+			current_line = i,
+			current_jump_line = current_jump_line,
 			jumps_count = jumps_count,
 			max_lnum = max_lnum,
 			max_col = max_col,
-			max_rel = max_rel,
+			max_relpos = max_relpos,
 			max_basename = max_basename,
 			max_suffix = max_suffix,
 			suffixes = suffixes,
@@ -373,7 +373,7 @@ function Jumplist:_render()
 
 	self:_setup_mappings(map)
 	util.fit_content(self._app.config.window.max_height)
-	util.cursor(cursor_line)
+	util.cursor(current_jump_line)
 
 	return map
 end

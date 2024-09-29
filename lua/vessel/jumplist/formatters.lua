@@ -25,11 +25,11 @@ function M.jump_formatter(jump, meta, context, config)
 
 	local rel_fmt, jump_rel
 	if config.jumps.real_position then
-		rel_fmt = "%" .. #tostring(meta.max_rel) .. "s"
-		jump_rel = string.format(rel_fmt, math.abs(jump.rel))
+		rel_fmt = "%" .. #tostring(meta.max_relpos) .. "s"
+		jump_rel = string.format(rel_fmt, math.abs(jump.relpos))
 	else
 		rel_fmt = "%" .. #tostring(meta.jumps_count) .. "s"
-		jump_rel = string.format(rel_fmt, math.abs(meta.current_line-meta.curpos_line))
+		jump_rel = string.format(rel_fmt, math.abs(meta.current_line-meta.current_jump_line))
 	end
 
 	local lnum_fmt = "%" .. #tostring(meta.max_lnum) .. "s"
