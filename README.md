@@ -150,7 +150,7 @@ The `Jump` object is `table` with the following keys:
 
 - `current` Whether this jump occupy the current position in the jump list
 - `pos` Position of the jump in the jump list
-- `rel` Position of the jump relative to the current position in the jump list
+- `relpos` Position of the jump relative to the current position in the jump list
 - `bufnr` Buffer number
 - `bufpath` Buffer full path
 - `lnum` Jump line number
@@ -475,11 +475,55 @@ vessel.opt.jumps.highlights.line = "Normal"
 
 ## Formatters
 
-Formatters are functions that let you customize how each line of the mark and jump list is going to look. Below the options you need to redefine to set your own formatter functions:
+Formatters are functions that let you customize how each line of the popup window is going to look.
 
-All formatter functions take four arguments: the object being rendered, the [context object](#context-oject), a `meta` table object, and a `config` table object. They all must should return a `string` and an optional `table` for setting up highlighting. See more at [Making your own formatter function](#making-your-own-formatter-function)
+All formatter functions take four arguments: the object being rendered, the [context object](#context-oject), a `meta` table object, and a `config` table object. They all should return a `string` and an optional `table` for setting up highlighting.
 
-### marks.formatters.header
+Most of the time you'll want to highlight specific parts of the formatted line. To make things easier the plugin provides a special `format` function to call in order to automatically generate the correct return values. This utility function is very similar to the lua native `string.format()` but the unlike the lua function, our format function only accepts `%s` placeholders.
+
+```lua
+> format = require("vessel.util").format
+> line, hl = format("%s : %s %s", {"foo", "Normal"}, "bar", {"baz", "LineNr"})
+> print(line)
+foo : bar baz
+> vim.inspect(hl)
+{ {
+    startpos = 1
+    endpos = 3,
+    hlgroup = "Normal",
+}, {
+    startpos = 11
+    endpos = 13,
+    hlgroup = "LineNr",
+} }
+```
+
+### Example formatters
+
+```lua
+local util = require("vessel.util")
+
+-- Note: You can return nil from a header formatter to prevent the line from being addded to the list
+local function header_formatter(path, meta, context, config)
+    local path = meta.suffixes[path]
+    return util.format("# %s", {path, "Directory"})
+end
+
+local function mark_formatter(mark, meta, context, config)
+    -- different colors for uppercase and lowercase marks
+    local hl = string.match(mark.mark, "%u") and "Blue" or "Red"
+    return util.format(" [%s] %s:%s %s",
+        {mark.mark, hl},
+        {mark.lnum, "LineNr"},
+        {mark.col, "LineNr"},
+        {mark.line, "Normal"}
+    )
+end
+```
+
+### Formatter function signatures
+
+#### marks.formatters.header
 
 ```lua
 vessel.opt.marks.formatters.header = <function>
@@ -488,14 +532,14 @@ vessel.opt.marks.formatters.header = <function>
 Controls how each group header (file path) in the mark list is formatted. Takes the following four arguments:
 
 - `path` The full path being formatted.
-- `context` Table containing information about the current window/buffer. See [context object](#context-oject) section.
+- `context` Table containing information about the current window/buffer. See the [context object](#context-object) section.
 - `config` Table containing the complete configuration.
 - `meta` Table containing additional contextual information. It has the following keys:
   - `groups_count` Total number of groups.
   - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
   - `max_suffix` Maximum length among all suffixes above.
 
-### marks.formatters.mark
+#### marks.formatters.mark
 
 ```lua
 vessel.opt.marks.formatters.mark = <function>
@@ -504,18 +548,18 @@ vessel.opt.marks.formatters.mark = <function>
 Controls how each mark in the mark list is formatted. Takes the following four arguments:
 
 - `mark` The mark being formatted. See the [mark object](#mark-object) section.
-- `context` Table containing information about the current window/buffer. See [context object](#context-oject) section.
+- `context` Table containing information about the current window/buffer. See the [context object](#context-object) section.
 - `config` Table containing the complete configuration
 - `meta` Table containing additional contextual information. It has the following keys:
-  - `pos` Position of the mark being formatted in its group.
-  - `is_last` Whether the mark being formated is last in its group.
+  - `pos` Position of the mark being formatted in the group.
+  - `is_last` Whether the mark being formatted is last in the group.
   - `groups_count` Total number of groups.
   - `max_group_lnum` Highest line number in the current group.
   - `max_group_col` Highest column number in the group.
   - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
   - `max_suffix` Max string length among all suffixes above.
 
-### jumps.formatters.jump
+#### jumps.formatters.jump
 
 ```lua
 vessel.opt.jumps.formatters.jump = <function>
@@ -524,15 +568,15 @@ vessel.opt.jumps.formatters.jump = <function>
 Controls how each line of the jump list is formatted. Takes the following four arguments:
 
 - `jump` The jump being formatted. See the [jump object](#jump-object) section.
-- `context` Table containing information about the current window/buffer. See [context object](#context-oject) section.
+- `context` Table containing information about the current window/buffer. See the [context object](#context-object) section.
 - `config` Table containing the complete configuration.
 - `meta` Table containing additional contextual information. It has the following keys:
   - `jumps_count` Total number of jumps.
   - `current_line` Line number of the jump being rendered.
-  - `curpos_line` Line number of the current jump position.
+  - `current_jump_line` Line number of the current jump position.
   - `max_lnum` Max line number among all jumps.
   - `max_col` Max column number among all jumps.
-  - `max_rel` Max relative number among all jumps.
+  - `max_relpos` Max relative number among all jumps.
   - `max_basename` Max basename length among all jumps paths.
   - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
   - `max_suffix` Max string length among all suffixes above.
