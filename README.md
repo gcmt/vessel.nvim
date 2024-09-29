@@ -2,6 +2,8 @@
 
 Interactive `marks` and `jumps` lists popup window.
 
+![Preview](assets/marks.png "Preview.")
+
 ## Setup
 
 In order to create commands and potentially override any default option you can call the usual `setup` function by passing one single optional `table` as argument.
@@ -417,8 +419,10 @@ vessel.opt.marks.mappings.keepj_vsplit = { "V" }
 ### Jump list options
 
 ```lua
+local vessel = require("vessel")
 
--- Display real jump entries positions. There might be gaps when filters are applied to the list
+-- Display real jump entries positions.
+-- There might be gaps when filters are applied to the list.
 vessel.opt.jumps.real_positions = false
 
 -- Strip leading spaces from lines
