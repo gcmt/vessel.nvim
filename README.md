@@ -1,6 +1,7 @@
 ## vessel.nvim
 
 Interactive `marks` and `jumps` lists popup window.
+
 ## Setup
 
 In order to create commands and potentially override any default option you can call the usual `setup` function by passing one single optional `table` as argument.
@@ -11,8 +12,8 @@ In order to create commands and potentially override any default option you can 
 require("vessel").setup({ create_commands = true })
 ```
 
-
 Calling the `setup` function is not required for using the plugin as internal `<plug>` mappings are automatically created for you.
+
 ### Mark list mappings
 
 - `<plug>(VesselViewMarks)` Show all global (uppercase) and local marks (lowercase)
@@ -21,19 +22,24 @@ Calling the `setup` function is not required for using the plugin as internal `<
 - `<plug>(VesselViewExternalMarks)` Show only global marks belonging to different files
 - `<plug>(VesselSetLocalMark)` Set/unset a *local* mark on the current line by automatically choosing the mark for you
 - `<plug>(VesselSetGlobalMark)` Set/unset a *global* mark on the current line by automatically choosing the mark for you
+
 ### Jump list mappings
 
 - `<plug>(VesselViewJumps)` Show the whole jump list
 - `<plug>(VesselViewLocalJumps)` Show only jumps inside the current file
 - `<plug>(VesselViewExternalJumps)` Show only jumps outside the current file
+
 ### Example mappings
 
 Here how to use `<plug>` mappings in lua
-```lua 
+
+```lua
 vim.keymap.set("n", "gl", "<Plug>(VesselViewLocalJumps)")
 vim.keymap.set("n", "gL", "<Plug>(VesselViewJumps)")
 ```
+
 and vimscript
+
 ```vim
 nnoremap m. <plug>(VesselSetLocalMark)
 nnoremap m, <plug>(VesselSetGlobalMark)
@@ -44,7 +50,7 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 The `:Marks`  command opens a popup window with all global and local marks grouped by the file they belong to. Once inside the window the following mappings are available:
 
 - `q`, `<ESC>` Close the popup window
-- `<C-J>` Move to the next path 
+- `<C-J>` Move to the next path
 - `<C-K>` Move to the previous path
 - `d` Delete the mark on the current line
 - `l`, `<CR>` Jump to the mark (or path) under cursor
@@ -56,7 +62,8 @@ The `:Marks`  command opens a popup window with all global and local marks group
 - `t` Open the mark under cursor in a new tab
 - `T` Open the mark under cursor in a new tab (does not change the jump list)
 - `m{a-zA-Z}` Change the mark under cursor
-- `'{a-z-A-Z}` Jump directly to a mark 
+- `'{a-z-A-Z}` Jump directly to a mark
+
 ### Jump list window
 
 The `:Jumps` command opens a popup window showing the entire jump list. Jumps are displayed top to bottom, with most recent jump being on top. The cursor is automatically placed on the current position in the jump list. Once inside the window the following mappings are available:
@@ -66,9 +73,11 @@ The `:Jumps` command opens a popup window showing the entire jump list. Jumps ar
 - `C` Clear the entire jump list
 - `<C-O>` Move backwards in the jump list (towards the bottom). As a `count`, you can use the relative number displayed on the left column
 - `<C-I>` Move forward in the jump list (towards the top). As a `count`, you can use the relative number displayed on the left column
+
 ## API
 
 All API functions take a single optional `opts` table argument if you want to override the default options or and every option you provided to the `setup` function.
+
 ### Mark list API
 
 - `vessel.view_marks(opts, filter_func)` Show all global (uppercase) and local marks (lowercase)
@@ -103,7 +112,7 @@ end)
 - [`context`](#context-object) *table* parameter that contains information about the current window/buffer.
 
 ```lua
--- Example usage of a filter function to filter out jumps outside the current working directory
+-- Usage of a filter function to filter out jumps outside the current working directory
 vim.keymap.set("n", "gL", function()
   require('vessel').view_jumps({}, function(jump, context)
     return vim.startswith(jump.bufpath, vim.fn.getcwd() .. "/")
@@ -201,14 +210,19 @@ local vessel = require("vessel")
 -- Control how much noisy the plugin is (one of :help vim.log.levels)
 vessel.opt.verbosity = vim.log.levels.INFO
 
--- Some global marks might belong to files currently not loaded in memory. In this case the plugin can't retrieve the mark line content. Set this option to `false` to load in memory any such file as soon as you open the mark list window. 
+-- Some global marks might belong to files currently not loaded in memory.
+-- In this case the plugin can't retrieve the mark line content. Set this option
+-- to `false` to load in memory any such file as soon as you open the mark list window.
 vessel.opt.lazy_load_buffers = true
 
--- Set 'cursorline' nvim option for a brief period of time after a jump for 'highlight_timeout' milliseconds
+-- Set 'cursorline' nvim option for a brief period of time after a jump
+-- for 'highlight_timeout' milliseconds
 vessel.opt.highlight_on_jump = false
 vessel.opt.highlight_timeout = 250
 
--- Function executed after each jump. By default it just centers the cursor vertically unless vim.o.jumpotions is set to 'view'. The function takes two parameters: mode and context, both described in the API section of the documentation.
+-- Function executed after each jump. By default it just centers the cursor vertically
+-- unless vim.o.jumpotions is set to 'view'. It takes two parameters: mode and context,
+-- both described in the API section of the documentation.
 vessel.opt.jump_callback = <function>
 ```
 
@@ -233,9 +247,12 @@ vessel.opt.window.relativenumber = false
 ```lua
 local vessel = require("vessel")
 
---- Control how the popup looks. This options are passed directly to the vim.api.nvim_open_win() function. ( See:help api-floatwin). 
+--- Control how the popup looks. This options are passed directly to the
+-- vim.api.nvim_open_win() function. ( See:help api-floatwin).
 
--- 'heigh', 'width', 'row' and 'col' may be either a number or function. In the latter case the function is evaluated and its return value (must be a number) used as the option value. See section below for their default implementations.
+-- 'heigh', 'width', 'row' and 'col' may be either a number or function.
+-- In the latter case the function is evaluated and its return value (must be a number)
+-- used as the option value. See section below for their default implementations.
 
 vessel.opt.window.options.relative = "editor"
 vessel.opt.window.options.anchor = "NW"
@@ -253,7 +270,8 @@ vessel.opt.window.options.col = popup_col
 ---@param list Marklist|Jumplist
 local function popup_height(list)
 	local max_height = list.app.config.window.max_height
-	 -- list:get_count() returns the number of entries + the number of groups (always 1 for the jump list)
+	 -- list:get_count() returns the number of entries + the number of groups
+    -- (always 1 for the jump list)
 	local item_count, group_count = list:get_count()
 	local max_lines = item_count + group_count
 	local max = math.floor(vim.o.lines * max_height / 100)
@@ -284,7 +302,7 @@ end
 ```lua
 local vessel = require("vessel")
 
--- Whether to create commands or not 
+-- Whether to create commands or not
 -- Note: you need to call the setup function to actually create commands
 vessel.opt.create_commands = false
 
@@ -323,7 +341,8 @@ vessel.opt.marks.not_found = "No marks found"
 -- Position the cursor on the first line of a mark group
 vessel.opt.marks.move_to_first_mark = true
 
--- Position the cursor on the closest mark relative to the current position in the buffer. If a mark is farther away than 'proximity_threshold' lines from the cursor, it won't be considered
+-- Position the cursor on the closest mark relative to the current position in the buffer.
+-- If a mark is farther from the cursor than 'proximity_threshold' lines, it won't be considered
 vessel.opt.marks.move_to_closest_mark = true
 vessel.opt.marks.proximity_threshold = 50
 
@@ -331,7 +350,8 @@ vessel.opt.marks.proximity_threshold = 50
 -- Note: Has effect only when using default formatters
 vessel.opt.marks.force_header = false
 
--- Decorations used as prefix to each formatted mark. Last item is for last entries in each group
+-- Decorations used as prefix to each formatted mark.
+-- Last item is for last entries in each group.
 -- Note: Has effect only when using default formatters
 vessel.opt.marks.decorations = { "├ ", "└ " }
 
@@ -343,7 +363,8 @@ vessel.opt.marks.show_colnr = false
 -- Note: Has effect only when using default formatters
 vessel.opt.marks.strip_lines = true
 
--- Functions used to format each mark / group header line (See "Formatters" section for more info)
+-- Functions used to format each mark / group header line
+-- See "Formatters" section for more info
 vessel.opt.marks.formatters.mark = <function>
 vessel.opt.marks.formatters.header = <function>
 
@@ -409,7 +430,8 @@ vessel.opt.jumps.filter_empty_lines = true
 -- Message used when the jump list is empty
 vessel.opt.jumps.not_found = "Jump list empty"
 
--- Prefix used for each formatted jup entry. First item is the line of the current position in the jump list
+-- Prefix used for each formatted jump entry.
+-- First item is the line of the current position in the jump list.
 -- Note: Has effect only when using default formatters
 vessel.opt.jumps.indicator = { " ", " " }
 
@@ -417,7 +439,8 @@ vessel.opt.jumps.indicator = { " ", " " }
 -- Note: Has effect only when using default formatters
 vessel.opt.jumps.show_colnr = false
 
--- Functions used to format each jump entry line (See "Formatters" section for more info)
+-- Functions used to format each jump entry line
+-- See "Formatters" section for more info
 vessel.opt.jumps.formatters.jump = <function>
 
 -- Mapping used to move backwards in the jump list (to the bottom of the window). Takes a count.
