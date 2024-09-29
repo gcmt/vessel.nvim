@@ -312,15 +312,15 @@ function Jumplist:_render()
 	local map = {}
 	local cursor_line = 1
 	local jump_formatter = self._app.config.jumps.formatters.jump
-	local max_index = #self._jumps
-	local curpos_index
+	local jumps_count = #self._jumps
+	local curpos_line
 	local max_basename
 	local max_lnum, max_col, max_rel
 
 	for i, jump in ipairs(self._jumps) do
 		if jump.current then
 			-- FIXME: lines can be skipped afterwards
-			curpos_index = i
+			curpos_line = i
 		end
 		if not max_lnum or jump.lnum > max_lnum then
 			max_lnum = jump.lnum
@@ -341,9 +341,9 @@ function Jumplist:_render()
 	local i = 0
 	for _, jump in ipairs(self._jumps) do
 		local ok, line, matches = pcall(jump_formatter, jump, {
-			current_index = i+1,
-			curpos_index = curpos_index,
-			max_index = max_index,
+			current_line = i+1,
+			curpos_line = curpos_line,
+			jumps_count = jumps_count,
 			max_lnum = max_lnum,
 			max_col = max_col,
 			max_rel = max_rel,
