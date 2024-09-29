@@ -52,8 +52,8 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 The `:Marks`  command opens a popup window with all global and local marks grouped by the file they belong to. Once inside the window the following mappings are available:
 
 - `q`, `<ESC>` Close the popup window
-- `<C-J>` Move to the next path
-- `<C-K>` Move to the previous path
+- `<C-J>` Move to the next mark group (path header)
+- `<C-K>` Move to the previous mark group (path header)
 - `d` Delete the mark on the current line
 - `l`, `<CR>` Jump to the mark (or path) under cursor
 - `o` Jump to the mark under cursor (does not change the jump list)
