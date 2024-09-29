@@ -75,7 +75,16 @@ function M.header_formatter(path, meta, context, config)
 	if meta.groups_count == 1 and not config.marks.force_header and path == context.bufpath then
 		return nil
 	end
-	return util.format(" %s", { util.prettify_path(path), config.marks.highlights.path })
+	if config.marks.path_style == "relcwd" then
+		path = util.prettify_path(path)
+	elseif config.marks.path_style == "relhome" then
+		path = string.gsub(path, "^" .. os.getenv("HOME") .. "/", "~/", 1)
+	elseif config.marks.path_style == "short" then
+		path = meta.suffixes[path]
+	else
+		path = path
+	end
+	return util.format(" %s", { path, config.marks.highlights.path })
 end
 
 return M

@@ -82,6 +82,7 @@ return {
 	["marks.decorations"] = {listof("string", 2), "list of 2 strings"},
 	["marks.show_colnr"] = {"boolean"},
 	["marks.strip_lines"] = {"boolean"},
+	["marks.path_style"] = {oneof({"full", "short", "relhome", "relcwd"}), "one of full|short|relhome|relcwd"},
 	["marks.formatters"] = {"table"},
 	["marks.formatters.mark"] = {"function"},
 	["marks.formatters.header"] = {"function"},

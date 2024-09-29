@@ -135,6 +135,7 @@ local _opt = {
 		decorations = { "├ ", "└ " },
 		show_colnr = false,
 		strip_lines = true,
+		path_style = "relcwd",
 		formatters = {
 			mark = marks_formatters.mark_formatter,
 			header = marks_formatters.header_formatter,
