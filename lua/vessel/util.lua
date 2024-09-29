@@ -10,6 +10,21 @@ M.modes = {
 	TAB = 4,
 }
 
+--- Join table values with the given separator
+---@param sep string
+---@param t table
+function M.tbl_join(sep, t)
+	local ret = ""
+	for _, v in ipairs(t) do
+		if ret == "" then
+			ret = tostring(v)
+		else
+			ret = ret .. sep .. tostring(v)
+		end
+	end
+	return ret
+end
+
 --- Join arguments with the given separator
 ---@param sep string
 ---@param ... any

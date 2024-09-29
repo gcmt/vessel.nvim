@@ -1,5 +1,7 @@
 ---@module "schema"
 
+local util = require("vessel.util")
+
 --- Check if a list contains only values of the given type
 ---@param typ string
 ---@param len integer?
@@ -23,9 +25,23 @@ local function listof(typ, len)
 	end
 end
 
+--- Check if a value is in the choices table
+---@param choices table
+---@return function
+function oneof(choices)
+	return function(val)
+		for _, v in pairs(choices) do
+			if v == val then
+				return true
+			end
+		end
+		return false
+	end
+end
+
 return {
 
-	["verbosity"] = {"number"},
+	["verbosity"] = {oneof(vim.log.levels), "one of " .. util.tbl_join("|", vim.tbl_values(vim.log.levels))},
 	["lazy_load_buffers"] = {"boolean"},
 	["highlight_on_jump"] = {"boolean"},
 	["highlight_timeout"] = {"number"},
