@@ -332,6 +332,13 @@ vessel.opt.marks.sort_groups = <function>
 -- Use this to sort marks alphabetically: function(a, b) return a.mark > b.mark end
 vessel.opt.marks.sort_marks = <function>
 
+-- Controls the style of the file path header. Can be one of:
+-- "full": Full file path
+-- "short" Shortest unique suffix
+-- "relhome" Relative to the home directory
+-- "relcwd" Relative to the current working directory
+vessel.opt.marks.path_style = "relcwd"
+
 -- Enable/disable unsetting a mark when trying to mark an alredy marked line
 vessel.opt.marks.toggle_mark = true
 
