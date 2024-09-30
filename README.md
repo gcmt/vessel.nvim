@@ -77,7 +77,7 @@ By default the mark list window shows all global and local marks grouped by the 
 - `o` Jump to the mark under cursor (does not change the jump list)
 - `v` Open the mark under cursor in a vertical split
 - `V` Open the mark under cursor in a vertical split with (does not change the jump list)
-- `s` Open the mark under cursor in a horizontal
+- `s` Open the mark under cursor in a horizontal split
 - `S` Open the mark under cursor in a horizontal split (does not change the jump list)
 - `t` Open the mark under cursor in a new tab
 - `T` Open the mark under cursor in a new tab (does not change the jump list)
