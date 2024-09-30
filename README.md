@@ -14,15 +14,24 @@ Also provides useful shortcuts for **setting marks automatically** without havin
 
 You can install the plugin with your favorite plugin manager.
 
-In order to create commands and potentially override any default option, you can call the usual `setup` function by passing a single `table` argument.
+The plugin provides a couple of basic commands to get you started:
 
-**Commands are not automatically created**. To create them you need to call the `setup` function and set the `create_commands` option.
+- `:Marks` to open up a nicely formatted window with all defined `[a-z][A-Z]` marks
+- `:Jumps` to open up a window with the jump list
+
+**Commands are not automatically created**, so in order to create them you need to call the usual `setup` function and set the `create_commands` option. As you can see below, you can even change their default names if you wish to do so. If you prefer using mappings instead, skip ahead to the next section.
 
 ```lua
-require("vessel").setup({ create_commands = true })
+require("vessel").setup({
+  create_commands = true
+  commands = {
+    view_marks = "Marks", -- you can customize each command name
+    view_jumps = "Jumps"
+  }
+})
 ```
 
-Calling the `setup` function is not required for using the plugin as internal `<plug>` mappings are automatically created for you.
+Calling the `setup` function is not required for using the plugin as internal `<plug>` mappings are automatically set up for you.
 
 ### Mark list mappings
 
@@ -31,7 +40,7 @@ Calling the `setup` function is not required for using the plugin as internal `<
 - `<plug>(VesselViewGlobalMarks)` Show only *global* marks.
 - `<plug>(VesselViewExternalMarks)` Show only *global* marks belonging to other files.
 - `<plug>(VesselSetLocalMark)` Automatically set/unset a *local* mark on the current line.
-- `<plug>(VesselSetGlobalMark)` Automatically set/unset a *global* mark on the current linea.
+- `<plug>(VesselSetGlobalMark)` Automatically set/unset a *global* mark on the current line.
 
 ### Jump list mappings
 
@@ -57,7 +66,7 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 
 ### Mark list window
 
-The `:Marks` command opens up a floating window with all global and local marks grouped by the file they belong to. Once inside the window the following mappings are available:
+By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. To change that, head over to the [configuration](#mark-list-options) section and look for the `sort_marks` option. Once inside the window the following mappings are available:
 
 - `q`, `<ESC>` Close the floating window
 - `<C-J>` Move to the next mark group (path header)
@@ -76,7 +85,7 @@ The `:Marks` command opens up a floating window with all global and local marks 
 
 ### Jump list window
 
-The `:Jumps` command opens up a floating window showing the entire jump list. Jumps are displayed top to bottom, with the most recent jump being on top. The cursor is automatically placed on the current position in the jump list. Once inside the window the following mappings are available:
+By default the jump list window shows the entire jump list with jumps spanning multiple files. Jumps are displayed top to bottom, with the most recent jump being on top. The cursor is automatically placed on the current position in the jump list. Once inside the window the following mappings are available:
 
 - `l`, `<CR>` Jump to the line under cursor.
 - `q`, `<ESC>` Close the floating window.
@@ -132,7 +141,7 @@ end)
 
 ### Context object
 
-Throughout the *API* documentation we will refer to the `context`  as something that contains information about the current window/buffer, that is the buffer currently being edited. It is a `table` object with the following keys:
+Throughout the *API* documentation we will refer to the `context` as something that contains information about the current window/buffer, that is the buffer currently being edited. It is a `table` object with the following keys:
 
 - `bufnr` Current buffer number
 - `bufpath` Current buffer full path
