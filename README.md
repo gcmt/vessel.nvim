@@ -1,4 +1,4 @@
-#function() return true end# vessel.nvim
+# vessel.nvim
 
 Interactive **mark** and **jump** lists floating window.
 
