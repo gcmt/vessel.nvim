@@ -225,6 +225,10 @@ vim.keymap.set("n", "g", function()
 end)
 ```
 
+### Options validation
+
+Whether you use the `setup` function or set options via the `opt` interface, some basic *type* validation is alsways performed before options are actually being set. Specifically, if you decide to go the `opt` interface route, you should know that each option is validated the moment it is assigned. The moment you mistakenly try to assign a wrong value type to an option, you'll get a nice error message about what you need to fix, everything will keep working, and the option will retain its original value.
+
 ### Generic options
 
 ```lua
