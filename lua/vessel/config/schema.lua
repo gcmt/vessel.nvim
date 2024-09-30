@@ -52,8 +52,6 @@ local function oneof(...)
 	return {fn, msg}
 end
 
-local log_levels = vim.tbl_values(vim.log.levels)
-
 return {
 
 	["verbosity"] = oneof(0, 1, 2, 3, 4, 5),
