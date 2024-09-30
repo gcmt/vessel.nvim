@@ -36,7 +36,7 @@ local function listof(typ, allow_empty, len)
 end
 
 --- Check if a value is in the choices table
----@param ...
+---@param ... any
 ---@return table
 local function oneof(...)
 	local t = { ... }
