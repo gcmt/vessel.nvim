@@ -10,6 +10,13 @@ Also provides useful shortcuts for **setting marks automatically** without havin
 
 ![Jumplist](assets/jumps.png "Jump list preview.")
 
+## Table of Contents
+
+- [Setup](#setup)
+- [API](#api)
+- [Configuration](#configuration)
+- [Formatters](#formatters)
+
 ## Setup
 
 You can install the plugin with your favorite plugin manager.
