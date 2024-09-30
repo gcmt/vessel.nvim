@@ -42,7 +42,7 @@ end
 --- Close the window
 function App:_close_window()
 	vim.fn.win_execute(self.winid, "close")
-	vim.api.nvim_set_current_win(self.context.wininfo.winid)
+	vim.cmd(self.context.wininfo.winnr .. "wincmd w")
 end
 
 --- Setup the buffer by setting sensible options
