@@ -5,9 +5,15 @@ local util = require("vessel.util")
 --- Check if a list contains only values of the given type
 ---@param typ string
 ---@param len integer?
----@return function
+---@return table
 local function listof(typ, allow_empty, len)
-	return function(t)
+	local qty = len and " " .. len or ""
+	local s = len == 1 and "" or "s"
+	local msg = string.format("list of%s %s%s", qty, typ, s)
+	if allow_empty ~= nil and not allow_empty then
+		msg = msg .. " (non-empty)"
+	end
+	local fn = function(t)
 		if type(t) ~= "table" then
 			return false
 		end
@@ -26,27 +32,31 @@ local function listof(typ, allow_empty, len)
 		end
 		return true
 	end
+	return {fn, msg}
 end
 
 --- Check if a value is in the choices table
----@param choices table
----@return function
-function oneof(choices)
-	return function(val)
-		for _, v in pairs(choices) do
+---@param ...
+---@return table
+local function oneof(...)
+	local t = { ... }
+	local msg = "one of " .. util.join("|", ...)
+	local fn = function(val)
+		for _, v in pairs(t) do
 			if v == val then
 				return true
 			end
 		end
 		return false
 	end
+	return {fn, msg}
 end
 
 local log_levels = vim.tbl_values(vim.log.levels)
 
 return {
 
-	["verbosity"] = {oneof(log_levels), "one of " .. util.tbl_join("|", log_levels)},
+	["verbosity"] = oneof(0, 1, 2, 3, 4, 5),
 	["lazy_load_buffers"] = {"boolean"},
 	["highlight_on_jump"] = {"boolean"},
 	["highlight_timeout"] = {"number"},
@@ -75,7 +85,7 @@ return {
 	["marks"] = {"table"},
 	["marks.locals"] = {"string"},
 	["marks.globals"] = {"string"},
-	["marks.sort_marks"] = {listof("function", false), "list of functions"},
+	["marks.sort_marks"] = listof("function", false),
 	["marks.sort_groups"] = "function",
 	["marks.toggle_mark"] = {"boolean"},
 	["marks.use_backtick"] = {"boolean"},
@@ -84,10 +94,10 @@ return {
 	["marks.move_to_closest_mark"] = {"boolean"},
 	["marks.proximity_threshold"] = {"number"},
 	["marks.force_header"] = {"boolean"},
-	["marks.decorations"] = {listof("string", false, 2), "list of 2 strings"},
+	["marks.decorations"] = listof("string", false, 2),
 	["marks.show_colnr"] = {"boolean"},
 	["marks.strip_lines"] = {"boolean"},
-	["marks.path_style"] = {oneof({"full", "short", "relhome", "relcwd"}), "one of full|short|relhome|relcwd"},
+	["marks.path_style"] = oneof("full", "short", "relhome", "relcwd"),
 	["marks.formatters"] = {"table"},
 	["marks.formatters.mark"] = {"function"},
 	["marks.formatters.header"] = {"function"},
@@ -100,32 +110,32 @@ return {
 	["marks.highlights.col"] = {"string"},
 	["marks.highlights.line"] = {"string"},
 	["marks.mappings"] = {"table"},
-	["marks.mappings.close"] = {listof("string"), "list of strings"},
-	["marks.mappings.delete"] = {listof("string"), "list of strings"},
-	["marks.mappings.next_group"] = {listof("string"), "list of strings"},
-	["marks.mappings.prev_group"] = {listof("string"), "list of strings"},
-	["marks.mappings.jump"] = {listof("string"), "list of strings"},
-	["marks.mappings.keepj_jump"] = {listof("string"), "list of strings"},
-	["marks.mappings.tab"] = {listof("string"), "list of strings"},
-	["marks.mappings.keepj_tab"] = {listof("string"), "list of strings"},
-	["marks.mappings.split"] = {listof("string"), "list of strings"},
-	["marks.mappings.keepj_split"] = {listof("string"), "list of strings"},
-	["marks.mappings.vsplit"] = {listof("string"), "list of strings"},
-	["marks.mappings.keepj_vsplit"] = {listof("string"), "list of strings"},
+	["marks.mappings.close"] = listof("string"),
+	["marks.mappings.delete"] = listof("string"),
+	["marks.mappings.next_group"] = listof("string"),
+	["marks.mappings.prev_group"] = listof("string"),
+	["marks.mappings.jump"] = listof("string"),
+	["marks.mappings.keepj_jump"] = listof("string"),
+	["marks.mappings.tab"] = listof("string"),
+	["marks.mappings.keepj_tab"] = listof("string"),
+	["marks.mappings.split"] = listof("string"),
+	["marks.mappings.keepj_split"] = listof("string"),
+	["marks.mappings.vsplit"] = listof("string"),
+	["marks.mappings.keepj_vsplit"] = listof("string"),
 
 	["jumps"] = {"table"},
 	["jumps.real_positions"] = {"boolean"},
 	["jumps.strip_lines"] = {"boolean"},
 	["jumps.filter_empty_lines"] = {"boolean"},
 	["jumps.not_found"] = {"string"},
-	["jumps.indicator"] = {listof("string", false, 2), "list of 2 strings"},
+	["jumps.indicator"] = listof("string", false, 2),
 	["jumps.show_colnr"] = {"boolean"},
 	["jumps.mappings"] = {"table"},
 	["jumps.mappings.ctrl_o"] = {"string"},
 	["jumps.mappings.ctrl_i"] = {"string"},
-	["jumps.mappings.jump"] = {listof("string"), "list of strings"},
-	["jumps.mappings.close"] = {listof("string"), "list of strings"},
-	["jumps.mappings.clear"] = {listof("string"), "list of strings"},
+	["jumps.mappings.jump"] = listof("string"),
+	["jumps.mappings.close"] = listof("string"),
+	["jumps.mappings.clear"] = listof("string"),
 	["jumps.formatters"] = {"table"},
 	["jumps.formatters.jump"] = {"function"},
 	["jumps.highlights"] = {"table"},
