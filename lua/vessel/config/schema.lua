@@ -6,7 +6,7 @@ local util = require("vessel.util")
 ---@param typ string
 ---@param len integer?
 ---@return function
-local function listof(typ, len)
+local function listof(typ, allow_empty, len)
 	return function(t)
 		if type(t) ~= "table" then
 			return false
@@ -19,6 +19,9 @@ local function listof(typ, len)
 			count = count + 1
 		end
 		if len and len ~= count then
+			return false
+		end
+		if allow_empty ~= nil and not allow_empty and count == 0 then
 			return false
 		end
 		return true
@@ -72,8 +75,8 @@ return {
 	["marks"] = {"table"},
 	["marks.locals"] = {"string"},
 	["marks.globals"] = {"string"},
-	["marks.sort_marks"] = {"function"},
-	["marks.sort_groups"] = {"function"},
+	["marks.sort_marks"] = {listof("function", false), "list of functions"},
+	["marks.sort_groups"] = "function",
 	["marks.toggle_mark"] = {"boolean"},
 	["marks.use_backtick"] = {"boolean"},
 	["marks.not_found"] = {"string"},
@@ -81,7 +84,7 @@ return {
 	["marks.move_to_closest_mark"] = {"boolean"},
 	["marks.proximity_threshold"] = {"number"},
 	["marks.force_header"] = {"boolean"},
-	["marks.decorations"] = {listof("string", 2), "list of 2 strings"},
+	["marks.decorations"] = {listof("string", false, 2), "list of 2 strings"},
 	["marks.show_colnr"] = {"boolean"},
 	["marks.strip_lines"] = {"boolean"},
 	["marks.path_style"] = {oneof({"full", "short", "relhome", "relcwd"}), "one of full|short|relhome|relcwd"},
@@ -115,7 +118,7 @@ return {
 	["jumps.strip_lines"] = {"boolean"},
 	["jumps.filter_empty_lines"] = {"boolean"},
 	["jumps.not_found"] = {"string"},
-	["jumps.indicator"] = {listof("string", 2), "list of 2 strings"},
+	["jumps.indicator"] = {listof("string", false, 2), "list of 2 strings"},
 	["jumps.show_colnr"] = {"boolean"},
 	["jumps.mappings"] = {"table"},
 	["jumps.mappings.ctrl_o"] = {"string"},

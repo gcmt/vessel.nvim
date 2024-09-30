@@ -1,4 +1,4 @@
-## vessel.nvim
+#function() return true end# vessel.nvim
 
 Interactive **mark** and **jump** lists floating window.
 
@@ -67,7 +67,7 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 
 ### Mark list window
 
-By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. To change that, head over to the [configuration](#mark-list-options) section and look for the `sort_marks` option. Once inside the window the following mappings are available:
+By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. , head over to the [configuration](#mark-list-options) section and look for the `sort_marks` option. Once inside the window the following mappings are available:
 
 - `q`, `<ESC>` Close the floating window
 - `<C-J>` Move to the next mark group (path header)
@@ -81,6 +81,7 @@ By default the mark list window shows all global and local marks grouped by the 
 - `S` Open the mark under cursor in a horizontal split (does not change the jump list)
 - `t` Open the mark under cursor in a new tab
 - `T` Open the mark under cursor in a new tab (does not change the jump list)
+- `<SPACE>` Cycle sorting type. Sort marks by line number or alphabetically
 - `m{a-zA-Z}` Change the mark under cursor
 - `'{a-z-A-Z}` Jump directly to a mark
 
@@ -346,11 +347,12 @@ vessel.opt.marks.globals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 -- Default: function(a, b) return a > b end
 vessel.opt.marks.sort_groups = <function>
 
--- Function used to sort marks in the each groups.
+-- List of functions used to sort marks in the each groups.
 -- By default marks are sorted by line number.
--- Default: function(a, b) return a.lnum < b.lnum end
--- Use this to sort marks alphabetically: function(a, b) return a.mark > b.mark end
-vessel.opt.marks.sort_marks = <function>
+-- See also 'marks.mappings.cycle_sort' option
+-- Function signature: function(MarkA, MarkB) return boolean end
+local sorters = require("vessel.config.sorters")
+vessel.opt.marks.sort_marks = { sorters.marks.by_lnum, sorters.marks.by_mark }
 
 -- Controls the style of the file path header. Can be one of:
 -- "full": Full file path
@@ -445,6 +447,9 @@ vessel.opt.marks.mappings.vsplit = { "v" }
 -- Open the mark under cursor in a vertical split with
 -- Does not change the jump list
 vessel.opt.marks.mappings.keepj_vsplit = { "V" }
+
+-- Cycle sorting functions (See 'marks.sort_marks' option)
+vessel.opt.marks.mappings.cycle_sort = { "<SPACE>" }
 ```
 
 ### Jump list options

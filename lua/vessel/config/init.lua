@@ -7,24 +7,9 @@ local schema = require("vessel.config.schema")
 local util = require("vessel.util")
 local logger = require("vessel.logger")
 local validate = require("vessel.config.validate")
+local sorters = require("vessel.config.sorters")
 
 local M = {}
-
---- Function used to sort marks
----@param a Mark
----@param b Mark
----@return boolean
-local function sort_marks(a, b)
-	return a.lnum < b.lnum
-end
-
---- Function used to sort mark groups
----@param a string Path
----@param b string Path
----@return boolean
-local function sort_groups(a, b)
-	return a > b
-end
 
 --- Compute the 'height' of the popup
 --- This function should return an estimate only. This is needed only for correct
@@ -123,8 +108,8 @@ local _opt = {
 	marks = {
 		locals = "abcdefghijklmnopqrstuvwxyz",
 		globals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-		sort_marks = sort_marks,
-		sort_groups = sort_groups,
+		sort_marks = {sorters.marks.by_lnum, sorters.marks.by_mark},
+		sort_groups = sorters.marks.sort_groups,
 		toggle_mark = true,
 		use_backtick = false,
 		not_found = "No marks found",
@@ -162,6 +147,7 @@ local _opt = {
 			keepj_split = { "S" },
 			vsplit = { "v" },
 			keepj_vsplit = { "V" },
+			cycle_sort = { "<space>" },
 		},
 	},
 

@@ -33,6 +33,7 @@ end
 ---@field _marks table Marks grouped by file
 ---@field _bufnr integer
 ---@field _filter_func function?
+---@field _sort_func function
 local Marklist = {}
 Marklist.__index = Marklist
 
@@ -48,6 +49,7 @@ function Marklist:new(app, filter_func)
 	marks._marks = {}
 	marks._bufnr = -1
 	marks._filter_func = filter_func
+	marks._sort_func = app.config.marks.sort_marks[1]
 	return marks
 end
 
@@ -195,7 +197,7 @@ function Marklist:_get_marks(bufnr)
 			table.insert(groups[mark.file], mark)
 		end
 	end
-	local ok, err = pcall(sort_marks, groups, self._app.config.marks.sort_marks)
+	local ok, err = pcall(sort_marks, groups, self._sort_func)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
 		logger.err("error while sorting marks: %s", msg)
@@ -401,9 +403,26 @@ function Marklist:_action_change_mark(map, mark)
 	end
 end
 
+--- Cycle sort functions
+function Marklist:_action_cycle_sort()
+	local funcs = self._app.config.marks.sort_marks
+	local index = 1
+	for i = 1, #funcs do
+		if self._sort_func == funcs[i] then
+			index = i
+			break
+		end
+	end
+	self._sort_func = funcs[(index % #funcs)+1]
+	self:_refresh()
+end
+
 --- Setup mappings for the mark window
 ---@param map table
 function Marklist:_setup_mappings(map)
+	util.keymap("n", self._app.config.marks.mappings.cycle_sort, function()
+		self:_action_cycle_sort()
+	end)
 	util.keymap("n", self._app.config.marks.mappings.close, function()
 		self:_action_close()
 	end)
