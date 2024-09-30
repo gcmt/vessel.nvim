@@ -518,7 +518,7 @@ vessel.opt.jumps.highlights.line = "Normal"
 
 Formatters are functions that let you customize how each line of the floating window is going to look.
 
-All formatter functions take four arguments: the object being formatted, the [context object](#context-oject), a `meta` table object, and a `config` table object. They all should return a `string` and an optional special `table` used by the plugin for setting up highlighting.
+All formatter functions take four arguments: the object being formatted, the [context object](#context-object), a `meta` table object, and a `config` table object. They all should return a `string` and an optional special `table` used by the plugin for setting up highlighting.
 
 Most of the time you'll want to highlight specific parts of the formatted line. To make things easier the plugin provides a special `format` function you can call in order to automatically generate the correct return values. This utility function is very similar to the lua native `string.format()`, but the unlike it, our format function only accepts `%s` placeholders.
 
