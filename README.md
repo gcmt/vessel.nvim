@@ -23,7 +23,7 @@ The plugin provides a couple of basic commands to get you started:
 
 ```lua
 require("vessel").setup({
-  create_commands = true
+  create_commands = true,
   commands = {
     view_marks = "Marks", -- you can customize each command name
     view_jumps = "Jumps"
@@ -36,8 +36,9 @@ Calling the `setup` function is not required for using the plugin as internal `<
 ### Mark list mappings
 
 - `<plug>(VesselViewMarks)` Show all *global* (uppercase) and local *marks* (lowercase) grouped by file.
-- `<plug>(VesselViewLocalMarks)` Show only *local* marks.
-- `<plug>(VesselViewGlobalMarks)` Show only *global* marks.
+- `<plug>(VesselViewLocalMarks)` Show only *local* (lowercase) marks.
+- `<plug>(VesselViewGlobalMarks)` Show only *global* (uppercase) marks.
+- `<plug>(VesselViewBufferMarks)` Show both *local* and *global* marks in the current file.
 - `<plug>(VesselViewExternalMarks)` Show only *global* marks belonging to other files.
 - `<plug>(VesselSetLocalMark)` Automatically set/unset a *local* mark on the current line.
 - `<plug>(VesselSetGlobalMark)` Automatically set/unset a *global* mark on the current line.
@@ -100,8 +101,9 @@ All *API* functions take a single optional `opts` table argument if you want to 
 ### Mark list API
 
 - `vessel.view_marks(opts, filter_func)` Show all *global* (uppercase) and *local* marks (lowercase).
-- `vessel.view_local_marks(opts)` Show only *local* marks.
-- `vessel.view_global_marks(opts)` Show only *global* marks.
+- `vessel.view_local_marks(opts)` Show only *local* (lowercase) marks.
+- `vessel.view_global_marks(opts)` Show only *global* (uppercase) marks.
+- `vessel.view_buffer_marks(opts)` Show both *local* and *global* marks in the current file.
 - `vessel.view_external_marks(opts)` Show only *global* marks belonging to different files.
 - `vessel.set_local_mark(opts)` Automatically set/unset a *local* mark on the current line.
 - `vessel.set_global_mark(opts)` Automatically set/unset a *global* mark on the current line.

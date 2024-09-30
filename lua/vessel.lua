@@ -52,13 +52,21 @@ end
 
 --- Open the mark list window with only entries belonging to the current buffer
 ---@param opts table? Config overrides
-function M.view_local_marks(opts)
+function M.view_buffer_marks(opts)
 	M.view_marks(opts, function(mark, context)
 		return mark.file == context.bufpath
 	end)
 end
 
---- Open the mark list window with only global marks
+--- Open the mark list window with only local (lowercase) marks
+---@param opts table? Config overrides
+function M.view_local_marks(opts)
+	M.view_marks(opts, function(mark, context)
+		return string.match(mark.mark, "%l")
+	end)
+end
+
+--- Open the mark list window with only global (uppercase) marks
 ---@param opts table? Config overrides
 function M.view_global_marks(opts)
 	M.view_marks(opts, function(mark, context)

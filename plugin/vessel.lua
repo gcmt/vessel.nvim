@@ -7,6 +7,10 @@ vim.keymap.set("n", "<plug>(VesselViewMarks)", function()
 	require("vessel").view_marks()
 end)
 
+vim.keymap.set("n", "<plug>(VesselViewBufferMarks)", function()
+	require("vessel").view_buffer_marks()
+end)
+
 vim.keymap.set("n", "<plug>(VesselViewLocalMarks)", function()
 	require("vessel").view_local_marks()
 end)
