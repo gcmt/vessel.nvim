@@ -67,7 +67,7 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 
 ### Mark list window
 
-By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. , head over to the [configuration](#mark-list-options) section and look for the `sort_marks` option. Once inside the window the following mappings are available:
+By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. To change that, head over to the [configuration](#mark-list-options) section and look for the `sort_marks` option. Once inside the window the following mappings are available:
 
 - `q`, `<ESC>` Close the floating window
 - `<C-J>` Move to the next mark group (path header)
