@@ -570,6 +570,47 @@ local function mark_formatter(mark, meta, context, config)
 end
 ```
 
+In this more complex example we'll remove the header and display the file name on each line instead:
+
+```lua
+local util = require("vessel.util")
+local vessel = require("vessel")
+
+vessel.opt.marks.formatters.header = function(path, meta, context, config)
+  return
+end
+
+vessel.opt.marks.formatters.mark = function(mark, meta, context, config)
+    -- Makes sure each line number is vertically aligned
+  local lnum_fmt = "%" .. #tostring(meta.max_lnum) .. "s"
+  local lnum = string.format(lnum_fmt, mark.lnum)
+
+  local line, line_hl
+  if mark.loaded then
+    -- strips leading white spaces from each line
+    line = string.gsub(mark.line, "^%s+", "")
+    line_hl = "Normal"
+  else
+    -- If the file the mark belongs to is not loaded in memory,
+    -- display its path instead
+    line = util.prettify_path(mark.file)
+    line_hl = "Comment"
+  end
+
+  -- Display a vertically aligned file name
+  local path_fmt = "%-" .. meta.max_suffix .. "s" -- align file names
+  local path = string.format(path_fmt, meta.suffixes[mark.file])
+
+  return util.format(
+    " [%s]  %s %s %s",
+    { mark.mark, "Keyword" },
+    { path, "Directory" },
+    { lnum, "LineNr" },
+    { line, line_hl }
+  )
+end
+```
+
 ### Formatter function signatures
 
 #### marks.formatters.header
