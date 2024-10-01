@@ -13,7 +13,7 @@ function M.validate_partial(config, schema, ignore_unknown)
 		for key, val in pairs(config) do
 			local s_key = schema_key == "" and key or util.join(".", schema_key, key)
 			if schema[s_key] ~= nil then
-				local ok, err = pcall(vim.validate, { [s_key] = {val, unpack(schema[s_key])}})
+				local ok, err = pcall(vim.validate, { [s_key] = { val, unpack(schema[s_key]) } })
 				if not ok then
 					error(string.format("%s (%s)", err, val))
 				end

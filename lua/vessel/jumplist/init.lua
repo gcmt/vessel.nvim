@@ -1,7 +1,7 @@
 ---@module "jumplist"
 
-local util = require("vessel.util")
 local logger = require("vessel.logger")
+local util = require("vessel.util")
 
 ---@class Jump
 ---@field current boolean

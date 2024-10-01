@@ -10,7 +10,7 @@ local function lazy_opt()
 		end,
 		__newindex = function(_, key, val)
 			require("vessel.config").opt[key] = val
-		end
+		end,
 	})
 	return t
 end

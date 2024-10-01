@@ -1,7 +1,7 @@
 ---@module "marklist"
 
-local util = require("vessel.util")
 local logger = require("vessel.logger")
+local util = require("vessel.util")
 
 ---@class Mark
 ---@field mark string Mark letter
@@ -413,7 +413,7 @@ function Marklist:_action_cycle_sort()
 			break
 		end
 	end
-	self._sort_func = funcs[(index % #funcs)+1]
+	self._sort_func = funcs[(index % #funcs) + 1]
 	self:_refresh()
 end
 
@@ -556,7 +556,7 @@ function Marklist:_render()
 		local ok, line, matches = pcall(header_formatter, path, {
 			groups_count = groups_count,
 			suffixes = suffixes,
-			max_suffix = max_suffix
+			max_suffix = max_suffix,
 		}, self._app.context, self._app.config)
 		if not ok then
 			self._app:_close_window()

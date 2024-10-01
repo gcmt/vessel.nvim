@@ -27,7 +27,7 @@ local function ConfigProxy(path, node, wrapped, validate_func)
 			return wrapped[key]
 		end
 	end
-	meta.__newindex = function (_, key, val)
+	meta.__newindex = function(_, key, val)
 		if node[key] == nil then
 			local fullpath = path ~= "" and path .. "." .. key or key
 			logger.err("option validation error: %s: unknown option", fullpath)

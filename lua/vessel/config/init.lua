@@ -1,13 +1,13 @@
 ---@module "config"
 
-local jumps_formatters = require("vessel.jumplist.formatters")
-local marks_formatters = require("vessel.marklist.formatters")
 local config_proxy = require("vessel.config.proxy")
-local schema = require("vessel.config.schema")
-local util = require("vessel.util")
+local jumps_formatters = require("vessel.jumplist.formatters")
 local logger = require("vessel.logger")
-local validate = require("vessel.config.validate")
+local marks_formatters = require("vessel.marklist.formatters")
+local schema = require("vessel.config.schema")
 local sorters = require("vessel.config.sorters")
+local util = require("vessel.util")
+local validate = require("vessel.config.validate")
 
 local M = {}
 
@@ -108,7 +108,7 @@ local _opt = {
 	marks = {
 		locals = "abcdefghijklmnopqrstuvwxyz",
 		globals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-		sort_marks = {sorters.marks.by_lnum, sorters.marks.by_mark},
+		sort_marks = { sorters.marks.by_lnum, sorters.marks.by_mark },
 		sort_groups = sorters.marks.sort_groups,
 		toggle_mark = true,
 		use_backtick = false,
