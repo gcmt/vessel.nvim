@@ -31,8 +31,8 @@ The plugin provides a couple of basic commands to get you started:
 ```lua
 require("vessel").setup({
   create_commands = true,
-  commands = {
-    view_marks = "Marks", -- you can customize each command name
+  commands = { -- not required unless you want to customize each command name
+    view_marks = "Marks",
     view_jumps = "Jumps"
   }
 })
@@ -204,7 +204,7 @@ You can configure the plugin in different ways. The most obvious one is by calli
 require("vessel").setup({
   create_commands = true,
   commands = {
-    view_marks = "Marks", -- you can customize each command name
+    view_marks = "Marks",
     view_jumps = "Jumps"
   },
   ...
