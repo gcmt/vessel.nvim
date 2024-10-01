@@ -32,6 +32,7 @@ end
 ---@field _app App
 ---@field _marks table Marks grouped by file
 ---@field _bufnr integer
+---@field _bufft string
 ---@field _filter_func function?
 ---@field _sort_func function
 local Marklist = {}
@@ -44,6 +45,7 @@ Marklist.__index = Marklist
 function Marklist:new(app, filter_func)
 	local marks = {}
 	setmetatable(marks, Marklist)
+	marks._bufft = "marklist"
 	marks._nsid = vim.api.nvim_create_namespace("__vessel__")
 	marks._app = app
 	marks._marks = {}
@@ -66,6 +68,7 @@ function Marklist:open()
 	local ok
 	self._bufnr, ok = self._app:open_window(self)
 	if ok then
+		vim.fn.setbufvar(self._bufnr, "&filetype", self._bufft)
 		self:_render()
 	end
 end

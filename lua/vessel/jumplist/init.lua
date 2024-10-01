@@ -46,6 +46,7 @@ end
 ---@class Jumplist
 ---@field _nsid integer Namespace id for highlighting
 ---@field _app App Reference to the main app
+---@field _bufft string Buffer filetype
 ---@field _bufnr integer Where jumps will be rendered
 ---@field _jumps table Jumps list (unfiltered)
 ---@field _filter_func function?
@@ -61,6 +62,7 @@ function Jumplist:new(app, filter_func)
 	setmetatable(jumps, Jumplist)
 	jumps._nsid = vim.api.nvim_create_namespace("__vessel__")
 	jumps._app = app
+	jumps._bufft = "jumplist"
 	jumps._bufnr = -1
 	jumps._jumps = {}
 	jumps._filter_func = filter_func
@@ -80,6 +82,7 @@ function Jumplist:open()
 	local ok
 	self._bufnr, ok = self._app:open_window(self)
 	if ok then
+		vim.fn.setbufvar(self._bufnr, "&filetype", self._bufft)
 		self:_render()
 	end
 end
