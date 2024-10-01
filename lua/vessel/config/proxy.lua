@@ -8,9 +8,8 @@ local M = {}
 --- Proxy to validate options as soon as they are set
 ---@param node table Child proxy object
 ---@param wrapped table Proxied object
----@param validate_func function? Validation function
 ---@return table Proxy object
-local function ConfigProxy(path, node, wrapped, validate_func)
+local function ConfigProxy(path, node, wrapped)
 	local proxy = {}
 	local meta = {}
 	meta.__proxy = true
