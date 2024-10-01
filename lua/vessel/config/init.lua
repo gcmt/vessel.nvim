@@ -4,7 +4,6 @@ local config_proxy = require("vessel.config.proxy")
 local jumps_formatters = require("vessel.jumplist.formatters")
 local logger = require("vessel.logger")
 local marks_formatters = require("vessel.marklist.formatters")
-local schema = require("vessel.config.schema")
 local sorters = require("vessel.config.sorters")
 local util = require("vessel.util")
 local validate = require("vessel.config.validate")
@@ -185,10 +184,10 @@ local _opt = {
 ---@param opts table?
 ---@return boolean
 local function check_options(opts)
-	local ok, err = pcall(validate.validate_partial, opts or {}, schema)
+	local ok, err = pcall(validate.validate_partial, opts or {})
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.-:%d+:%s+", "")
-		logger.err("option validation error: %s", msg)
+		logger.err("validation error: %s", msg)
 		return false
 	end
 	return true
@@ -200,7 +199,7 @@ end
 M.load = function(opts)
 	if check_options(opts) then
 		_opt = vim.tbl_deep_extend("force", _opt, opts or {})
-		M.opt = config_proxy.new(_opt, check_options)
+		M.opt = config_proxy.new(_opt)
 	end
 	return _opt
 end
@@ -216,6 +215,6 @@ M.get = function(opts)
 end
 
 --- Proxy object to allow setting options safely
-M.opt = config_proxy.new(_opt, check_options)
+M.opt = config_proxy.new(_opt)
 
 return M
