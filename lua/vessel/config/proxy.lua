@@ -35,7 +35,7 @@ local function ConfigProxy(path, node, wrapped, validate_func)
 		end
 		local ok, err = pcall(validate.validate_option, fullpath, val)
 		if not ok then
-			logger.err(string.gsub(tostring(err), "^.-:%d+:%s+", ""))
+			logger.err("validation error: %s", string.gsub(tostring(err), "^.-:%d+:%s+", ""))
 			return
 		end
 		wrapped[key] = val
