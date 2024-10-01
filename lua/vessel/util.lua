@@ -223,7 +223,7 @@ function M.format(fmt, ...)
 		if repl[i] then
 			if type(repl[i]) == "table" then
 				local start = #ret + 1
-				ret = ret .. repl[i][1]
+				ret = ret .. tostring(repl[i][1])
 				table.insert(matches, { startpos = start, endpos = #ret, hlgroup = repl[i][2] })
 			else
 				ret = ret .. repl[i]
