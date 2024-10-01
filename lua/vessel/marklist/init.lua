@@ -500,8 +500,6 @@ function Marklist:_render()
 		return {}
 	end
 
-	local _, groups_count = self:get_count()
-
 	local paths = vim.tbl_keys(self._marks)
 	local ok, err = pcall(table.sort, paths, self._app.config.marks.sort_groups)
 	if not ok then
@@ -511,13 +509,38 @@ function Marklist:_render()
 		return {}
 	end
 
+	local max_suffix
 	-- find for each path the shortest unique suffix
 	local suffixes = util.unique_suffixes(paths)
-	local max_suffix
+
 	for _, suffix in pairs(suffixes) do
 		local suffix_len = vim.fn.strchars(suffix)
 		if not max_suffix or suffix_len > max_suffix then
 			max_suffix = suffix_len
+		end
+	end
+
+	local max_col
+	local max_lnum
+	local groups_max = {}
+	local groups_count = 0
+
+	for path, group in pairs(self._marks) do
+		groups_max[path] = {}
+		groups_count = groups_count + 1
+		for _, mark in pairs(group) do
+			if not max_lnum or mark.lnum > max_lnum then
+				max_lnum = mark.lnum
+			end
+			if not max_col or mark.col > max_col then
+				max_col = mark.col
+			end
+			if not groups_max[path].max_lnum or mark.lnum > groups_max[path].max_lnum then
+				groups_max[path].max_lnum = mark.lnum
+			end
+			if not groups_max[path].max_col or mark.col > groups_max[path].max_col then
+				groups_max[path].max_col = mark.col
+			end
 		end
 	end
 
@@ -550,16 +573,6 @@ function Marklist:_render()
 			end
 		end
 
-		local max_lnum, max_col
-		for _, mark in pairs(group) do
-			if not max_lnum or mark.lnum > max_lnum then
-				max_lnum = mark.lnum
-			end
-			if not max_col or mark.col > max_col then
-				max_col = mark.col
-			end
-		end
-
 		local k = 0
 		for _, mark in ipairs(group) do
 			k = k + 1
@@ -567,10 +580,12 @@ function Marklist:_render()
 				pos = k,
 				is_last = k == #group,
 				groups_count = groups_count,
-				max_group_lnum = max_lnum,
-				max_group_col = max_col,
+				max_lnum = max_lnum,
+				max_col = max_col,
+				max_group_lnum = groups_max[path].max_lnum,
+				max_group_col = groups_max[path].max_col,
 				suffixes = suffixes,
-				max_suffix = max_suffix
+				max_suffix = max_suffix,
 			}, self._app.context, self._app.config)
 			if not ok or not line then
 				local msg

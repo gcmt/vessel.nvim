@@ -35,12 +35,12 @@ end
 function M.mark_formatter(mark, meta, context, config)
 	local prefix = get_prefix(mark, meta, context, config)
 
-	local lnum_fmt = "%" .. #tostring(meta.max_group_lnum) .. "s"
+	local lnum_fmt = "%" .. #tostring(meta.max_lnum) .. "s"
 	local lnum = string.format(lnum_fmt, mark.lnum)
 
 	local col = ""
 	if config.marks.show_colnr then
-		local col_fmt = "%" .. #tostring(meta.max_group_col) .. "s"
+		local col_fmt = "%" .. #tostring(meta.max_col) .. "s"
 		col = " " .. string.format(col_fmt, mark.col)
 	end
 
