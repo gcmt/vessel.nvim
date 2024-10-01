@@ -602,7 +602,9 @@ Controls how each mark in the mark list is formatted. Takes the following four a
 - `meta` Table containing additional contextual information. It has the following keys:
   - `pos` Position of the mark being formatted in the group.
   - `is_last` Whether the mark being formatted is last in the group.
-  - `groups_count` Total number of groups.
+  - `groups_count` Total number of mark groups.
+  - `max_lnum` Highest line number among all mark groups.
+  - `max_col` Highest column number among all mark groups.
   - `max_group_lnum` Highest line number in the current group.
   - `max_group_col` Highest column number in the group.
   - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
