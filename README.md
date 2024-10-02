@@ -16,15 +16,15 @@ On a quest to bring better ergonomics around *Neovim* native lists. This plugin 
 
 - [Setup](#setup)
 - [Windows](#windows)
-  - [Mark List](#mark-list-window)
-  - [Jump List](#jump-list-window)
-  - [Buffer List](#buffer-list-window)
+  - [Mark List Window](#mark-list-window)
+  - [Jump List Window](#jump-list-window)
+  - [Buffer List Window](#buffer-list-window)
 - [API](#api)
   - [Mark List API](#mark-list-api)
   - [Jump List API](#jump-list-api)
   - [Buffer List API](#buffer-list-api)
   - [Mark Object](#mark-object)
-  - [Jump Object](#mark-object)
+  - [Jump Object](#jump-object)
   - [Buffer Object](#mark-object)
   - [Modes](#modes)
   - [Autocommand Events](#autocommand-events)
@@ -65,7 +65,7 @@ require("vessel").setup({
 
 Calling the `setup` function is not required for using the plugin as internal `<plug>` mappings are automatically set up for you.
 
-### Mark list mappings
+### Mark List Mappings
 
 - `<plug>(VesselViewMarks)` Show all *global* (uppercase) and local *marks* (lowercase) grouped by file.
 - `<plug>(VesselViewLocalMarks)` Show only *local* (lowercase) marks.
@@ -75,17 +75,17 @@ Calling the `setup` function is not required for using the plugin as internal `<
 - `<plug>(VesselSetLocalMark)` Automatically set/unset a *local* mark on the current line.
 - `<plug>(VesselSetGlobalMark)` Automatically set/unset a *global* mark on the current line.
 
-### Jump list mappings
+### Jump List mappings
 
 - `<plug>(VesselViewJumps)` Show the whole jump list.
 - `<plug>(VesselViewLocalJumps)` Show only jumps inside the current file.
 - `<plug>(VesselViewExternalJumps)` Show only jumps outside the current file.
 
-### Buffer list mappings
+### Buffer List Mappings
 
 - `<plug>(VesselViewBuffers)` Show the buffer list. Only normal listed buffers will be displayed. A normal buffer is a buffer with the `buftype` option empty. Unlisted buffers can be toggled later directly inside the buffer list window.
 
-### Example mappings
+### Example Mappings
 
 Here how to use `<plug>` mappings in lua
 
@@ -103,7 +103,7 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 
 ## Windows
 
-### Mark list window
+### Mark List Window
 
 By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. To change that, head over to the [configuration section](#mark-list-options) and look for the `sort_marks` option.
 
@@ -125,7 +125,7 @@ Once inside the window, the following mappings are available:
 - `m{a-zA-Z}` Change the mark under cursor
 - `'{a-z-A-Z}` Jump directly to a mark
 
-### Jump list window
+### Jump List Window
 
 By default the jump list window shows the entire jump list with jumps spanning multiple files. Jumps are displayed top to bottom, with the most recent jump being on top. The cursor is automatically placed on the current position in the jump list. On the left column you can see jump positions relative to the current one. You can use those relative position as a count to `<c-o>` and `<c-i>`.
 
@@ -139,7 +139,7 @@ Once inside the window, the following mappings are available:
 
 **NOTE**: the relative positions you see by default on the left column are not the **real relative positions** you would use as a count outside the jump list window. This is because the list can be filtered and you could potentially see big gaps between these positions otherwise.
 
-### Buffer list window
+### Buffer List Window
 
 By default the buffer list window shows all the normal buffers with the `listed` option set. Showing *unlisted* buffers can be toggled with the press of a key. By default buffers are sorted by their directory name. Head over to the [configuration section](#buffer-list-options) and look for the `sort_buffers` option to see how you can customize buffer sorting.
 
@@ -157,13 +157,13 @@ Once inside the window, the following mappings are available:
 - `<space>` Cycle sorting type. It will be remembered once you close and reopen the window.
 - `a` Toggle showing *unlisted* buffers (`:bdelete`d buffers).
 
-**NOTE:** Don't be afraid to delete a buffer as you can still reopen it later by simply toggling *unlisted buffers* and re-editing the buffer. This will help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
+**NOTE:** Don't be afraid to delete buffers. You can still re-open the later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
 
 ## API
 
 All *API* functions take a single optional `opts` table argument if you want to override the default options or every option you passed to the `setup` function.
 
-### Mark list API
+### Mark List API
 
 - `vessel.view_marks(opts, filter_func)` Show all *global* (uppercase) and *local* marks (lowercase). With the optional `filter_func` function argument you can filter out mark entries.
 - `vessel.view_local_marks(opts)` Show only *local* (lowercase) marks.
@@ -187,7 +187,7 @@ vim.keymap.set("n", "gm", function()
 end)
 ```
 
-### Jump list API
+### Jump List API
 
 - `vessel.view_jumps(opts, filter_func)` Show the whole jump list. With the optional `filter_func` function argument you can filter out jump entries.
 - `vessel.view_local_jumps(opts)` Show only jumps inside the current file.
@@ -207,7 +207,7 @@ vim.keymap.set("n", "gL", function()
 end)
 ```
 
-### Buffer list API
+### Buffer List API
 
 - `vessel.view_buffers(opts, filter_func)` Show the buffer list. Only normal listed buffers will be displayed. A normal buffer is a buffer with the `buftype` option empty. Unlisted buffers can be toggled later directly inside the buffer list window.
 
@@ -225,7 +225,7 @@ vim.keymap.set("n", "gm", function()
 end)
 ```
 
-### Context object
+### Context Object
 
 Throughout the *API* documentation we will refer to the `context` as something that contains information about the current window/buffer, that is the buffer currently being edited. It is a `table` object with the following keys:
 
@@ -234,7 +234,7 @@ Throughout the *API* documentation we will refer to the `context` as something t
 - `wininfo` Window information as returned by `vim.fn.getwininfo()`
 - `curpos` Cursor position as returned by `vim.fn.getcurpos()`
 
-### Mark object
+### Mark Object
 
 The `Mark` object is `table` with the following keys:
 
@@ -245,7 +245,7 @@ The `Mark` object is `table` with the following keys:
 - `file` File the mark belongs to
 - `loaded` Whether the file is actually loaded in memory
 
-### Jump object
+### Jump Object
 
 The `Jump` object is `table` with the following keys:
 
@@ -258,7 +258,7 @@ The `Jump` object is `table` with the following keys:
 - `col` Jump column number
 - `line` Line on which the jump is positioned
 
-### Buffer object
+### Buffer Object
 
 The `Buffer` object is `table` with the following keys:
 
@@ -291,7 +291,7 @@ The plugin triggers `User` autocommands on certain events:
 - `VesselJumplistEnter` After the vessel buffer is created and the window opened but before any content is displayed in the buffer.
 - `VesselJumplistChanged` Each time the jump list window content changes.
 
-#### How to setup custom mappings
+#### How to Setup Custom Mappings
 
 The example below shows how you can setup your own mappings in the buffer window with the help of custom autocommand events.
 
@@ -305,18 +305,25 @@ local vessel_aug = vim.api.nvim_create_augroup("VesselCustom", { clear = true })
 -- notice the use of the "User" autocommand event
 vim.api.nvim_create_autocmd("User", {
   group = vessel_aug,
+
   -- use the custom event name as pattern
   pattern = "VesselBufferlistEnter",
+
   callback = function()
     vim.keymap.set("n", ".", function()
+
       -- grab the selected buffer entry
       local sel = vim.b.vessel.get_selected()
+
         -- get_selected() can return nil on an empty list
       local path = sel and vim.fs.dirname(sel.path) or vim.fn.getcwd()
+
       -- close the buffer list window with the provided function
       vim.b.vessel.close_window()
+
       -- open up the file explorer for the given path
       vim.cmd("FileExplorer " .. vim.fn.fnameescape(path))
+
     end, { buffer = true })
   end,
 })
@@ -371,6 +378,7 @@ end)
 ### Options Validation
 
 Whether you use the `setup` function or set options via the `opt` interface, some basic *type* validation is alsways performed before options are actually being set. Specifically, if you decide to go the `opt` interface route, you should know that each option is validated the moment it is assigned. The moment you mistakenly try to assign a wrong value type to an option, you'll get a nice error message about what you need to fix, but everything will keep working and the option will retain its original value.
+
 ### Generic Options
 
 ```lua
