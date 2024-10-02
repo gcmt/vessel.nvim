@@ -12,6 +12,14 @@ function M.buffers.by_path(a, b)
 	return vim.fs.dirname(a.path) < vim.fs.dirname(b.path)
 end
 
+--- Sort buffers by basename
+---@param a Buffer
+---@param b Buffer
+---@return boolean
+function M.buffers.by_basename(a, b)
+	return vim.fs.basename(a.path) < vim.fs.basename(b.path)
+end
+
 --- Sort marks by line number
 ---@param a Mark
 ---@param b Mark
