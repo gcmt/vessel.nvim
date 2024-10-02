@@ -17,11 +17,12 @@ local Mark = {}
 Mark.__index = Mark
 
 --- Return a new Mark instance
+---@param letter string
 ---@return Mark
-function Mark:new()
+function Mark:new(letter)
 	local mark = {}
 	setmetatable(mark, Mark)
-	mark.mark = ""
+	mark.mark = letter or ""
 	mark.lnum = 0
 	mark.col = 0
 	mark.line = ""
@@ -176,8 +177,7 @@ end
 function Marklist:_get_marks(bufnr)
 	local groups = {}
 	for _, item in pairs(getmarklist(bufnr)) do
-		local mark = Mark:new()
-		mark.mark = item.mark
+		local mark = Mark:new(item.mark)
 		mark.lnum = item.pos[2]
 		mark.col = item.pos[3]
 		mark.file = item.file
@@ -231,8 +231,13 @@ end
 ---@param selected Mark Selected mark
 ---@param map table New map table
 function Marklist:_follow_cursor(selected, map)
-	for i, mark in pairs(map) do
-		if mark.mark == selected.mark then
+	for i, item in pairs(map) do
+		if
+			type(item) == "string" and type(selected) == "string" and item == selected
+			or type(item) == "table"
+				and type(selected) == "table"
+				and item.mark == selected.mark
+		then
 			util.vcursor(i)
 			break
 		end
@@ -416,7 +421,8 @@ function Marklist:_action_change_mark(map, mark)
 		end
 		vim.fn.win_execute(self._app.context.wininfo.winid, "delmarks " .. selected.mark)
 		vim.api.nvim_buf_set_mark(mark_bufnr, mark, selected.lnum, selected.col, {})
-		self:_refresh()
+		local newmap = self:_refresh()
+		self:_follow_cursor(Mark:new(mark), newmap)
 	else
 		logger.err("cannot change mark, buffer not loaded")
 	end
