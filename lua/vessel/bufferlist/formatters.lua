@@ -11,20 +11,20 @@ local M = {}
 ---@return string
 local function format_bufname(path, meta, config)
 	local align = ""
-	if config.buffers.name_align == "right" then
+	if config.buffers.bufname_align == "right" then
 		align = "%"
-	elseif config.buffers.name_align == "left" then
+	elseif config.buffers.bufname_align == "left" then
 		align = "%-"
 	end
 	local name = ""
 	local bname_fmt = "%s"
-	if config.buffers.name_style == "unique" then
+	if config.buffers.bufname_style == "unique" then
 		name = meta.suffixes[path]
 		bname_fmt = align .. meta.max_suffix .. "s"
-	elseif config.buffers.name_style == "basename" then
+	elseif config.buffers.bufname_style == "basename" then
 		name = vim.fs.basename(path)
 		bname_fmt = align .. meta.max_basename .. "s"
-	elseif config.buffers.name_style == "hide" then
+	elseif config.buffers.bufname_style == "hide" then
 		name = ""
 	end
 	if align ~= "" and name ~= "" then
@@ -40,15 +40,15 @@ end
 ---@param config table
 ---@return string
 local function format_path(path, meta, config)
-	if config.buffers.path_style == "relcwd" then
+	if config.buffers.bufpath_style == "relcwd" then
 		return util.prettify_path(path)
-	elseif config.buffers.path_style == "relhome" then
+	elseif config.buffers.bufpath_style == "relhome" then
 		return select(1, string.gsub(path, "^" .. os.getenv("HOME") .. "/", "~/", 1))
-	elseif config.buffers.path_style == "short" then
+	elseif config.buffers.bufpath_style == "short" then
 		return meta.suffixes[path]
-	elseif config.buffers.path_style == "full" then
+	elseif config.buffers.bufpath_style == "full" then
 		return path
-	elseif config.buffers.path_style == "hide" then
+	elseif config.buffers.bufpath_style == "hide" then
 		return ""
 	end
 end
