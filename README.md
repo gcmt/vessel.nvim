@@ -48,6 +48,7 @@ The plugin provides a couple of basic commands to get you started:
 
 - `:Marks` to open up a nicely formatted window with all defined `[a-z][A-Z]` marks
 - `:Jumps` to open up a window with the jump list
+- `:Buffers` to open up a window with the buffer list
 
 **Commands are not automatically created**, so in order to create them you need to call the usual `setup` function and set the `create_commands` option. As you can see below, you can even change their default names if you wish to do so. If you prefer using mappings instead, skip ahead to the next section.
 
