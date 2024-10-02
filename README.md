@@ -145,17 +145,17 @@ By default the buffer list window shows all the normal buffers with the `listed`
 
 Once inside the window, the following mappings are available:
 
-`q`, `<esc>` Close the floating window,
-`l`, `<cr>` Edit the buffer under cursor.
-`t` Edit the buffer undeer cursor in a new tab.
-`s` Edit the buffer under cursor in a horizontal split.
-`v` Edit the buffer under cursor in a vertical split.
-`d` Delete the buffer under cursor. Fails if there is any unsaved change. Executes `:bdelete` on the buffer.
-`D` **Force** delete the buffer under cursor. **All unsaved changes will be lost!**. Executes `:bdelete!` on the buffer.
-`w` Wipe buffer under cursor. Fails if there is any unsaved change. Executes `:bwipeout` on the buffer.
-`W` **Force** wipe the buffer under cursor. **All unsaved changes will be lost!**. Executes `:bwipeout!` on the buffer.
-`<space>` Cycle sorting type. It will be remembered once you close and reopen the window.
-`a` Toggle showing *unlisted* buffers (`:bdelete`d buffers).
+- `q`, `<esc>` Close the floating window,
+- `l`, `<cr>` Edit the buffer under cursor.
+- `t` Edit the buffer undeer cursor in a new tab.
+- `s` Edit the buffer under cursor in a horizontal split.
+- `v` Edit the buffer under cursor in a vertical split.
+- `d` Delete the buffer under cursor. Fails if there is any unsaved change. Executes `:bdelete` on the buffer.
+- `D` **Force** delete the buffer under cursor. **All unsaved changes will be lost!**. Executes `:bdelete!` on the buffer.
+- `w` Wipe buffer under cursor. Fails if there is any unsaved change. Executes `:bwipeout` on the buffer.
+- `W` **Force** wipe the buffer under cursor. **All unsaved changes will be lost!**. Executes `:bwipeout!` on the buffer.
+- `<space>` Cycle sorting type. It will be remembered once you close and reopen the window.
+- `a` Toggle showing *unlisted* buffers (`:bdelete`d buffers).
 
 **NOTE:** Don't be afraid to delete a buffer as you can still reopen it later by simply toggling *unlisted buffers* and re-editing the buffer. This will help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
 
