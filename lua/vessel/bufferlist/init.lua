@@ -329,6 +329,8 @@ function Bufferlist:_render()
 		vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
 		self:_setup_mappings({})
 		util.fit_content(self._app.config.window.max_height)
+		self._app:_set_buffer_data({})
+		vim.cmd("doau User VesselBufferlistChanged")
 		return {}
 	end
 
@@ -392,14 +394,7 @@ function Bufferlist:_render()
 	util.fit_content(self._app.config.window.max_height)
 	self:_set_cursor(map)
 
-	-- set buffer-local variable together with the window close handler
-	vim.api.nvim_buf_set_var(self._bufnr, "vessel", {
-		map = map,
-		close = function()
-			self._app:_close_window()
-		end,
-	})
-
+	self._app:_set_buffer_data(map)
 	vim.cmd("doau User VesselBufferlistChanged")
 
 	return map

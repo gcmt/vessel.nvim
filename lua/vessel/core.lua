@@ -109,6 +109,20 @@ function App:_get_popup_options(list)
 	return opts
 end
 
+--- Set the buffer-local variable with info about the buffer content
+---@param map table
+function App:_set_buffer_data(map)
+	vim.api.nvim_buf_set_var(self.bufnr, "vessel", {
+		map = map,
+		get_selected = function()
+			return map[vim.fn.line(".")]
+		end,
+		close_window = function()
+			self:_close_window()
+		end,
+	})
+end
+
 --- Open the popup window
 ---@param list Marklist|Jumplist|Bufferlist
 ---@return integer, boolean Whether the window was actually opened

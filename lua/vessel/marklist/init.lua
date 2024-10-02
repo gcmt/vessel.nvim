@@ -534,6 +534,8 @@ function Marklist:_render()
 		vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
 		self:_setup_mappings({})
 		util.fit_content(self._app.config.window.max_height)
+		self._app:_set_buffer_data({})
+		vim.cmd("doau User VesselMarklistChanged")
 		return {}
 	end
 
@@ -649,6 +651,7 @@ function Marklist:_render()
 	self:_setup_mappings(map)
 	util.fit_content(self._app.config.window.max_height)
 	self:_set_cursor(map)
+	self._app:_set_buffer_data(map)
 	vim.cmd("doau User VesselMarklistChanged")
 
 	return map

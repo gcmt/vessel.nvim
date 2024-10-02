@@ -294,6 +294,8 @@ function Jumplist:_render()
 		vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
 		self:_setup_mappings({})
 		util.fit_content(self._app.config.window.max_height)
+		self._app:_set_buffer_data({})
+		vim.cmd("doau User VesselJumplistChanged")
 		return {}
 	end
 
@@ -378,6 +380,7 @@ function Jumplist:_render()
 	self:_setup_mappings(map)
 	util.fit_content(self._app.config.window.max_height)
 	util.cursor(current_jump_line)
+	self._app:_set_buffer_data(map)
 	vim.cmd("doau User VesselJumplistChanged")
 
 	return map
