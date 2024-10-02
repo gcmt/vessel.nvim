@@ -270,11 +270,15 @@ function Bufferlist:_get_buffers()
 	end
 
 	local sort_func = Sort_func or self._app.config.buffers.sort_buffers[1]
-	local ok, err = pcall(table.sort, buffers, sort_func)
+	local func, description = sort_func()
+	local ok, err = pcall(table.sort, buffers, func)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
 		logger.err("buffer sorting error: %s", msg)
 		return {}
+	elseif Sort_func then
+		-- giv feeback only if Sort_func gets changed
+		logger.info("vessel: %s", description)
 	end
 
 	return buffers

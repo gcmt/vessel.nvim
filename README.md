@@ -361,7 +361,10 @@ vessel.opt.marks.sort_groups = <function>
 -- List of functions used to sort marks in the each groups.
 -- By default marks are sorted by line number.
 -- See also 'marks.mappings.cycle_sort' option
--- Function signature: function(MarkA, MarkB) return boolean end
+-- Each of the fucntions in this list must return two values:
+-- * A fucntion with the signature: function(MarkA, MarkB) return boolean end
+-- * A description string that will be used to give feedback to the user when
+--   cycling between these function
 local sorters = require("vessel.config.sorters")
 vessel.opt.marks.sort_marks = { sorters.marks.by_lnum, sorters.marks.by_mark }
 

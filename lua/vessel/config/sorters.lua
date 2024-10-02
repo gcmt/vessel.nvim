@@ -5,35 +5,39 @@ M.marks = {}
 M.buffers = {}
 
 --- Sort buffers by path
----@param a Buffer
----@param b Buffer
----@return boolean
-function M.buffers.by_path(a, b)
-	return vim.fs.dirname(a.path) < vim.fs.dirname(b.path)
+---@return function, string
+function M.buffers.by_path()
+	local fn = function(a, b)
+		return vim.fs.dirname(a.path) < vim.fs.dirname(b.path)
+	end
+	return fn, "sorting by path"
 end
 
 --- Sort buffers by basename
----@param a Buffer
----@param b Buffer
----@return boolean
-function M.buffers.by_basename(a, b)
-	return vim.fs.basename(a.path) < vim.fs.basename(b.path)
+---@return function, string
+function M.buffers.by_basename()
+	local fn = function(a, b)
+		return vim.fs.basename(a.path) < vim.fs.basename(b.path)
+	end
+	return fn, "sorting by basename"
 end
 
 --- Sort marks by line number
----@param a Mark
----@param b Mark
----@return boolean
-function M.marks.by_lnum(a, b)
-	return a.lnum < b.lnum
+---@return function, string
+function M.marks.by_lnum()
+	local fn = function(a, b)
+		return a.lnum < b.lnum
+	end
+	return fn, "sorting by line number"
 end
 
 --- Sort marks alphabetically
----@param a Mark
----@param b Mark
----@return boolean
-function M.marks.by_mark(a, b)
-	return a.mark < b.mark
+---@return function, string
+function M.marks.by_mark()
+	local fn = function(a, b)
+		return a.mark < b.mark
+	end
+	return fn, "sorting alphabetically"
 end
 
 --- Sort mark groups

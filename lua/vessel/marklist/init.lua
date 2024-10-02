@@ -203,11 +203,15 @@ function Marklist:_get_marks(bufnr)
 	end
 
 	local sort_func = Sort_func or self._app.config.marks.sort_marks[1]
-	local ok, err = pcall(sort_marks, groups, sort_func)
+	local func, description = sort_func()
+	local ok, err = pcall(sort_marks, groups, func)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
 		logger.err("marks sorting error: %s", msg)
 		return {}
+	elseif Sort_func then
+		-- giv feeback only if Sort_func gets changed
+		logger.info("vessel: %s", description)
 	end
 
 	return groups
