@@ -179,13 +179,14 @@ All *API* functions take a single optional `opts` table argument if you want to 
 - [`context`](#context-object) *table* parameter that contains information about the current window/buffer.
 
 ```lua
--- Example usage `of a filter function to show only lowercase marks
+-- Example usage of a filter function to show only lowercase marks
 vim.keymap.set("n", "gm", function()
   require('vessel').view_marks({}, function(mark, context)
     return string.match(mark.mark, "%l")
   end)
 end)
 ```
+
 ### Jump list API
 
 - `vessel.view_jumps(opts, filter_func)` Show the whole jump list. With the optional `filter_func` function argument you can filter out jump entries.
@@ -209,6 +210,20 @@ end)
 ### Buffer list API
 
 - `vessel.view_buffers(opts, filter_func)` Show the buffer list. Only normal listed buffers will be displayed. A normal buffer is a buffer with the `buftype` option empty. Unlisted buffers can be toggled later directly inside the buffer list window.
+
+`filter_func` is a function used to filter out entries in the buffer list. If the function returns `false`, the buffer won't be displayed. The function takes two arguments:
+
+- [`buffer`](#buffer-object) *table* parameter representing the buffer currently being filtered.
+- [`context`](#context-object) *table* parameter that contains information about the current window/buffer.
+
+```lua
+-- Example usage of a filter function to show only init.lua files
+vim.keymap.set("n", "gm", function()
+  require('vessel').view_buffers({}, function(buffer, context)
+    return vim.fs.basename(buffer.path) == "init.lua"
+  end)
+end)
+```
 
 ### Context object
 
@@ -356,7 +371,6 @@ end)
 ### Options Validation
 
 Whether you use the `setup` function or set options via the `opt` interface, some basic *type* validation is alsways performed before options are actually being set. Specifically, if you decide to go the `opt` interface route, you should know that each option is validated the moment it is assigned. The moment you mistakenly try to assign a wrong value type to an option, you'll get a nice error message about what you need to fix, but everything will keep working and the option will retain its original value.
-
 ### Generic Options
 
 ```lua
