@@ -3,6 +3,9 @@
 local logger = require("vessel.logger")
 local util = require("vessel.util")
 
+-- Stateful sort type
+local Sort_func
+
 ---@class Buffer
 ---@field nr integer Buffer number
 ---@field path string Buffer full path
@@ -75,6 +78,18 @@ function Bufferlist:get_count()
 	return #self._buffers, 1
 end
 
+--- Keep cursor on selected buffer
+---@param selected Buffer Selected buffer
+---@param map table New map table
+function Bufferlist:_follow_cursor(selected, map)
+	for i, buffer in pairs(map) do
+		if buffer.nr == selected.nr then
+			util.vcursor(i)
+			break
+		end
+	end
+end
+
 --- Close the buffer list window
 function Bufferlist:_action_close()
 	self._app:_close_window()
@@ -116,19 +131,9 @@ function Bufferlist:_action_toggle_unlisted(map)
 	if not selected then
 		return
 	end
-
-	local line = vim.fn.line(".")
 	self._show_unlisted = not self._show_unlisted
 	local newmap = self:_render()
-
-	util.vcursor(line, 1)
-	-- keep cursor on selected buffer
-	for i, buffer in pairs(newmap) do
-		if buffer.nr == selected.nr then
-			util.vcursor(i)
-			break
-		end
-	end
+	self:_follow_cursor(selected, newmap)
 end
 
 --- Delete/Wipe the buffer under cursor
@@ -180,11 +185,34 @@ function Bufferlist:_action_delete(map, cmd, force)
 	self:_refresh()
 end
 
+--- Cycle sort functions
+function Bufferlist:_action_cycle_sort(map)
+	local selected = map[vim.fn.line(".")]
+	if not selected then
+		return
+	end
+	local funcs = self._app.config.buffers.sort_buffers
+	local index = 1
+	for i = 1, #funcs do
+		-- Sort_func is module-local
+		if Sort_func == funcs[i] then
+			index = i
+			break
+		end
+	end
+	Sort_func = funcs[(index % #funcs) + 1]
+	local newmap = self:_refresh()
+	self:_follow_cursor(selected, newmap)
+end
+
 --- Setup mappings for the buffer list window
 ---@param map table
 function Bufferlist:_setup_mappings(map)
 	util.keymap("n", self._app.config.buffers.mappings.close, function()
 		self:_action_close()
+	end)
+	util.keymap("n", self._app.config.buffers.mappings.cycle_sort, function()
+		self:_action_cycle_sort(map)
 	end)
 	util.keymap("n", self._app.config.buffers.mappings.toggle_unlisted, function()
 		self:_action_toggle_unlisted(map)
@@ -241,7 +269,7 @@ function Bufferlist:_get_buffers()
 		::continue::
 	end
 
-	local sort_func = self._app.config.buffers.sort_buffers[1]
+	local sort_func = Sort_func or self._app.config.buffers.sort_buffers[1]
 	local ok, err = pcall(table.sort, buffers, sort_func)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")

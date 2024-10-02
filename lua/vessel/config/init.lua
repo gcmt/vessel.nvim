@@ -189,6 +189,7 @@ local _opt = {
 		name_align = "none",
 		path_style = "relcwd",
 		mappings = {
+			cycle_sort = { "<space>" },
 			toggle_unlisted = { "a" },
 			edit = { "l", "<cr>" },
 			tab = { "t" },
