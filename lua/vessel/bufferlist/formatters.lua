@@ -16,11 +16,19 @@ local function format_bufname(path, meta, config)
 	elseif config.buffers.name_align == "left" then
 		align = "%-"
 	end
-	if align ~= "" then
+	local name = ""
+	if config.buffers.name_style == "unique" then
+		name = meta.suffixes[path]
+	elseif config.buffers.name_style == "basename" then
+		name = vim.fs.basename(path)
+	elseif config.buffers.name_style == "hide" then
+		name = ""
+	end
+	if align ~= "" and name ~= "" then
 		local bname_fmt = align .. meta.max_suffix .. "s"
-		return string.format(bname_fmt, meta.suffixes[path])
+		return string.format(bname_fmt, name)
 	else
-		return meta.suffixes[path]
+		return name
 	end
 end
 
@@ -58,18 +66,21 @@ function M.buffer_formatter(buffer, meta, context, config)
 		bufname = format_bufname(buffer.path, meta, config)
 		bufpath = format_path(buffer.path, meta, config)
 	end
+
+	bufname = bufname ~= "" and " " .. bufname or ""
+	bufpath = bufpath ~= "" and " " .. bufpath or ""
+
 	local hl_bufname = config.buffers.highlights.bufname
 	if vim.fn.isdirectory(buffer.path) == 1 then
 		hl_bufname = config.buffers.highlights.directory
-	end
-	if vim.fn.getbufvar(buffer.nr, "&modified") == 1 then
+	elseif vim.fn.getbufvar(buffer.nr, "&modified") == 1 then
 		hl_bufname = config.buffers.highlights.modified
-	end
-	if vim.fn.buflisted(buffer.nr) == 0 then
+	elseif vim.fn.buflisted(buffer.nr) == 0 then
 		hl_bufname = config.buffers.highlights.unlisted
 	end
+
 	return util.format(
-		" %s %s",
+		"%s%s",
 		{ bufname, hl_bufname },
 		{ bufpath, config.buffers.highlights.bufpath }
 	)
