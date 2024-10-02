@@ -149,6 +149,8 @@ return {
 	["buffers.not_found"] = { "string" },
 	["buffers.unnamed_label"] = { "string" },
 	["buffers.sort_buffers"] = listof("function", false),
+	["buffers.name_align"] = oneof("none", "left", "right"),
+	["buffers.path_style"] = oneof("full", "short", "relhome", "relcwd", "hide"),
 	["buffers.mappings.toggle_unlisted"] = listof("string"),
 	["buffers.mappings.edit"] = listof("string"),
 	["buffers.mappings.close"] = listof("string"),
