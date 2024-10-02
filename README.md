@@ -157,7 +157,7 @@ Once inside the window, the following mappings are available:
 - `<space>` Cycle sorting type. It will be remembered once you close and reopen the window.
 - `a` Toggle showing *unlisted* buffers (`:bdelete`d buffers).
 
-**NOTE:** Don't be afraid to delete buffers. You can still re-open the later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
+**NOTE:** Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
 
 ## API
 
@@ -264,7 +264,7 @@ The `Buffer` object is `table` with the following keys:
 
 - `nr` Buffer number
 - `path` Buffer full path
-- `listed` Boolean flag indicating wheter the buffer is listed
+- `listed` Boolean flag indicating whether the buffer is listed
 
 ### Modes
 
