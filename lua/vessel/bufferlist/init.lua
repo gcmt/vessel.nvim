@@ -64,6 +64,7 @@ function Bufferlist:open()
 	self._bufnr, ok = self._app:open_window(self)
 	if ok then
 		vim.fn.setbufvar(self._bufnr, "&filetype", self._bufft)
+		vim.cmd("doau User VesselBufferlistEnter")
 		self:_render()
 	end
 end
@@ -360,6 +361,8 @@ function Bufferlist:_render()
 			self._app:_close_window()
 		end,
 	})
+
+	vim.cmd("doau User VesselBufferlistChanged")
 
 	return map
 end

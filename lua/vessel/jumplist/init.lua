@@ -83,6 +83,7 @@ function Jumplist:open()
 	self._bufnr, ok = self._app:open_window(self)
 	if ok then
 		vim.fn.setbufvar(self._bufnr, "&filetype", self._bufft)
+		vim.cmd("doau User VesselJumplistEnter")
 		self:_render()
 	end
 end
@@ -377,6 +378,7 @@ function Jumplist:_render()
 	self:_setup_mappings(map)
 	util.fit_content(self._app.config.window.max_height)
 	util.cursor(current_jump_line)
+	vim.cmd("doau User VesselJumplistChanged")
 
 	return map
 end

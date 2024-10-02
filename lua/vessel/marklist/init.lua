@@ -69,6 +69,7 @@ function Marklist:open()
 	self._bufnr, ok = self._app:open_window(self)
 	if ok then
 		vim.fn.setbufvar(self._bufnr, "&filetype", self._bufft)
+		vim.cmd("doau User VesselMarklistEnter")
 		self:_render()
 	end
 end
@@ -615,6 +616,7 @@ function Marklist:_render()
 	self:_setup_mappings(map)
 	util.fit_content(self._app.config.window.max_height)
 	self:_set_cursor(map)
+	vim.cmd("doau User VesselMarklistChanged")
 
 	return map
 end
