@@ -415,6 +415,7 @@ vessel.opt.create_commands = false
 -- Customize each command name
 vessel.opt.commands.view_marks = "Marks"
 vessel.opt.commands.view_jumps = "Jumps"
+vessel.opt.commands.view_buffers = "Buffers"
 ```
 
 ### Window Options
