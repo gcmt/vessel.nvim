@@ -276,8 +276,8 @@ function Bufferlist:_get_buffers()
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
 		logger.err("buffer sorting error: %s", msg)
 		return {}
-	elseif Sort_func then
-		-- giv feeback only if Sort_func gets changed
+	elseif Sort_func and description ~= "" then
+		-- give feedback only if Sort_func gets changed
 		logger.info("vessel: %s", description)
 	end
 
