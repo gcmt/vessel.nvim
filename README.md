@@ -1,6 +1,6 @@
 # vessel.nvim
 
-On a quest to bring better ergonomics around *Neovim* native lists. Provides nicely formatted interactive windows to better manage the **mark list**, the **buffer list** and the **jump list**.
+On a quest to bring better ergonomics around *Neovim* native lists. This plugin provides nicely formatted interactive windows to better manage the **mark list**, the **buffer list** and the **jump list**.
 
 - Highly customizable look and feel thanks to an [extensive range of options](#Configuration) and [custom formatters](#Formatters).
 - Workflow still centered around native *Neovim* functionality.
