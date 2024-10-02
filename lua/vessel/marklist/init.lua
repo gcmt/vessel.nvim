@@ -3,6 +3,9 @@
 local logger = require("vessel.logger")
 local util = require("vessel.util")
 
+-- Stateful sort type
+local Sort_func
+
 ---@class Mark
 ---@field mark string Mark letter
 ---@field lnum integer Mark line number
@@ -34,7 +37,6 @@ end
 ---@field _bufnr integer
 ---@field _bufft string
 ---@field _filter_func function?
----@field _sort_func function
 local Marklist = {}
 Marklist.__index = Marklist
 
@@ -51,7 +53,6 @@ function Marklist:new(app, filter_func)
 	marks._marks = {}
 	marks._bufnr = -1
 	marks._filter_func = filter_func
-	marks._sort_func = app.config.marks.sort_marks[1]
 	return marks
 end
 
@@ -131,7 +132,6 @@ end
 --- Sort marks by the given field
 ---@param groups table
 ---@param func function
----@return table
 local function sort_marks(groups, func)
 	for _, group in pairs(groups) do
 		table.sort(group, func)
@@ -201,12 +201,15 @@ function Marklist:_get_marks(bufnr)
 			table.insert(groups[mark.file], mark)
 		end
 	end
-	local ok, err = pcall(sort_marks, groups, self._sort_func)
+
+	local sort_func = Sort_func or self._app.config.marks.sort_marks[1]
+	local ok, err = pcall(sort_marks, groups, sort_func)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
-		logger.err("error while sorting marks: %s", msg)
+		logger.err("marks sorting error: %s", msg)
 		return {}
 	end
+
 	return groups
 end
 
@@ -222,6 +225,18 @@ function Marklist:_mark_exists(mark)
 		end
 	end
 	return false
+end
+
+--- Keep cursor on selected mark
+---@param selected Mark Selected mark
+---@param map table New map table
+function Marklist:_follow_cursor(selected, map)
+	for i, mark in pairs(map) do
+		if mark.mark == selected.mark then
+			util.vcursor(i)
+			break
+		end
+	end
 end
 
 --- Move the cursor to the first mark of the current buffer or the the closest mark, if any
@@ -408,24 +423,32 @@ function Marklist:_action_change_mark(map, mark)
 end
 
 --- Cycle sort functions
-function Marklist:_action_cycle_sort()
+---@param map table
+function Marklist:_action_cycle_sort(map)
+	local selected = map[vim.fn.line(".")]
+	if not selected then
+		return
+	end
+
 	local funcs = self._app.config.marks.sort_marks
 	local index = 1
 	for i = 1, #funcs do
-		if self._sort_func == funcs[i] then
+		if Sort_func == funcs[i] then
 			index = i
 			break
 		end
 	end
-	self._sort_func = funcs[(index % #funcs) + 1]
-	self:_refresh()
+
+	Sort_func = funcs[(index % #funcs) + 1]
+	local newmap = self:_refresh()
+	self:_follow_cursor(selected, newmap)
 end
 
 --- Setup mappings for the mark window
 ---@param map table
 function Marklist:_setup_mappings(map)
 	util.keymap("n", self._app.config.marks.mappings.cycle_sort, function()
-		self:_action_cycle_sort()
+		self:_action_cycle_sort(map)
 	end)
 	util.keymap("n", self._app.config.marks.mappings.close, function()
 		self:_action_close()
