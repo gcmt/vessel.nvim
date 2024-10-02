@@ -115,12 +115,23 @@ function Bufferlist:_action_edit(map, mode, line)
 		vim.cmd("tab split")
 	end
 
-	if vim.fn.buflisted(selected.nr) == 1 then
+	if vim.fn.isdirectory(selected.path) == 1 then
+		self._app.config.buffers.directory_handler(selected.path, self._app.context)
+		return
+	elseif vim.fn.buflisted(selected.nr) == 1 then
 		vim.cmd("buffer " .. selected.nr)
 	else
 		-- Unlike the 'buffer' command, the 'edit' command on unlisted buffers
 		-- makes them listed again
 		vim.cmd("edit " .. vim.fn.fnameescape(selected.path))
+	end
+
+	if self._app.config.jump_callback then
+		self._app.config.jump_callback(mode, self._app.context)
+	end
+
+	if self._app.config.highlight_on_jump then
+		util.cursorline(self._app.config.highlight_timeout)
 	end
 end
 

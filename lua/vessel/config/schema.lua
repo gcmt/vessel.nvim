@@ -152,6 +152,7 @@ return {
 	["buffers.bufname_align"] = oneof("none", "left", "right"),
 	["buffers.bufname_style"] = oneof("basename", "unique", "hide"),
 	["buffers.bufpath_style"] = oneof("full", "short", "relhome", "relcwd", "hide"),
+	["buffers.directory_handler"] = { "function" },
 	["buffers.mappings.cycle_sort"] = listof("string"),
 	["buffers.mappings.toggle_unlisted"] = listof("string"),
 	["buffers.mappings.edit"] = listof("string"),

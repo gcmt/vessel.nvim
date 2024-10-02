@@ -68,6 +68,13 @@ local function jump_callback(mode, context)
 	vim.cmd("norm! zz")
 end
 
+--- Callback function executed on directory entries
+---@param path string
+---@param context Context
+local function directory_handler(path, context)
+	vim.cmd("edit " .. vim.fn.fnameescape(path))
+end
+
 --- Default plugin options
 local _opt = {
 
@@ -189,6 +196,7 @@ local _opt = {
 		bufname_align = "left",
 		bufname_style = "unique",
 		bufpath_style = "relcwd",
+		directory_handler = directory_handler,
 		mappings = {
 			cycle_sort = { "<space>" },
 			toggle_unlisted = { "a" },
