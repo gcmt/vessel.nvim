@@ -17,15 +17,17 @@ local function format_bufname(path, meta, config)
 		align = "%-"
 	end
 	local name = ""
+	local bname_fmt = "%s"
 	if config.buffers.name_style == "unique" then
 		name = meta.suffixes[path]
+		bname_fmt = align .. meta.max_suffix .. "s"
 	elseif config.buffers.name_style == "basename" then
 		name = vim.fs.basename(path)
+		bname_fmt = align .. meta.max_basename .. "s"
 	elseif config.buffers.name_style == "hide" then
 		name = ""
 	end
 	if align ~= "" and name ~= "" then
-		local bname_fmt = align .. meta.max_suffix .. "s"
 		return string.format(bname_fmt, name)
 	else
 		return name

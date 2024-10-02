@@ -330,11 +330,16 @@ function Bufferlist:_render()
 
 	local map = {}
 	local max_suffix
+	local max_basename
 	local buf_formatter = self._app.config.buffers.formatters.buffer
 
 	local paths = {}
 	for _, buffer in pairs(self._buffers) do
 		table.insert(paths, buffer.path)
+		local basename_len = #vim.fs.basename(buffer.path)
+		if not max_basename or basename_len > max_basename then
+			max_basename = basename_len
+		end
 	end
 
 	-- find for each path the shortest unique suffix
@@ -354,6 +359,7 @@ function Bufferlist:_render()
 		i = i + 1
 		local ok, line, matches = pcall(buf_formatter, buffer, {
 			current_line = i,
+			max_basename = max_basename,
 			max_suffix = max_suffix,
 			suffixes = suffixes,
 		}, self._app.context, self._app.config)
