@@ -1,5 +1,6 @@
 ---@module "config"
 
+local buf_formatters = require("vessel.bufferlist.formatters")
 local config_proxy = require("vessel.config.proxy")
 local jumps_formatters = require("vessel.jumplist.formatters")
 local logger = require("vessel.logger")
@@ -101,6 +102,7 @@ local _opt = {
 	commands = {
 		view_marks = "Marks",
 		view_jumps = "Jumps",
+		view_buffers = "Buffers",
 	},
 
 	--- marklist-related options
@@ -176,6 +178,35 @@ local _opt = {
 			lnum = "LineNr",
 			col = "LineNr",
 			line = "Normal",
+		},
+	},
+
+	--- bufferlist-related options
+	buffers = {
+		not_found = "Buffer list empty",
+		unnamed_label = "[no name]",
+		sort_buffers = { sorters.buffers.by_path },
+		mappings = {
+			toggle_unlisted = { "a" },
+			edit = { "l", "<cr>" },
+			tab = { "t" },
+			split = { "s" },
+			vsplit = { "v" },
+			delete = { "d" },
+			force_delete = { "D" },
+			wipe = { "w" },
+			force_wipe = { "W" },
+			close = { "q", "<esc>" },
+		},
+		formatters = {
+			buffer = buf_formatters.buffer_formatter,
+		},
+		highlights = {
+			bufname = "Normal",
+			bufpath = "Comment",
+			unlisted = "Comment",
+			directory = "Directory",
+			modified = "Keyword",
 		},
 	},
 }

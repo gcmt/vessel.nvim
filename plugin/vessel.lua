@@ -3,6 +3,10 @@ if vim.g.loaded_vessel == 1 then
 end
 vim.g.loaded_vessel = 1
 
+vim.keymap.set("n", "<plug>(VesselViewBuffers)", function()
+	require("vessel").view_buffers()
+end)
+
 vim.keymap.set("n", "<plug>(VesselViewMarks)", function()
 	require("vessel").view_marks()
 end)

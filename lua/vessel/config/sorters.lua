@@ -2,6 +2,15 @@
 
 local M = {}
 M.marks = {}
+M.buffers = {}
+
+--- Sort buffers by path
+---@param a Buffer
+---@param b Buffer
+---@return boolean
+function M.buffers.by_path(a, b)
+	return vim.fs.dirname(a.path) < vim.fs.dirname(b.path)
+end
 
 --- Sort marks by line number
 ---@param a Mark

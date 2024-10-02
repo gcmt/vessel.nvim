@@ -82,7 +82,7 @@ end
 
 --- Return options for the popup window
 --- Compute width|height|col|row at runtime if they are defined as functions
----@param list Marklist|Jumplist (Must have get_count() method)
+---@param list Marklist|Jumplist|Bufferlist
 ---@return table
 function App:_get_popup_options(list)
 	local opts = {}
@@ -110,7 +110,7 @@ function App:_get_popup_options(list)
 end
 
 --- Open the popup window
----@param list Marklist|Jumplist
+---@param list Marklist|Jumplist|Bufferlist
 ---@return integer, boolean Whether the window was actually opened
 function App:open_window(list)
 	local popup_opts = self:_get_popup_options(list)

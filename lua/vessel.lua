@@ -17,6 +17,15 @@ end
 
 M.opt = lazy_opt()
 
+--- Open the buffer list window
+---@param opts table? Config overrides
+---@param filter_func function?
+function M.view_buffers(opts, filter_func)
+	local app = require("vessel.core"):new(require("vessel.config").get(opts))
+	local bufferlist = require("vessel.bufferlist"):new(app, filter_func)
+	bufferlist:open()
+end
+
 --- Set/Unset a mark on the current line
 ---@param global boolean Whether the mark should be global or not
 ---@param opts table?  Config table
