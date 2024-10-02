@@ -41,7 +41,6 @@ local function format_path(path, meta, config)
 	elseif config.buffers.path_style == "hide" then
 		return ""
 	end
-	print("no match")
 end
 
 --- Default formatter for a single buffer entry
