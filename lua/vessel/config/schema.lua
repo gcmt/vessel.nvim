@@ -148,6 +148,7 @@ return {
 
 	["buffers.not_found"] = { "string" },
 	["buffers.unnamed_label"] = { "string" },
+	["buffers.quickjump"] = { "boolean" },
 	["buffers.sort_buffers"] = listof("function", false),
 	["buffers.bufname_align"] = oneof("none", "left", "right"),
 	["buffers.bufname_style"] = oneof("basename", "unique", "hide"),

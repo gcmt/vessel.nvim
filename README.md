@@ -937,6 +937,14 @@ Label used for unnamed buffers.
 vessel.opt.buffers.unnamed_label = "[no name]"
 ```
 
+#### buffers.quickjump
+
+Remap numbers `[1-9]` in normal mode to quickly edit the 9 buffers at the top of the window.
+
+```lua
+vessel.opt.buffers.quickjump = true
+```
+
 #### buffers.directory_handler
 
 Function called for buffers that are directories (after splits). By default assumes Netrw is enabled (vim.gloaded_netrwPlugin == 1) and simply executes `:edit` command on the buffer.

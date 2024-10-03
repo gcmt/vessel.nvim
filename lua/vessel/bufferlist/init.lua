@@ -252,11 +252,13 @@ function Bufferlist:_setup_mappings(map)
 	util.keymap("n", self._app.config.buffers.mappings.vsplit, function()
 		self:_action_edit(map, util.modes.VSPLIT)
 	end)
-	-- quick edit for the top 9 lines buffers
-	for i = 1, 9 do
-		util.keymap("n", tostring(i), function()
-			self:_action_edit(map, util.modes.BUFFER, i)
-		end)
+	-- quick edit for the 9 buffers at the top of the list
+	if self._app.config.buffers.quickjump then
+		for i = 1, 9 do
+			util.keymap("n", tostring(i), function()
+				self:_action_edit(map, util.modes.BUFFER, i)
+			end)
+		end
 	end
 end
 

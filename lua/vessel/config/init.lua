@@ -192,6 +192,7 @@ local _opt = {
 	buffers = {
 		not_found = "Buffer list empty",
 		unnamed_label = "[no name]",
+		quickjump = true,
 		sort_buffers = { sorters.buffers.by_path, sorters.buffers.by_basename },
 		bufname_align = "left",
 		bufname_style = "unique",
