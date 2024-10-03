@@ -72,7 +72,7 @@ function Marklist:open()
 	if ok then
 		vim.fn.setbufvar(self._bufnr, "&filetype", self._bufft)
 		vim.cmd("doau User VesselMarklistEnter")
-		self:_render()
+		self:_set_cursor(self:_render())
 	end
 end
 
@@ -249,6 +249,7 @@ function Marklist:_follow_cursor(selected, map)
 end
 
 --- Move the cursor to the first mark of the current buffer or the the closest mark, if any
+--- Used just after the windows opens up
 ---@param map table
 function Marklist:_set_cursor(map)
 	if not map then
@@ -650,7 +651,6 @@ function Marklist:_render()
 
 	self:_setup_mappings(map)
 	util.fit_content(self._app.config.window.max_height)
-	self:_set_cursor(map)
 	self._app:_set_buffer_data(map)
 	vim.cmd("doau User VesselMarklistChanged")
 

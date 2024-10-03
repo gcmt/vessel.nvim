@@ -68,7 +68,7 @@ function Bufferlist:open()
 	if ok then
 		vim.fn.setbufvar(self._bufnr, "&filetype", self._bufft)
 		vim.cmd("doau User VesselBufferlistEnter")
-		self:_render()
+		self:_set_cursor(self:_render())
 	end
 end
 
@@ -307,6 +307,7 @@ function Bufferlist:_filter(buffer, context)
 end
 
 --- Position the cursor on the current buffer
+---Used just after the windows opens up
 ---@param map table
 function Bufferlist:_set_cursor(map)
 	vim.fn.cursor(1, 1)
@@ -400,11 +401,8 @@ function Bufferlist:_render()
 	end
 
 	vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
-
 	self:_setup_mappings(map)
 	util.fit_content(self._app.config.window.max_height)
-	self:_set_cursor(map)
-
 	self._app:_set_buffer_data(map)
 	vim.cmd("doau User VesselBufferlistChanged")
 
