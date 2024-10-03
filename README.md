@@ -8,10 +8,6 @@ On a quest to bring better ergonomics around *Neovim* native lists. This plugin 
 - Allow **changing and deleting marks** more effectively directly from the interactive mark list window.
 - Allow **deleting and "resurrecting" buffers** directly from the buffer list window.
 
-![Marklist](assets/marks.png "Mark list preview.")
-
-![Jumplist](assets/jumps.png "Jump list preview.")
-
 ## Table of Contents
 
 - [Setup](#setup)
@@ -114,6 +110,8 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 
 ## Windows
 
+![Marklist](assets/marks.jpg "Mark list preview.")
+
 ### Mark List Window
 
 By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. To change that, head over to the [configuration section](#mark-list-options) and look for the `sort_marks` option.
@@ -143,6 +141,8 @@ Once inside the window, the following mappings are available:
 
 ### Jump List Window
 
+![Jumplist](assets/jumps.jpg "Jump list preview.")
+
 By default the jump list window shows the entire jump list with jumps spanning multiple files. Jumps are displayed top to bottom, with the most recent jump being on top. The cursor is automatically placed on the current position in the jump list. On the left column you can see jump positions relative to the current one. You can use those relative position as a count to `<c-o>` and `<c-i>`.
 
 Once inside the window, the following mappings are available:
@@ -164,11 +164,13 @@ Once inside the window, the following mappings are available:
 > [!NOTE]
 > The relative positions you see by default on the left column are not the **real relative positions** you would use as a count outside the jump list window. This is because the list can be filtered and you could potentially see big gaps between these positions otherwise.
 
-#### Autoloding buffers
+#### Autoloading buffers
 
 By default, lines cannot be displayed for files that are not loaded in memory. You'll see instead the jump file path greyed out. To automatically load in memory all files for which jumps exist, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded in memory.
 
 ### Buffer List Window
+
+![Jumplist](assets/buffers.jpg "Buffer list preview.")
 
 By default the buffer list window shows all the normal buffers with the `listed` option set. Showing *unlisted* buffers can be toggled with the press of a key. By default buffers are sorted by their directory name. Head over to the [configuration section](#buffer-list-options) and look for the `sort_buffers` option to see how you can customize buffer sorting.
 
