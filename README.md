@@ -386,7 +386,7 @@ Whether you use the `setup` function or set options via the `opt` interface, som
 
 #### verbosity
 
-Control how much noisy the plugin is (one of `:help vim.log.levels`)
+Control how much noisy the plugin is. One of `vim.log.levels`.
 
 ```lua
 vessel.opt.verbosity = vim.log.levels.INFO
@@ -395,6 +395,7 @@ vessel.opt.verbosity = vim.log.levels.INFO
 #### lazy_load_buffers
 
  Some global marks might belong to files currently not loaded in memory. In this case the plugin can't retrieve the mark line content.
+
  Set this option to `false` to load in memory any such file as soon as you open the mark list window.
 
 ```lua
@@ -412,7 +413,7 @@ vessel.opt.highlight_timeout = 250
 
 #### jump_callback
 
-Function executed after each jump. By default it just centers the cursor vertically unless `vim.o.jumpotion`s is set to 'view'.
+Function executed after each jump. By default it just centers the cursor vertically unless `vim.o.jumpotion`s is set to "view".
 
 This function takes two parameters: [mode](#modes) and [context](#context-object).
 
@@ -492,7 +493,7 @@ vessel.opt.window.options.row = popup_row
 vessel.opt.window.options.col = popup_col
 ```
 
-### Default popup size and positioning functions
+#### default popup size and positioning functions
 
 ```lua
 ---@param list Marklist|Jumplist
@@ -552,7 +553,7 @@ Each fucntion in this list must return two values:
 - A function with the signature: `function(MarkA, MarkB) return boolean end`
 - A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
 
-See also `marks.mappings.cycle_sort` option
+See also [marks.mappings.cycle_sort](#marks.mappings.cycle_sort).
 
 ```lua
 local sorters = require("vessel.config.sorters")
@@ -617,9 +618,9 @@ Position the cursor on the first line of a mark group.
 vessel.opt.marks.move_to_first_mark = true
 ```
 
-#### marks.move_to_closest_mark and marks.proximity_threshold
+#### marks.move_to_closest_mark, marks.proximity_threshold
 
-Position the cursor on the closest mark relative to the current position in the buffer. If a mark is farther from the cursor than 'proximity_threshold' lines, it won't be considered.
+Position the cursor on the closest mark relative to the current position in the buffer. If a mark is farther from the cursor than `proximity_threshold` lines, it won't be considered.
 
 ```lua
 vessel.opt.marks.move_to_closest_mark = true
@@ -670,7 +671,7 @@ Strip leading white spaces from lines.
 vessel.opt.marks.strip_lines = true
 ```
 
-#### marks.formatters.mark and marks.formatters.header
+#### marks.formatters.mark, marks.formatters.header
 
 Functions used to format each mark / group header line. See [Formatters](#Formatters) section for more info.
 
@@ -794,7 +795,7 @@ vessel.opt.marks.mappings.keepj_vsplit = { "V" }
 
 #### marks.mappings.cycle_sort
 
-Cycle sorting functions. See also the `marks.sort_marks` option.
+Cycle sorting functions. See also [marks.sort_marks](#marks.sort_marks).
 
 ```lua
 vessel.opt.marks.mappings.cycle_sort = { "<SPACE>" }
@@ -954,7 +955,7 @@ Each fucntion in this list must return two values:
 - A function with the signature: `function(BufferA, BufferB) return boolean end`
 - A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
 
-See also the `buffers.mappings.cycle_sort` option
+See [buffers.mappings.cycle_sort](#buffers.mappings.cycle_sort).
 
 ```lua
 vessel.opt.buffers.sort_buffers = { sorters.buffers.by_path, sorters.buffers.by_basename }
@@ -1017,7 +1018,7 @@ vessel.opt.buffers.bufpath_style = "relcwd"
 
 #### buffers.mappings.cycle_sort
 
-Cycle sorting functions. See also `buffers.sort_buffers` option.
+Cycle sorting functions. See also [buffers.sort_buffers](#buffers.sort_buffers).
 
 ```lua
 vessel.opt.buffers.mappings.cycle_sort = { "<space>" }
@@ -1067,7 +1068,7 @@ vessel.opt.buffers.mappings.vsplit = { "v" }
 
 Executes `:bdelete` on the buffer under cursor (fails with unsaved changes).
 
-Basically sets the buffer unlisted. The buffer can then be re-openend by toggling unlisted buffers with the option `buffers.mappings.toggle_unlisted`.
+Basically sets the buffer unlisted. The buffer can then be re-openend by toggling unlisted buffers with [buffers.mappings.toggle_unlisted](#buffers.mappings.toggle_unlisted).
 
 ```lua
 vessel.opt.buffers.mappings.delete = { "d" }
@@ -1116,7 +1117,7 @@ vessel.opt.buffers.mappings.close = { "q", "<esc>" }
 Functions used to format each buffer entry line. See [Formatters](#formatters) section for more info.
 
 ```lua
-vessel.opt.buffers.formatters.buffer = buf_formatters.buffer_formatter,
+vessel.opt.buffers.formatters.buffer = <function>,
 ```
 
 #### buffers.highlights.bufname
