@@ -384,38 +384,60 @@ Whether you use the `setup` function or set options via the `opt` interface, som
 
 ### Generic Options
 
+#### verbosity
+
+Control how much noisy the plugin is (one of `:help vim.log.levels`)
+
 ```lua
-local vessel = require("vessel")
-
--- Control how much noisy the plugin is (one of :help vim.log.levels)
 vessel.opt.verbosity = vim.log.levels.INFO
+```
 
--- Some global marks might belong to files currently not loaded in memory.
--- In this case the plugin can't retrieve the mark line content. Set this option
--- to `false` to load in memory any such file as soon as you open the mark list window.
+#### lazy_load_buffers
+
+ Some global marks might belong to files currently not loaded in memory. In this case the plugin can't retrieve the mark line content.
+ Set this option to `false` to load in memory any such file as soon as you open the mark list window.
+
+```lua
 vessel.opt.lazy_load_buffers = true
+```
 
--- Set 'cursorline' vim option for a brief period of time after a jump
--- for 'highlight_timeout' milliseconds
+#### highlight_on_jump, highlight_timeout
+
+Set `cursorline` vim option for a brief period of time after a jump for `highlight_timeout` milliseconds.
+
+```lua
 vessel.opt.highlight_on_jump = false
 vessel.opt.highlight_timeout = 250
+```
 
--- Function executed after each jump. By default it just centers the cursor vertically
--- unless vim.o.jumpotions is set to 'view'. It takes two parameters: mode and context,
--- both described in the API section of the documentation.
+#### jump_callback
+
+Function executed after each jump. By default it just centers the cursor vertically unless `vim.o.jumpotion`s is set to 'view'.
+
+This function takes two parameters: [mode](#modes) and [context](#context-object).
+
+```lua
 vessel.opt.jump_callback = <function>
 ```
 
 ### Commands Options
 
+#### create_commands
+
+Whether to create commands or not.
+
+> [!NOTE]
+> You need to call the setup function to actually create commands
+
 ```lua
-local vessel = require("vessel")
-
--- Whether to create commands or not
--- Note: you need to call the setup function to actually create commands
 vessel.opt.create_commands = false
+```
 
--- Customize each command name
+#### commands.view_marks, view_jumps, view_buffers
+
+Customize each command name.
+
+```lua
 vessel.opt.commands.view_marks = "Marks"
 vessel.opt.commands.view_jumps = "Jumps"
 vessel.opt.commands.view_buffers = "Buffers"
@@ -423,32 +445,43 @@ vessel.opt.commands.view_buffers = "Buffers"
 
 ### Window Options
 
+#### window.max_height
+
+Control the maximum height of the popup window as a percentage of the nvim UI.
+
 ```lua
-local vessel = require("vessel")
-
--- Control the maximum height of the popup window as a percentage of the nvim UI
 vessel.opt.window.max_height = 80
+```
+#### window.cursorline
 
--- Enable/disable 'cursorline' nvim option in the popup window
+Enable/disable `cursorline` *neovim* option in the window.
+
+```lua
 vessel.opt.window.cursorline = true
+```
+#### window.number
 
--- Enable/disable 'number' nvim option in the popup window
+Enable/disable `number` *neovim* option in the window.
+
+```lua
 vessel.opt.window.number = false
+```
 
--- Enable/disable 'relativenumber' nvim option in the popup window
+#### window.relativenumber
+
+Enable/disable `relativenumber` *neovim* option in the popup window
+
+```lua
 vessel.opt.window.relativenumber = false
 ```
 
+#### popup options
+
+Control how the popup looks. This options are passed directly to the `vim.api.nvim_open_win()` function. See `:help api-floatwin`.
+
+`heigh`, `width`, `row` and `col` may be either a number or function. In the latter case the function is evaluated and its return value (must be a number) used as the option value. See section below for their default implementations.
+
 ```lua
-local vessel = require("vessel")
-
---- Control how the popup looks. This options are passed directly to the
--- vim.api.nvim_open_win() function. ( See:help api-floatwin).
-
--- 'heigh', 'width', 'row' and 'col' may be either a number or function.
--- In the latter case the function is evaluated and its return value (must be a number)
--- used as the option value. See section below for their default implementations.
-
 vessel.opt.window.options.relative = "editor"
 vessel.opt.window.options.anchor = "NW"
 vessel.opt.window.options.style = "minimal"
@@ -494,77 +527,166 @@ end
 
 ### Mark List Options
 
-```lua
-local vessel = require("vessel")
+#### marks.locals and maks.globals
 
--- The pool of marks the plugin chooses from when automatically
--- picking the letter for you
+The pool of marks the plugin chooses from when automatically picking the letter for you
+
+```lua
 vessel.opt.marks.locals = "abcdefghijklmnopqrstuvwxyz"
 vessel.opt.marks.globals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+```
+#### marks.sort_groups
 
--- Function used to sort groups. A group is a set of marks belonging to the same file.
--- Default: function(a, b) return a > b end
-vessel.opt.marks.sort_groups = <function>
+Function used to sort groups. A group is a set of marks belonging to the same file.
 
--- List of functions used to sort marks in the each groups.
--- First item is the function used by default.
--- Each of the fucntions in this list must return two values:
--- * A function with the signature: function(MarkA, MarkB) return boolean end
--- * A description string that will be used to give feedback to the user when
---   cycling between these function, or empty string for no feedback
--- See also 'marks.mappings.cycle_sort' option
+```lua
+vessel.opt.marks.sort_groups = function(a, b)
+    return a > b
+end
+```
+#### marks.sort_marks
+
+List of functions used to sort marks in the each groups. First item is the function used by default the first time you open the window.
+
+Each fucntion in this list must return two values:
+- A function with the signature: `function(MarkA, MarkB) return boolean end`
+- A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
+
+See also `marks.mappings.cycle_sort` option
+
+```lua
 local sorters = require("vessel.config.sorters")
 vessel.opt.marks.sort_marks = { sorters.marks.by_lnum, sorters.marks.by_mark }
+```
 
--- Controls the style of the file path header. Can be one of:
--- * "full": Full file path
--- * "short": Shortest unique suffix among all paths
--- * "relhome": Relative to the home directory
--- * "relcwd": Relative to the current working directory
--- Note: Has effect only when using default formatters
+Example function:
+
+```lua
+function sort_by_lnum()
+	local fn = function(a, b)
+		return a.lnum < b.lnum
+	end
+	return fn, "sorting by line number"
+end
+```
+
+#### marks.path_style
+
+Controls the style of the file path header. Can be one of:
+- `full` Full file path
+- `short` Shortest unique suffix among all paths
+- `relhome` Relative to the home directory
+- `relcwd` Relative to the current working directory
+
+> [!NOTE]
+> Has effect only when using default formatters.
+
+```lua
 vessel.opt.marks.path_style = "relcwd"
+```
 
--- Enable/disable unsetting a mark when trying to mark an alredy marked line
+#### marks.toggle_mark
+
+Enable/disable unsetting a mark when trying to mark an alredy marked line.
+
+```lua
 vessel.opt.marks.toggle_mark = true
+```
 
--- Use backtick instead of apostrophe for jumping to marks (:help mark-motions)
+#### marks.use_backtick
+
+Use backtick instead of apostrophe for jumping to marks. See `:help mark-motions`.
+
+```lua
 vessel.opt.marks.use_backtick = false
+```
 
--- Message used when the mark list is empty
+#### marks.not_found
+
+Message used when the mark list is empty.
+
+```lua
 vessel.opt.marks.not_found = "No marks found"
+```
 
--- Position the cursor on the first line of a mark group
+#### marks.move_to_first_mark
+
+Position the cursor on the first line of a mark group.
+
+```lua
 vessel.opt.marks.move_to_first_mark = true
+```
 
--- Position the cursor on the closest mark relative to the current position in the buffer.
--- If a mark is farther from the cursor than 'proximity_threshold' lines,
--- it won't be considered
+#### marks.move_to_closest_mark and marks.proximity_threshold
+
+Position the cursor on the closest mark relative to the current position in the buffer. If a mark is farther from the cursor than 'proximity_threshold' lines, it won't be considered.
+
+```lua
 vessel.opt.marks.move_to_closest_mark = true
 vessel.opt.marks.proximity_threshold = 50
+```
 
--- Force displaying the group header (file path) even when there is just one group
--- Note: Has effect only when using default formatters
+#### marks.force_header
+
+Force displaying the group header (file path) even when there is just one group.
+
+> [!NOTE]
+> Has effect only when using default formatters.
+
+```lua
 vessel.opt.marks.force_header = false
+```
 
--- Decorations used as prefix to each formatted mark.
--- Last item is for last entries in each group.
--- Note: Has effect only when using default formatters
+#### marks.decorations
+
+Decorations used as prefix to each formatted mark. Last item is for last entries in each group.
+
+> [!NOTE]
+> Has effect only when using default formatters.
+
+```lua
 vessel.opt.marks.decorations = { "├ ", "└ " }
+```
 
--- Show/hide mark column number
--- Note: Has effect only when using default formatters
+#### marks.show_colnr
+
+Show/hide mark column number.
+
+> [!NOTE]
+> Has effect only when using default formatters.
+
+```lua
 vessel.opt.marks.show_colnr = false
+```
 
--- Strip leading spaces from lines
--- Note: Has effect only when using default formatters
+#### marks.strip_lines
+
+Strip leading white spaces from lines.
+
+> [!NOTE]
+> Has effect only when using default formatters.
+
+```lua
 vessel.opt.marks.strip_lines = true
+```
 
--- Functions used to format each mark / group header line
--- See "Formatters" section for more info
+#### marks.formatters.mark and marks.formatters.header
+
+Functions used to format each mark / group header line. See [Formatters](#Formatters) section for more info.
+
+```lua
 vessel.opt.marks.formatters.mark = <function>
 vessel.opt.marks.formatters.header = <function>
+```
 
--- Highlight groups used by default formatters
+#### marks.highlights.*
+
+Highlight groups used by default formatters.
+
+> [!NOTE]
+> Have effect only when using the default formatters.
+
+```lua
 vessel.opt.marks.highlights.path = "Directory"
 vessel.opt.marks.highlights.not_loaded = "Comment"
 vessel.opt.marks.highlights.decorations = "NonText"
@@ -572,98 +694,221 @@ vessel.opt.marks.highlights.mark = "Keyword"
 vessel.opt.marks.highlights.lnum = "LineNr"
 vessel.opt.marks.highlights.col = "LineNr"
 vessel.opt.marks.highlights.line = "Normal"
+```
 
--- Close the popup window
+#### marks.mappings.close
+
+Close the mark list window.
+
+```lua
 vessel.opt.marks.mappings.close = { "q", "<esc>" }
+```
 
--- Delete the mark under cursor
+#### marks.mappings.delete
+
+Delete the mark under cursor.
+
+```lua
 vessel.opt.marks.mappings.delete = { "d" }
+```
 
--- Move to the next group header
+#### marks.mappings.next_group
+
+Move to the next group header.
+
+```lua
 vessel.opt.marks.mappings.next_group = { "<c-j>" }
+```
 
--- Move to the previous group header
+#### marks.mappings.prev_group
+
+Move to the previous group header.
+
+```lua
 vessel.opt.marks.mappings.prev_group = { "<c-k>" }
+```
 
--- Jump to the mark (or path) under cursor
+#### marks.mappings.jump
+
+Jump to the mark (or path) under cursor.
+
+```lua
 vessel.opt.marks.mappings.jump = { "l", "<cr>" }
+```
 
--- Jump to the mark under cursor (does not change the jump list)
+#### marks.mappings.keepj_jump
+
+Jump to the mark under cursor (does not change the jump list).
+
+```lua
 vessel.opt.marks.mappings.keepj_jump = { "o" }
+```
 
--- Open the mark under cursor in a new tab
+#### marks.mappings.tab
+
+Open the mark under cursor in a new tab.
+
+```lua
 vessel.opt.marks.mappings.tab = { "t" }
+```
 
--- Open the mark under cursor in a new tab (does not change the jump list)
+#### marks.mappings.keepj_tab
+
+Open the mark under cursor in a new tab (does not change the jump list).
+
+```lua
 vessel.opt.marks.mappings.keepj_tab = { "T" }
+```
 
--- Open the mark under cursor in a horizontal
+#### marks.mappings.split
+
+Open the mark under cursor in a horizontal.
+
+```lua
 vessel.opt.marks.mappings.split = { "s" }
+```
 
--- Open the mark under cursor in a horizontal split
--- Does not change the jump list
+#### marks.mappings.keepj_split
+
+Open the mark under cursor in a horizontal split (does not change the jump list).
+
+```lua
 vessel.opt.marks.mappings.keepj_split = { "S" }
+```
 
--- Open the mark under cursor in a vertical split
+#### marks.mappings.vsplit
+
+Open the mark under cursor in a vertical split.
+
+```lua
 vessel.opt.marks.mappings.vsplit = { "v" }
+```
 
--- Open the mark under cursor in a vertical split with
--- Does not change the jump list
+#### marks.mappings.keepj_vsplit
+
+Open the mark under cursor in a vertical split with (does not change the jump list).
+
+```lua
 vessel.opt.marks.mappings.keepj_vsplit = { "V" }
+```
 
--- Cycle sorting functions (See 'marks.sort_marks' option)
+#### marks.mappings.cycle_sort
+
+Cycle sorting functions. See also the `marks.sort_marks` option.
+
+```lua
 vessel.opt.marks.mappings.cycle_sort = { "<SPACE>" }
 ```
 
 ### Jump List Options
 
+#### jumps.real_positions
+
+Display real jump entries positions. There might be gaps when filters are applied to the list.
+
 ```lua
-local vessel = require("vessel")
-
--- Display real jump entries positions.
--- There might be gaps when filters are applied to the list.
 vessel.opt.jumps.real_positions = false
+```
 
--- Strip leading spaces from lines
+#### jumps.strip_lines
+
+Strip leading white spaces from lines.
+
+```lua
 vessel.opt.jumps.strip_lines = false
+```
 
--- Filter jump entries that point to empty lines
+#### jumps.filter_empty_lines
+
+Filter jump entries that point to empty lines.
+
+```lua
 vessel.opt.jumps.filter_empty_lines = true
+```
 
--- Message used when the jump list is empty
+#### jumps.not_found
+
+Message used when the jump list is empty.
+
+```lua
 vessel.opt.jumps.not_found = "Jump list empty"
+```
 
--- Prefix used for each formatted jump entry.
--- First item is the line of the current position in the jump list.
--- Note: Has effect only when using default formatters
+#### jumps.indicator
+
+Prefix used for each formatted jump entry. First item is the line of the current position in the jump list.
+
+> [!NOTE]
+> Has effect only when using the default formatter.
+
+```lua
 vessel.opt.jumps.indicator = { " ", " " }
+```
 
--- Show/hide jump entries column numbers
--- Note: Has effect only when using default formatters
+#### jumps.show_colnr
+
+Show/hide jump entries column numbers.
+
+> [!NOTE]
+> Has effect only when using the default formatter.
+
+```lua
 vessel.opt.jumps.show_colnr = false
+```
 
--- Functions used to format each jump entry line
--- See "Formatters" section for more info
+#### jumps.formatters.jump
+
+Functions used to format each jump entry line. See [Formatters](#Formatters) section for more info.
+
+```lua
 vessel.opt.jumps.formatters.jump = <function>
+```
 
--- Mapping used to move backwards in the jump list (to the bottom of the window).
--- Takes a count.
+#### jumps.mappings.ctrl_o
+
+Mapping used to move backwards in the jump list (to the bottom of the window). Takes a count.
+
+```lua
 vessel.opt.jumps.mappings.ctrl_o = "<c-o>"
+```
 
--- Mapping used to move forwards in the jump list (to the top of the window).
--- Takes a count.
+#### jumps.mappings.ctrl_i
+
+Mapping used to move forwards in the jump list (to the top of the window). Takes a count.
+
+```lua
 vessel.opt.jumps.mappings.ctrl_i = "<c-i>"
+```
 
--- Jump to the entry under cursor
+#### jumps.mappings.jump
+
+Jump to the entry under cursor.
+
+```lua
 vessel.opt.jumps.mappings.jump = { "l", "<cr>" }
+```
 
--- Close the popup window
+#### jumps.mappings.close
+
+Close the jump list window.
+
+```lua
 vessel.opt.jumps.mappings.close = { "q", "<esc>" }
+```
 
--- Clear the jump list (executes :clearjumps)
+#### jumps.mappings.clear
+
+Clear the jump list. Executes `:clearjumps`.
+
+```lua
 vessel.opt.jumps.mappings.clear = { "C" }
+```
 
--- Highlight groups used by default formatters
+#### jumps.highlights.*
+
+Highlight groups used by the default formatter.
+
+```lua
 vessel.opt.jumps.highlights.indicator = "Comment"
 vessel.opt.jumps.highlights.pos = "LineNr"
 vessel.opt.jumps.highlights.current_pos = "CursorLineNr"
@@ -675,90 +920,210 @@ vessel.opt.jumps.highlights.line = "Normal"
 
 ### Buffer List Options
 
+#### buffers.not_found
+
+Message used when the buffer list is empty
+
 ```lua
-local vessel = require("vessel")
-
--- Message used when the jump list is empty
 vessel.opt.buffers.not_found = "Buffer list empty"
+```
 
--- label used for unnamed buffers
+#### buffers.unnamed_label
+
+Label used for unnamed buffers.
+
+```lua
 vessel.opt.buffers.unnamed_label = "[no name]"
+```
 
--- Function called for buffers that are directories (after splits)
--- By default assumes Netrw is enabled (g:loaded_netrwPlugin == 1) and simply
--- executes :edit command on the buffer
+#### buffers.directory_handler
+
+Function called for buffers that are directories (after splits). By default assumes Netrw is enabled (vim.gloaded_netrwPlugin == 1) and simply executes `:edit` command on the buffer.
+
+This function takes two parameters: `path` and [context](#context-object).
+
+```lua
 vessel.opt.buffers.directory_handler = <function>
+```
 
--- List of functions used to sort buffers.
--- First item is the function used by default.
--- Each of the fucntions in this list must return two values:
--- * A function with the signature: function(BufferA, BufferB) return boolean end
--- * A description string that will be used to give feedback to the user when
---   cycling between these function, or empty string for no feedback
--- See also 'buffers.mappings.cycle_sort' option
+#### buffers.sort_buffers
+
+List of functions used to sort buffers. First item is the function used by default the first time you open the window.
+
+Each fucntion in this list must return two values:
+- A function with the signature: `function(BufferA, BufferB) return boolean end`
+- A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
+
+See also the `buffers.mappings.cycle_sort` option
+
+```lua
 vessel.opt.buffers.sort_buffers = { sorters.buffers.by_path, sorters.buffers.by_basename }
+```
 
--- How to align the buffer name. Can be one of:
--- * "left": Left alignment
--- * "right": Right alignment
--- * "none": No alignment
--- Note: Has effect only when using the default formatter.
+Example function:
+
+```lua
+function sort_by_basename()
+	local fn = function(a, b)
+		return vim.fs.basename(a.path) < vim.fs.basename(b.path)
+	end
+	return fn, "sorting by basename"
+end
+```
+
+#### buffers.bufname_align
+
+How to align the buffer name. Can be one of:
+- `left` Left alignment
+- `right` Right alignment
+- `none` No alignment
+
+> [!NOTE]
+> Has effect only when using the default formatter.
+
+```lua
 vessel.opt.buffers.bufname_align = "left"
+```
 
--- Buffer name style. Can be one of:
--- * "basename": Buffer base name
--- * "unique": Shortest unique suffix among all paths
--- * "hide": Hide bufname completely
--- Note: Has effect only when using the default formatter.
+#### buffers.bufname_style
+
+Buffer name style. Can be one of:
+- `basename` Buffer base name
+- `unique` Shortest unique suffix among all paths
+- `hide` Hide bufname completely
+
+> [!NOTE]
+> Has effect only when using the default formatter.
+
+```lua
 vessel.opt.buffers.bufname_style = "unique"
+```
 
--- Buffer path style. Can be one of:
--- * "full": Full file path
--- * "short": Shortest unique suffix among all paths
--- * "relhome": Relative to the home directory
--- * "relcwd": Relative to the current working directory
--- * "hide": Hide buffer path completely
--- Note: Has effect only when using the default formatter
+#### buffers.bufpath_style
+
+Buffer path style. Can be one of:
+- `full` Full file path
+- `short` Shortest unique suffix among all paths
+- `relhome` Relative to the home directory
+- `relcwd` Relative to the current working directory
+- `hide` Hide buffer path completely
+
+> [!NOTE]
+> Has effect only when using the default formatter.
+
+```lua
 vessel.opt.buffers.bufpath_style = "relcwd"
+```
 
--- Cycle sorting functions (See 'buffers.sort_buffers' option)
+#### buffers.mappings.cycle_sort
+
+Cycle sorting functions. See also `buffers.sort_buffers` option.
+
+```lua
 vessel.opt.buffers.mappings.cycle_sort = { "<space>" }
+```
 
--- Toggle unlisted buffers
+#### buffers.mappings.toggle_unlisted
+
+Toggle unlisted buffers.
+
+```lua
 vessel.opt.buffers.mappings.toggle_unlisted = { "a" }
+```
 
--- Edit buffer under cursor
+#### buffers.mappings.edit
+
+Edit the buffer under cursor.
+
+```lua
 vessel.opt.buffers.mappings.edit = { "l", "<cr>" }
+```
 
--- Edit buffer under cursor in a new tab
+#### buffers.mappings.tab
+
+Edit the buffer under cursor in a new tab.
+
+```lua
 vessel.opt.buffers.mappings.tab = { "t" }
+```
 
--- Edit buffer under cursor in a horizontal split
+#### buffers.mappings.split
+
+Edit the buffer under cursor in a horizontal split.
+
+```lua
 vessel.opt.buffers.mappings.split = { "s" }
+```
 
--- Edit buffer under cursor in a vertical split
+#### buffers.mappings.vsplit
+
+Edit buffer under cursor in a vertical split.
+
+```lua
 vessel.opt.buffers.mappings.vsplit = { "v" }
+```
 
--- :bdelete buffer under cursor (fails with unsaved changes)
+#### buffers.mappings.delete
+
+Executes `:bdelete` on the buffer under cursor (fails with unsaved changes).
+
+Basically sets the buffer unlisted. The buffer can then be re-openend by toggling unlisted buffers with the option `buffers.mappings.toggle_unlisted`.
+
+```lua
 vessel.opt.buffers.mappings.delete = { "d" }
+```
 
--- :bdelete! buffer under cursor (all unsaved changes will be lost!)
+#### buffers.mappings.force_delete
+
+Executes `:bdelete!` on the buffer under cursor.
+
+> [!CAUTION]
+> All unsaved changes will be lost!
+
+```lua
 vessel.opt.buffers.mappings.force_delete = { "D" }
+```
 
--- :bwipeout buffer under cursor (fails with unsaved changes)
+#### buffers.mappings.wipe
+
+Executes `:bwipeout` buffer under cursor (fails with unsaved changes).
+
+```lua
 vessel.opt.buffers.mappings.wipe = { "w" }
+```
 
--- :bwipeout! buffer under cursor (all unsaved changes will be lost!)
+#### buffers.mappings.force_wipe
+
+Executes `:bwipeout!` on the buffer under cursor.
+
+> [!CAUTION]
+> All unsaved changes will be lost!
+
+```lua
 vessel.opt.buffers.mappings.force_wipe = { "W" }
+```
 
--- Close the buffer list window
+#### buffers.mappings.close
+
+Close the buffer list window.
+
+```lua
 vessel.opt.buffers.mappings.close = { "q", "<esc>" }
+```
 
--- Functions used to format each buffer entry line
--- See "Formatters" section for more info
+#### buffers.formatters.buffer
+
+Functions used to format each buffer entry line. See [Formatters](#formatters) section for more info.
+
+```lua
 vessel.opt.buffers.formatters.buffer = buf_formatters.buffer_formatter,
+```
 
--- Highlight groups used by the default formatter
+#### buffers.highlights.bufname
+
+Highlight groups used by the default formatter.
+
+```lua
 vessel.opt.buffers.highlights.bufname = "Normal"
 vessel.opt.buffers.highlights.bufpath = "Comment"
 vessel.opt.buffers.highlights.unlisted = "Comment"
