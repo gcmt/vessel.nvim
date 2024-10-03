@@ -468,27 +468,13 @@ function Bufferlist:_render()
 		return a.pinpos < b.pinpos
 	end)
 
-	-- render pinned buffers first
-	local i = _render(0, pinned)
-
-	-- render the separator
-	local separator = self._app.config.buffers.pin_separator
-	if i > 0 and separator ~= "" then
-		i = i + 1
-		vim.fn.setbufline(self._bufnr, i, string.rep(separator, vim.fn.winwidth(0)))
-		local match = {
-			hlgroup = self._app.config.buffers.highlights.pin_separator,
-			startpos = 1,
-			endpos = -1,
-		}
-		util.set_matches({ match }, i, self._bufnr, self._nsid)
-	end
-
-	-- render the rest of the buffers
-
 	local unpinned = vim.tbl_filter(function(buffer)
 		return buffer.pinpos < 0
 	end, self._buffers)
+
+	local unpinned_listed = vim.tbl_filter(function(buffer)
+		return buffer.listed
+	end, unpinned)
 
 	local sort_func = Sort_func or self._app.config.buffers.sort_buffers[1]
 	local func, description = sort_func()
@@ -502,6 +488,23 @@ function Bufferlist:_render()
 		logger.info("vessel: %s", description)
 	end
 
+	-- render pinned buffers first
+	local i = _render(0, pinned)
+
+	-- render the separator
+	local separator = self._app.config.buffers.pin_separator
+	if i > 0 and separator ~= "" and #unpinned_listed > 0 then
+		i = i + 1
+		vim.fn.setbufline(self._bufnr, i, string.rep(separator, vim.fn.winwidth(0)))
+		local match = {
+			hlgroup = self._app.config.buffers.highlights.pin_separator,
+			startpos = 1,
+			endpos = -1,
+		}
+		util.set_matches({ match }, i, self._bufnr, self._nsid)
+	end
+
+	-- render the rest of the buffers
 	_render(i, unpinned)
 
 	vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
