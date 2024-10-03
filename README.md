@@ -110,9 +110,9 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 
 ## Windows
 
-![Marklist](assets/marks.jpg "Mark list preview.")
-
 ### Mark List Window
+
+![Marklist](assets/marks.jpg "Mark list preview.")
 
 By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. To change that, head over to the [configuration section](#mark-list-options) and look for the `sort_marks` option.
 
