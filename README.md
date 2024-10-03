@@ -553,7 +553,7 @@ Each fucntion in this list must return two values:
 - A function with the signature: `function(MarkA, MarkB) return boolean end`
 - A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
 
-See also [marks.mappings.cycle_sort](#marks.mappings.cycle_sort).
+See also [marks.mappings.cycle_sort](#marksmappingscycle_sort).
 
 ```lua
 local sorters = require("vessel.config.sorters")
@@ -795,7 +795,7 @@ vessel.opt.marks.mappings.keepj_vsplit = { "V" }
 
 #### marks.mappings.cycle_sort
 
-Cycle sorting functions. See also [marks.sort_marks](#marks.sort_marks).
+Cycle sorting functions. See also [marks.sort_marks](#markssort_marks).
 
 ```lua
 vessel.opt.marks.mappings.cycle_sort = { "<SPACE>" }
@@ -955,7 +955,7 @@ Each fucntion in this list must return two values:
 - A function with the signature: `function(BufferA, BufferB) return boolean end`
 - A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
 
-See [buffers.mappings.cycle_sort](#buffers.mappings.cycle_sort).
+See also [buffers.mappings.cycle_sort](#buffersmappingscycle_sort).
 
 ```lua
 vessel.opt.buffers.sort_buffers = { sorters.buffers.by_path, sorters.buffers.by_basename }
@@ -1018,7 +1018,7 @@ vessel.opt.buffers.bufpath_style = "relcwd"
 
 #### buffers.mappings.cycle_sort
 
-Cycle sorting functions. See also [buffers.sort_buffers](#buffers.sort_buffers).
+Cycle sorting functions. See also [buffers.sort_buffers](#bufferssort_buffers).
 
 ```lua
 vessel.opt.buffers.mappings.cycle_sort = { "<space>" }
@@ -1068,7 +1068,7 @@ vessel.opt.buffers.mappings.vsplit = { "v" }
 
 Executes `:bdelete` on the buffer under cursor (fails with unsaved changes).
 
-Basically sets the buffer unlisted. The buffer can then be re-openend by toggling unlisted buffers with [buffers.mappings.toggle_unlisted](#buffers.mappings.toggle_unlisted).
+Basically sets the buffer unlisted. The buffer can then be re-openend by toggling unlisted buffers with [buffers.mappings.toggle_unlisted](#buffersmappingstoggle_unlisted).
 
 ```lua
 vessel.opt.buffers.mappings.delete = { "d" }
