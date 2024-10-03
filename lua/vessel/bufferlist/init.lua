@@ -105,7 +105,16 @@ end
 ---@param mode integer
 ---@param line integer?
 function Bufferlist:_action_edit(map, mode, line)
-	local selected = map[line and line or vim.fn.line(".")]
+	local target
+	if line then
+		target = line
+	elseif vim.v.count > 0 then
+		target = vim.v.count
+	else
+		target = vim.fn.line(".")
+	end
+
+	local selected = map[target]
 	if not selected then
 		return
 	end
