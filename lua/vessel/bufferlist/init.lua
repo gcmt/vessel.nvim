@@ -186,6 +186,18 @@ function Bufferlist:_action_toggle_pin(map)
 	self:_refresh()
 end
 
+--- Pin directory of the buffer under cursor
+---@param map table
+function Bufferlist:_action_pin_directory(map)
+	local selected = map[vim.fn.line(".")]
+	if selected then
+		local bufnr = vim.fn.bufadd(vim.fs.dirname(selected.path))
+		vim.fn.setbufvar(bufnr, "&buflisted", 1)
+		table.insert(Pinned, bufnr)
+		self:_refresh()
+	end
+end
+
 --- Toggle unlisted buffes
 ---@param map table
 function Bufferlist:_action_toggle_unlisted(map)
@@ -292,6 +304,9 @@ function Bufferlist:_setup_mappings(map)
 	end)
 	util.keymap("n", self._app.config.buffers.mappings.toggle_pin, function()
 		self:_action_toggle_pin(map)
+	end)
+	util.keymap("n", self._app.config.buffers.mappings.pin_directory, function()
+		self:_action_pin_directory(map)
 	end)
 	util.keymap("n", self._app.config.buffers.mappings.delete, function()
 		self:_action_delete(map, "bdelete", false)

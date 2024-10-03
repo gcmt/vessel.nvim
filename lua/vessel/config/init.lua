@@ -219,6 +219,7 @@ local _opt = {
 			pin_increment = { "<c-j>" },
 			pin_decrement = { "<c-k>" },
 			toggle_pin = { "p" },
+			pin_directory = { "P" },
 			toggle_unlisted = { "a" },
 			edit = { "l", "<cr>" },
 			tab = { "t" },

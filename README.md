@@ -1173,6 +1173,14 @@ See also [Pinned Buffers](#pinned-buffers) section.
 vessel.opt.buffers.mappings.toggle_pin = { "p" }
 ```
 
+#### buffers.mappings.pin_directory
+
+Add to the pinned list the directory of the buffer under cursor.
+
+```lua
+vessel.opt.buffers.mappings.pin_directory = { "P" }
+```
+
 #### buffers.mappings.pin_increment
 
 Move the buffer under cursor down in the *pinned list*. If the buffer is pinned if not already in the *pinned list*.
