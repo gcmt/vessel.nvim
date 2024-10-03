@@ -234,7 +234,7 @@ end
 --- Keep cursor on selected mark
 ---@param selected Mark Selected mark
 ---@param map table New map table
-function Marklist:_follow_cursor(selected, map)
+function Marklist:_follow_selected(selected, map)
 	for i, item in pairs(map) do
 		if
 			type(item) == "string" and type(selected) == "string" and item == selected
@@ -427,7 +427,7 @@ function Marklist:_action_change_mark(map, mark)
 		vim.fn.win_execute(self._app.context.wininfo.winid, "delmarks " .. selected.mark)
 		vim.api.nvim_buf_set_mark(mark_bufnr, mark, selected.lnum, selected.col, {})
 		local newmap = self:_refresh()
-		self:_follow_cursor(Mark:new(mark), newmap)
+		self:_follow_selected(Mark:new(mark), newmap)
 	else
 		logger.err("cannot change mark, buffer not loaded")
 	end
@@ -452,7 +452,7 @@ function Marklist:_action_cycle_sort(map)
 
 	Sort_func = funcs[(index % #funcs) + 1]
 	local newmap = self:_refresh()
-	self:_follow_cursor(selected, newmap)
+	self:_follow_selected(selected, newmap)
 end
 
 --- Setup mappings for the mark window

@@ -81,7 +81,7 @@ end
 --- Keep cursor on selected buffer
 ---@param selected Buffer Selected buffer
 ---@param map table New map table
-function Bufferlist:_follow_cursor(selected, map)
+function Bufferlist:_follow_selected(selected, map)
 	for i, buffer in pairs(map) do
 		if buffer.nr == selected.nr then
 			util.vcursor(i)
@@ -144,7 +144,7 @@ function Bufferlist:_action_toggle_unlisted(map)
 	end
 	self._show_unlisted = not self._show_unlisted
 	local newmap = self:_render()
-	self:_follow_cursor(selected, newmap)
+	self:_follow_selected(selected, newmap)
 end
 
 --- Delete/Wipe the buffer under cursor
@@ -213,7 +213,7 @@ function Bufferlist:_action_cycle_sort(map)
 	end
 	Sort_func = funcs[(index % #funcs) + 1]
 	local newmap = self:_refresh()
-	self:_follow_cursor(selected, newmap)
+	self:_follow_selected(selected, newmap)
 end
 
 --- Setup mappings for the buffer list window
