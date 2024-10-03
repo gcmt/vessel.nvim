@@ -75,6 +75,14 @@ local function directory_handler(path, context)
 	vim.cmd("edit " .. vim.fn.fnameescape(path))
 end
 
+--- Filter jump files from being autoloaded
+---@param bufnr integer
+---@param bufpath string
+---@return boolean
+local function autoload_filter(bufnr, bufpath)
+	return vim.startswith(bufpath, vim.fn.getcwd() .. "/")
+end
+
 --- Default plugin options
 local _opt = {
 
@@ -167,12 +175,17 @@ local _opt = {
 		not_found = "Jump list empty",
 		indicator = { " ", " " },
 		show_colnr = false,
+		not_loaded = "",
+		autoload_filter = autoload_filter,
 		mappings = {
 			ctrl_o = "<c-o>",
 			ctrl_i = "<c-i>",
 			jump = { "l", "<cr>" },
 			close = { "q", "<esc>" },
 			clear = { "C" },
+			load_buffer = { "r" },
+			load_all = { "R" },
+			load_cwd = { "W" },
 		},
 		formatters = {
 			jump = jumps_formatters.jump_formatter,
@@ -185,6 +198,7 @@ local _opt = {
 			lnum = "LineNr",
 			col = "LineNr",
 			line = "Normal",
+			not_loaded = "Comment",
 		},
 	},
 

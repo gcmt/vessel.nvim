@@ -12,6 +12,7 @@ local util = require("vessel.util")
 ---@field lnum integer
 ---@field col integer
 ---@field line string
+---@field loaded boolean
 local Jump = {}
 Jump.__index = Jump
 
@@ -28,6 +29,7 @@ function Jump:new()
 	jump.lnum = 0
 	jump.col = 0
 	jump.line = ""
+	jump.loaded = false
 	return jump
 end
 
@@ -97,6 +99,19 @@ end
 --- Close the jump list window
 function Jumplist:_action_close()
 	self._app:_close_window()
+end
+
+--- Load in memory buffers that match condition
+---@param map table
+---@param condition? function
+function Jumplist:_action_load_buffers(map, condition)
+	local sel = map[vim.fn.line(".")]
+	for _, jump in pairs(map) do
+		if not condition or (condition and condition(jump, sel)) then
+			vim.fn.bufload(jump.bufnr)
+		end
+	end
+	self:_refresh()
 end
 
 --- Jump to the jump entry on the current line
@@ -204,6 +219,21 @@ function Jumplist:_setup_mappings(map)
 	util.keymap("n", self._app.config.jumps.mappings.jump, function()
 		self:_action_jump(util.modes.BUFFER, map)
 	end)
+	if self._app.config.lazy_load_buffers then
+		util.keymap("n", self._app.config.jumps.mappings.load_buffer, function()
+			self:_action_load_buffers(map, function(jump, sel)
+				return sel and jump.bufnr == sel.bufnr
+			end)
+		end)
+		util.keymap("n", self._app.config.jumps.mappings.load_cwd, function()
+			self:_action_load_buffers(map, function(jump, sel)
+				return vim.startswith(jump.bufpath, vim.fn.getcwd() .. "/")
+			end)
+		end)
+		util.keymap("n", self._app.config.jumps.mappings.load_all, function()
+			self:_action_load_buffers(map)
+		end)
+	end
 end
 
 --- Retrieve the jump list (reversed)
@@ -227,24 +257,35 @@ function Jumplist:_get_jumps()
 		jump.line = ""
 		jump.lnum = j.lnum
 		jump.col = j.col
+		jump.loaded = true
 
 		-- both nvim_buf_get_name() and bufload() fail if buffer does not exist
 		if vim.fn.bufexists(j.bufnr) == 0 then
 			goto continue
 		end
 
-		-- buffers are already added to the buffer list as soon as you execute
-		-- :jumps or call getjumplist(), might as well load anyway
-		vim.fn.bufload(jump.bufnr)
-		jump.bufpath = vim.api.nvim_buf_get_name(j.bufnr)
+		jump.bufpath = vim.api.nvim_buf_get_name(jump.bufnr)
+
+		if vim.fn.bufloaded(jump.bufnr) == 0 then
+			if
+				not self._app.config.lazy_load_buffers
+				and self._app.config.jumps.autoload_filter(jump.bufnr, jump.bufpath)
+			then
+				vim.fn.bufload(jump.bufnr)
+			else
+				jump.line = jump.bufpath
+				jump.loaded = false
+			end
+		end
 
 		-- getbufline() returns empty table for invalid (out of bound) lines
 		local line = vim.fn.getbufline(jump.bufnr, jump.lnum)
 		if #line == 1 then
 			jump.line = line[1]
-			if self:_filter(jump, self._app.context) or curpos == jump.pos then
-				table.insert(jumps, jump)
-			end
+		end
+
+		if self:_filter(jump, self._app.context) or curpos == jump.pos then
+			table.insert(jumps, jump)
 		end
 
 		::continue::

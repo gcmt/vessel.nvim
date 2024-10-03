@@ -138,25 +138,34 @@ Once inside the window, the following mappings are available:
 | `m{a-zA-Z}`  | Change the mark under cursor.                                                        |
 | `'{a-z-A-Z}` | Jump directly to a mark.
 
+> [!NOTE]
+> By default, lines cannot be displayed for files that are not loaded in memory. You'll see instead the mark file path greyed out. To automatically load in memory all files for which marks exist, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`.
+
 ### Jump List Window
 
 By default the jump list window shows the entire jump list with jumps spanning multiple files. Jumps are displayed top to bottom, with the most recent jump being on top. The cursor is automatically placed on the current position in the jump list. On the left column you can see jump positions relative to the current one. You can use those relative position as a count to `<c-o>` and `<c-i>`.
 
 Once inside the window, the following mappings are available:
 
-| Mapping      | Action                                                |
-|--------------|-------------------------------------------------------|
-| `l`, `<CR>`  | Jump to the line under cursor.                        |
-| `q`, `<ESC>` | Close the floating window.                            |
-| `C`          | Clear the entire jump list.                           |
-| `<C-O>`      | Move backwards in the jump list (towards the bottom). |
-| `<C-I>`      | Move forward in the jump list (towards the top).      |
+| Mapping      | Action                                                         |
+|--------------|----------------------------------------------------------------|
+| `l`, `<CR>`  | Jump to the line under cursor.                                 |
+| `q`, `<ESC>` | Close the floating window.                                     |
+| `C`          | Clear the entire jump list.                                    |
+| `<C-O>`      | Move backwards in the jump list (towards the bottom).          |
+| `<C-I>`      | Move forward in the jump list (towards the top).               |
+| `r`          | Load the file under cursor in memory.                          |
+| `R`          | Load all files in memory.                                      |
+| `W`          | Load in memory all files inside the current working directory. |
 
 > [!TIP]
 >  As a count to `<C-O>` and `<C-I>`, you can use the relative number displayed on the left column.
 
 > [!NOTE]
 > The relative positions you see by default on the left column are not the **real relative positions** you would use as a count outside the jump list window. This is because the list can be filtered and you could potentially see big gaps between these positions otherwise.
+
+> [!NOTE]
+> By default, lines cannot be displayed for files that are not loaded in memory. You'll see instead the jump file path greyed out. To automatically load in memory all files for which jumps exist, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded in memory.
 
 ### Buffer List Window
 
@@ -440,9 +449,9 @@ vessel.opt.verbosity = vim.log.levels.INFO
 
 #### lazy_load_buffers
 
- Some global marks might belong to files currently not loaded in memory. In this case the plugin can't retrieve the mark line content.
+ Some global marks or jumps might belong to files currently not loaded in memory. In this case the plugin can't retrieve the line content.
 
- Set this option to `false` to load in memory any such file as soon as you open the mark list window.
+ Set this option to `false` to load in memory any such file as soon as you open the mark or jump list window.
 
 ```lua
 vessel.opt.lazy_load_buffers = true
@@ -881,6 +890,24 @@ Message used when the jump list is empty.
 vessel.opt.jumps.not_found = "Jump list empty"
 ```
 
+#### jumps.not_loaded
+
+Label used as prefix for unloaded file paths.
+
+```lua
+vessel.opt.jumps.not_loaded = ""
+```
+
+#### jumps.autoload_filter
+
+This function comes into play when [lazy_load_buffers](#lazy_load_buffers) is set to `false`, that is, when the plugin is instructed to load all files automatically in memory. This functions limits the buffers that are actually going to be loaded. By default, anything that does not reside in the *current working directory* gets filtered out.
+
+```lua
+vessel.opt.jumps.not_loaded = function(bufnr, bufpath)
+	return vim.startswith(bufpath, vim.fn.getcwd() .. "/")
+end
+```
+
 #### jumps.indicator
 
 Prefix used for each formatted jump entry. First item is the line of the current position in the jump list.
@@ -949,6 +976,36 @@ Clear the jump list. Executes `:clearjumps`.
 
 ```lua
 vessel.opt.jumps.mappings.clear = { "C" }
+```
+
+#### jumps.mappings.load_buffer
+
+Load the file under cursor in memory.
+
+Useful when [lazy_load_buffers](#lazy_load_buffers) is set to `true` and buffers are not automatically loaded in memory when there are jumps that refer to them.
+
+```lua
+vessel.opt.jumps.mappings.load_buffer = { "r" }
+```
+
+#### jumps.mappings.load_all
+
+Load all files in memory.
+
+Useful when [lazy_load_buffers](#lazy_load_buffers) is set to `true` and buffers are not automatically loaded in memory when there are jumps that refer to them.
+
+```lua
+vessel.opt.jumps.mappings.load_all = { "R" }
+```
+
+#### jumps.mappings.load_cwd
+
+Load in memory all files inside the current working directory.
+
+Useful when [lazy_load_buffers](#lazy_load_buffers) is set to `true` and buffers are not automatically loaded in memory when there are jumps that refer to them.
+
+```lua
+vessel.opt.jumps.mappings.load_cwd = { "W" }
 ```
 
 #### jumps.highlights.*
