@@ -193,6 +193,8 @@ local _opt = {
 		not_found = "Buffer list empty",
 		unnamed_label = "[no name]",
 		quickjump = true,
+		show_pin_positions = true,
+		pin_separator = "─",
 		sort_buffers = { sorters.buffers.by_path, sorters.buffers.by_basename },
 		bufname_align = "left",
 		bufname_style = "unique",
@@ -200,6 +202,9 @@ local _opt = {
 		directory_handler = directory_handler,
 		mappings = {
 			cycle_sort = { "<space>" },
+			pin_increment = { "<c-j>" },
+			pin_decrement = { "<c-k>" },
+			toggle_pin = { "p" },
 			toggle_unlisted = { "a" },
 			edit = { "l", "<cr>" },
 			tab = { "t" },
@@ -220,6 +225,8 @@ local _opt = {
 			unlisted = "Comment",
 			directory = "Directory",
 			modified = "Keyword",
+			pin_position = "LineNr",
+			pin_separator = "NonText",
 		},
 	},
 }

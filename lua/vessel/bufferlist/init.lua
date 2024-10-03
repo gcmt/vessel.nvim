@@ -6,10 +6,14 @@ local util = require("vessel.util")
 -- Stateful sort type
 local Sort_func
 
+-- List of pinned buffers
+local Pinned = {}
+
 ---@class Buffer
 ---@field nr integer Buffer number
 ---@field path string Buffer full path
----@field listed boolean Buffer is listed
+---@field listed boolean Whether the buffer is listed
+---@field pinpos integer > 0 for pinned buffers
 local Buffer = {}
 Buffer.__index = Buffer
 
@@ -22,6 +26,7 @@ function Buffer:new(bufnr)
 	buffer.nr = bufnr or -1
 	buffer.path = ""
 	buffer.listed = false
+	buffer.pinpos = -1
 	return buffer
 end
 
@@ -135,7 +140,44 @@ function Bufferlist:_action_edit(map, mode, line)
 	end
 end
 
---- Toggle unlisted buffers
+--- Increment/decrement pin position
+--- If the buffer is not pinned, add it to pinned list
+---@param map table
+---@param increment integer (1 or -1)
+function Bufferlist:_action_increment_pin_pos(map, increment)
+	local selected = map[vim.fn.line(".")]
+	if not selected then
+		return
+	end
+	if selected.pinpos < 0 then
+		table.insert(Pinned, selected.nr)
+	else
+		local newpos = selected.pinpos + increment
+		if newpos >= 1 and newpos <= #Pinned then
+			table.remove(Pinned, selected.pinpos)
+			table.insert(Pinned, selected.pinpos + increment, selected.nr)
+		end
+	end
+	local newmap = self:_refresh()
+	self:_follow_selected(selected, newmap)
+end
+
+--- Pin/unpin the buffer under cursor
+---@param map table
+function Bufferlist:_action_toggle_pin(map)
+	local selected = map[vim.fn.line(".")]
+	if not selected then
+		return
+	end
+	if selected.pinpos > 0 then
+		table.remove(Pinned, selected.pinpos)
+	else
+		table.insert(Pinned, selected.nr)
+	end
+	self:_refresh()
+end
+
+--- Toggle unlisted buffes
 ---@param map table
 function Bufferlist:_action_toggle_unlisted(map)
 	local selected = map[vim.fn.line(".")]
@@ -167,7 +209,11 @@ function Bufferlist:_action_delete(map, cmd, force)
 	end
 
 	-- Replacement buffer in case the target is being shown in a window
-	local repl = map[(curline % vim.fn.line("$")) + 1]
+	local next = function(offset)
+		return map[(curline % vim.fn.line("$")) + offset]
+	end
+	-- Handle the possibility of the pinned separator being shown
+	local repl = next(1) or next(2)
 	if repl.nr == selected.nr then
 		if selected.path == "" then
 			logger.info("Can't delete last unnamed buffer")
@@ -193,6 +239,7 @@ function Bufferlist:_action_delete(map, cmd, force)
 		return
 	end
 
+	table.remove(Pinned, selected.pinpos)
 	self:_refresh()
 end
 
@@ -227,6 +274,15 @@ function Bufferlist:_setup_mappings(map)
 	end)
 	util.keymap("n", self._app.config.buffers.mappings.toggle_unlisted, function()
 		self:_action_toggle_unlisted(map)
+	end)
+	util.keymap("n", self._app.config.buffers.mappings.pin_increment, function()
+		self:_action_increment_pin_pos(map, 1)
+	end)
+	util.keymap("n", self._app.config.buffers.mappings.pin_decrement, function()
+		self:_action_increment_pin_pos(map, -1)
+	end)
+	util.keymap("n", self._app.config.buffers.mappings.toggle_pin, function()
+		self:_action_toggle_pin(map)
 	end)
 	util.keymap("n", self._app.config.buffers.mappings.delete, function()
 		self:_action_delete(map, "bdelete", false)
@@ -265,33 +321,30 @@ end
 --- Retrieve the buffer list
 ---@return table
 function Bufferlist:_get_buffers()
+	local pinpos = {}
+	for i, nr in pairs(Pinned) do
+		pinpos[nr] = i
+	end
+
 	local buffers = {}
 	for bufnr = 1, vim.fn.bufnr("$") do
 		if vim.fn.bufexists(bufnr) == 0 or vim.fn.getbufvar(bufnr, "&buftype") ~= "" then
+			if pinpos[bufnr] then
+				table.remove(Pinned, pinpos[bufnr])
+			end
 			goto continue
 		end
 
 		local buffer = Buffer:new(bufnr)
 		buffer.path = vim.api.nvim_buf_get_name(bufnr)
 		buffer.listed = vim.fn.buflisted(bufnr) == 1
+		buffer.pinpos = pinpos[bufnr] or -1
 
 		if self:_filter(buffer, self._app.context) then
 			table.insert(buffers, buffer)
 		end
 
 		::continue::
-	end
-
-	local sort_func = Sort_func or self._app.config.buffers.sort_buffers[1]
-	local func, description = sort_func()
-	local ok, err = pcall(table.sort, buffers, func)
-	if not ok then
-		local msg = string.gsub(tostring(err), "^.*:%s+", "")
-		logger.err("buffer sorting error: %s", msg)
-		return {}
-	elseif Sort_func and description ~= "" then
-		-- give feedback only if Sort_func gets changed
-		logger.info("vessel: %s", description)
 	end
 
 	return buffers
@@ -351,6 +404,7 @@ function Bufferlist:_render()
 	local map = {}
 	local max_suffix
 	local max_basename
+	local pinned_count = #Pinned
 	local buf_formatter = self._app.config.buffers.formatters.buffer
 
 	local paths = {}
@@ -371,36 +425,84 @@ function Bufferlist:_render()
 		end
 	end
 
-	local i = 0
-	for _, buffer in pairs(self._buffers) do
-		if not self._show_unlisted and not buffer.listed then
-			goto continue
-		end
-		i = i + 1
-		local ok, line, matches = pcall(buf_formatter, buffer, {
-			current_line = i,
-			max_basename = max_basename,
-			max_suffix = max_suffix,
-			suffixes = suffixes,
-		}, self._app.context, self._app.config)
-		if not ok or not line then
-			local msg
-			if not line then
-				msg = string.format("line %s: string expected, got nil", i)
-			else
-				msg = string.gsub(tostring(line), "^.*:%s+", "")
+	local _render = function(start, buffers)
+		local i = start
+		for _, buffer in pairs(buffers) do
+			if not self._show_unlisted and not buffer.listed then
+				goto continue
 			end
-			self._app:_close_window()
-			logger.err("formatter error: %s", msg)
-			return {}
+			i = i + 1
+			local ok, line, matches = pcall(buf_formatter, buffer, {
+				current_line = i,
+				max_basename = max_basename,
+				max_suffix = max_suffix,
+				pinned_count = pinned_count,
+				suffixes = suffixes,
+			}, self._app.context, self._app.config)
+			if not ok or not line then
+				local msg
+				if not line then
+					msg = string.format("line %s: string expected, got nil", i)
+				else
+					msg = string.gsub(tostring(line), "^.*:%s+", "")
+				end
+				self._app:_close_window()
+				logger.err("formatter error: %s", msg)
+				return {}
+			end
+			map[i] = buffer
+			vim.fn.setbufline(self._bufnr, i, line)
+			if matches then
+				util.set_matches(matches, i, self._bufnr, self._nsid)
+			end
+			::continue::
 		end
-		map[i] = buffer
-		vim.fn.setbufline(self._bufnr, i, line)
-		if matches then
-			util.set_matches(matches, i, self._bufnr, self._nsid)
-		end
-		::continue::
+		return i
 	end
+
+	local pinned = vim.tbl_filter(function(buffer)
+		return buffer.pinpos > 0
+	end, self._buffers)
+
+	table.sort(pinned, function(a, b)
+		return a.pinpos < b.pinpos
+	end)
+
+	-- render pinned buffers first
+	local i = _render(0, pinned)
+
+	-- render the separator
+	local separator = self._app.config.buffers.pin_separator
+	if i > 0 and separator ~= "" then
+		i = i + 1
+		vim.fn.setbufline(self._bufnr, i, string.rep(separator, vim.fn.winwidth(0)))
+		local match = {
+			hlgroup = self._app.config.buffers.highlights.pin_separator,
+			startpos = 1,
+			endpos = -1,
+		}
+		util.set_matches({ match }, i, self._bufnr, self._nsid)
+	end
+
+	-- render the rest of the buffers
+
+	local unpinned = vim.tbl_filter(function(buffer)
+		return buffer.pinpos < 0
+	end, self._buffers)
+
+	local sort_func = Sort_func or self._app.config.buffers.sort_buffers[1]
+	local func, description = sort_func()
+	local ok, err = pcall(table.sort, unpinned, func)
+	if not ok then
+		local msg = string.gsub(tostring(err), "^.*:%s+", "")
+		logger.err("buffer sorting error: %s", msg)
+		return {}
+	elseif Sort_func and description ~= "" then
+		-- give feedback only if Sort_func gets changed
+		logger.info("vessel: %s", description)
+	end
+
+	_render(i, unpinned)
 
 	vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
 	self:_setup_mappings(map)

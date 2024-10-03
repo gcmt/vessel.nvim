@@ -69,6 +69,16 @@ function M.buffer_formatter(buffer, meta, context, config)
 		bufpath = format_path(buffer.path, meta, config)
 	end
 
+	local pinned_pos = ""
+	if meta.pinned_count > 0 and config.buffers.show_pin_positions then
+		local pos_fmt = " %" .. #tostring(meta.pinned_count) .. "s"
+		if buffer.pinpos > 0 then
+			pinned_pos = string.format(pos_fmt, buffer.pinpos)
+		else
+			pinned_pos = string.format(pos_fmt, " ")
+		end
+	end
+
 	bufname = bufname ~= "" and " " .. bufname or ""
 	bufpath = bufpath ~= "" and " " .. bufpath or ""
 
@@ -82,7 +92,8 @@ function M.buffer_formatter(buffer, meta, context, config)
 	end
 
 	return util.format(
-		"%s%s",
+		"%s%s%s",
+		{ pinned_pos, config.buffers.highlights.pin_position },
 		{ bufname, hl_bufname },
 		{ bufpath, config.buffers.highlights.bufpath }
 	)

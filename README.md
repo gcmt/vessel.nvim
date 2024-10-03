@@ -19,6 +19,7 @@ On a quest to bring better ergonomics around *Neovim* native lists. This plugin 
   - [Mark List Window](#mark-list-window)
   - [Jump List Window](#jump-list-window)
   - [Buffer List Window](#buffer-list-window)
+  - [Pinned Buffers](#pinned-buffers)
 - [API](#api)
   - [Mark List API](#mark-list-api)
   - [Jump List API](#jump-list-api)
@@ -171,14 +172,29 @@ Once inside the window, the following mappings are available:
 | `s`          | Edit the buffer under cursor in a horizontal split.                                                                  |
 | `v`          | Edit the buffer under cursor in a vertical split.                                                                    |
 | `d`          | Delete the buffer under cursor. Fails if there is any unsaved change. Executes `:bdelete` on the buffer.             |
-| `D`          | **Force** delete the buffer under cursor. **All unsaved changes will be lost!**. Executes `:bdelete!` on the buffer. |
+| `D`          | Force delete the buffer under cursor. **All unsaved changes will be lost!** Executes `:bdelete!` on the buffer.      |
 | `w`          | Wipe buffer under cursor. Fails if there is any unsaved change. Executes `:bwipeout` on the buffer.                  |
-| `W`          | **Force** wipe the buffer under cursor. **All unsaved changes will be lost!**. Executes `:bwipeout!` on the buffer.  |
+| `W`          | Force wipe the buffer under cursor. **All unsaved changes will be lost!** Executes `:bwipeout!` on the buffer.       |
 | `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.                                      |
 | `a`          | Toggle showing *unlisted* buffers (`:bdelete`d buffers).                                                             |
+| `p`          | Pin/unpin the buffer under cursor.                                                                                   |
+| `<c-k>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                             |
+| `<c-j>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                           |
+
 
 > [!NOTE]
 > Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
+
+### Pinned Buffers
+
+Pinned buffers are buffers that always stay at the top of the window and and are not influenced by the current sort type. Together they form the **pinned list** and are separated by other buffers by a [separator](#bufferspin_separator).
+
+This list is particularly useful when combined with the [buffers.quickjump](#buffersquickjump) option. With this option enabled, you can quickly jump to the top `[1-9]` buffers just by pressing a number. Buffers positions follow the natural order of line numbers so, in order to select the right buffer, you need to enable line numbers for the whole window with the option [window.number](#windownumber) or, if you only want to display numbers for the *pinned list*, the option [buffers.show_pin_positions](#buffersshow_pin_positions).
+
+The order of buffers in the *pinned list* can be manually adjusted with the help of the mappings [buffers.pin_increase](#bufferspin_increase) and [buffers.pin_decrease](#bufferspin_decrease).
+
+> [!NOTE]
+> When enabled, the `buffers.quickjump` also works for unpinned buffers, but it's going to be less effective since you can't control the buffers positions unless they are in the *pinned list*.
 
 ## API
 
@@ -322,7 +338,7 @@ The plugin defines `User` autocommands for certain events:
 | `User VesselMarklistEnter`     | After the vessel buffer is created and the window opened but before any content is displayed in the buffer. |
 | `User VesselMarklistChanged`   | Each time the mark list window content changes                                                              |
 | `User VesselJumplistEnter`     | After the vessel buffer is created and the window opened but before any content is displayed in the buffer. |
-| `User VesselJumplistChanged`   | Each time the jump list window content changes.
+| `User VesselJumplistChanged`   | Each time the jump list window content changes.                                                             |
 
 #### How to Setup Custom Mappings
 
@@ -1010,6 +1026,29 @@ function sort_by_basename()
 end
 ```
 
+#### buffers.show_pin_positions
+
+Whether line numbers are diplayed next to pinned buffers.
+
+Useful when line numbers are not enabled for the window or the [buffers.quickjump](#buffersquickjump) option is enabled.
+
+> [!NOTE]
+> Has effect only when using the default formatter.
+
+```lua
+vessel.opt.buffers.show_pin_positions = true
+```
+
+#### buffers.pin_separator
+
+Character used as separator between the *pinned list* and the rest of the buffers. Use an empty string to hide the separator. Its color is controlled by the option [buffers.highlights.pin_separator](#buffershighlights).
+
+See also [Pinned Buffers](#pinned-buffers) section.
+
+```lua
+vessel.opt.buffers.pin_separator = "─"
+```
+
 #### buffers.bufname_align
 
 How to align the buffer name. Can be one of:
@@ -1060,6 +1099,42 @@ Cycle sorting functions. See also [buffers.sort_buffers](#bufferssort_buffers).
 
 ```lua
 vessel.opt.buffers.mappings.cycle_sort = { "<space>" }
+```
+
+#### buffers.mappings.toggle_pin
+
+Toggle pinned status on the buffer under cursor.
+
+See also [Pinned Buffers](#pinned-buffers) section.
+
+```lua
+vessel.opt.buffers.mappings.toggle_pin = { "p" }
+```
+
+#### buffers.mappings.pin_increment
+
+Move the buffer under cursor down in the *pinned list*. If the buffer is pinned if not already in the *pinned list*.
+
+> [!NOTE]
+>  Pinned buffers are displayed in decresing order, so incrementing the position essentially moves the buffer down the list.
+
+See also [pinned buffers](#pinned-buffers) section.
+
+```lua
+vessel.opt.buffers.mappings.pin_increment = { "<c-j>" }
+```
+
+#### buffers.mappings.pin_decrement
+
+Move the buffer under cursor up in the *pinned list*. If the buffer is pinned if not already in the *pinned list*.
+
+> [!NOTE]
+> Pinned buffers are displayed in decresing order, so incrementing the position essentially moves the buffer up.
+
+See also [Pinned Buffers](#pinned-buffers) section.
+
+```lua
+vessel.opt.buffers.mappings.pin_decrement = { "<c-k>" }
 ```
 
 #### buffers.mappings.toggle_unlisted
@@ -1158,7 +1233,7 @@ Functions used to format each buffer entry line. See [Formatters](#formatters) s
 vessel.opt.buffers.formatters.buffer = <function>,
 ```
 
-#### buffers.highlights.bufname
+#### buffers.highlights.*
 
 Highlight groups used by the default formatter.
 
@@ -1168,6 +1243,8 @@ vessel.opt.buffers.highlights.bufpath = "Comment"
 vessel.opt.buffers.highlights.unlisted = "Comment"
 vessel.opt.buffers.highlights.directory = "Directory"
 vessel.opt.buffers.highlights.modified = "Keyword"
+vessel.opt.buffers.highlights.pin_position = "LineNr"
+vessel.opt.buffers.highlights.pin_separator = "NonText"
 ```
 
 ## Formatters
@@ -1366,3 +1443,4 @@ Controls how each line of the buffer list is formatted. Takes the following four
 | `max_basename` | Max basename length among all buffer paths.                                 |
 | `suffixes`     | Table mapping each full path to its shortest unique suffix among all paths. |
 | `max_suffix`   | Max string length among all suffixes above.                                 |
+| `pinned_count` | Number of pinned buffers.                                                   |
