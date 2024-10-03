@@ -189,7 +189,7 @@ function Bufferlist:_action_delete(map, cmd, force)
 	cmd = force and cmd .. "!" or cmd
 	local ok, err = pcall(vim.fn.win_execute, winid, cmd .. " " .. selected.nr)
 	if not ok then
-		logger.warn(err)
+		logger.warn(string.gsub(err, ".-:E%d+:%s+", ""))
 		return
 	end
 
