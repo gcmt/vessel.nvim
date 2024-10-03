@@ -187,11 +187,11 @@ Once inside the window, the following mappings are available:
 
 ### Pinned Buffers
 
-Pinned buffers are buffers that always stay at the top of the window and and are not influenced by the current sort type. Together they form the **pinned list** and are separated by other buffers by a [separator](#bufferspin_separator).
+Pinned buffers are buffers that always stay at the top of the window and and are not influenced by the current sort type. Together they form the *pinned list* and are separated from other buffers by a [separator](#bufferspin_separator).
 
-This list is particularly useful when combined with the [buffers.quickjump](#buffersquickjump) option. With this option enabled, you can quickly jump to the top `[1-9]` buffers just by pressing a number. Buffers positions follow the natural order of line numbers so, in order to select the right buffer, you need to enable line numbers for the whole window with the option [window.number](#windownumber) or, if you only want to display numbers for the *pinned list*, the option [buffers.show_pin_positions](#buffersshow_pin_positions).
+This list is particularly useful when combined with the [buffers.quickjump](#buffersquickjump) option. With this option enabled, you can quickly jump to the top `[1-9]` buffers just by pressing a number. Buffers positions follow the natural order of line numbers so, in order to select the right buffer, you need to either enable line numbers for the whole window with the option [window.number](#windownumber) or, if you only want to display numbers for the *pinned list*, the option [buffers.show_pin_positions](#buffersshow_pin_positions).
 
-The order of buffers in the *pinned list* can be manually adjusted with the help of the mappings [buffers.pin_increase](#bufferspin_increase) and [buffers.pin_decrease](#bufferspin_decrease).
+The order of buffers in the *pinned list* can be manually adjusted. See mappings [buffers.pin_increase](#bufferspin_increase) and [buffers.pin_decrease](#bufferspin_decrease).
 
 > [!NOTE]
 > When enabled, the `buffers.quickjump` also works for unpinned buffers, but it's going to be less effective since you can't control the buffers positions unless they are in the *pinned list*.
