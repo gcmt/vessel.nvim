@@ -137,7 +137,8 @@ Once inside the window, the following mappings are available:
 - `<C-O>` Move backwards in the jump list (towards the bottom). As a `count`, you can use the relative number displayed on the left column.
 - `<C-I>` Move forward in the jump list (towards the top). As a `count`, you can use the relative number displayed on the left column.
 
-**NOTE**: the relative positions you see by default on the left column are not the **real relative positions** you would use as a count outside the jump list window. This is because the list can be filtered and you could potentially see big gaps between these positions otherwise.
+> [!NOTE]
+> The relative positions you see by default on the left column are not the **real relative positions** you would use as a count outside the jump list window. This is because the list can be filtered and you could potentially see big gaps between these positions otherwise.
 
 ### Buffer List Window
 
@@ -157,7 +158,8 @@ Once inside the window, the following mappings are available:
 - `<space>` Cycle sorting type. It will be remembered once you close and reopen the window.
 - `a` Toggle showing *unlisted* buffers (`:bdelete`d buffers).
 
-**NOTE:** Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
+> [!NOTE]
+> Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
 
 ## API
 
@@ -335,7 +337,8 @@ For each list, the plugin sets a **buffer-local variable** named `vessel` that c
 - `get_selected` Function to retrieve the *object* on the current line. Can return `nil` in case the list is empty.
 - `close_window` Function to close the vessel window.
 
-This buffer-local variable is only **available after the events** `VesselMarklistChanged`, `VesselJumplistChanged` and `VesselBufferlistChanged`.
+> [!IMPORTANT]
+> This buffer-local variable is only **available after the events** `VesselMarklistChanged`, `VesselJumplistChanged` and `VesselBufferlistChanged`.
 
 ## Configuration
 
