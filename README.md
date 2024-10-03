@@ -67,23 +67,33 @@ Calling the `setup` function is not required for using the plugin as internal `<
 
 ### Mark List Mappings
 
-- `<plug>(VesselViewMarks)` Show all *global* (uppercase) and local *marks* (lowercase) grouped by file.
-- `<plug>(VesselViewLocalMarks)` Show only *local* (lowercase) marks.
-- `<plug>(VesselViewGlobalMarks)` Show only *global* (uppercase) marks.
-- `<plug>(VesselViewBufferMarks)` Show both *local* and *global* marks in the current file.
-- `<plug>(VesselViewExternalMarks)` Show only *global* marks belonging to other files.
-- `<plug>(VesselSetLocalMark)` Automatically set/unset a *local* mark on the current line.
-- `<plug>(VesselSetGlobalMark)` Automatically set/unset a *global* mark on the current line.
+| Plug Mapping                      | Action                                                                      |
+|-----------------------------------|-----------------------------------------------------------------------------|
+| `<plug>(VesselViewMarks)`         | Show all *global* (uppercase) and local *marks* (lowercase) grouped by file.|
+| `<plug>(VesselViewLocalMarks)`    | Show only *local* (lowercase) marks.                                        |
+| `<plug>(VesselViewGlobalMarks)`   | Show only *global* (uppercase) marks.                                       |
+| `<plug>(VesselViewBufferMarks)`   | Show both *local* and *global* marks in the current file.                   |
+| `<plug>(VesselViewExternalMarks)` | Show only *global* marks belonging to other files.                          |
+| `<plug>(VesselSetLocalMark)`      | Automatically set/unset a *local* mark on the current line.                 |
+| `<plug>(VesselSetGlobalMark)`     | Automatically set/unset a *global* mark on the current line.                |
 
 ### Jump List mappings
 
-- `<plug>(VesselViewJumps)` Show the whole jump list.
-- `<plug>(VesselViewLocalJumps)` Show only jumps inside the current file.
-- `<plug>(VesselViewExternalJumps)` Show only jumps outside the current file.
+| Plug Mapping                      | Action                                                                      |
+|-----------------------------------|-----------------------------------------------------------------------------|
+| `<plug>(VesselViewJumps)`         | Show the whole jump list.                                                   |
+| `<plug>(VesselViewLocalJumps)`    | Show only jumps inside the current file.                                    |
+| `<plug>(VesselViewExternalJumps)` | Show only jumps outside the current file.                                   |
 
 ### Buffer List Mappings
 
-- `<plug>(VesselViewBuffers)` Show the buffer list. Only normal listed buffers will be displayed. A normal buffer is a buffer with the `buftype` option empty. Unlisted buffers can be toggled later directly inside the buffer list window.
+| Plug Mapping                | Action                                                                |
+|-----------------------------|-----------------------------------------------------------------------|
+| `<plug>(VesselViewBuffers)` | Show the buffer list. Only *normal listed buffers* will be displayed. |
+
+> [!NOTE]
+> - A *normal buffer* is a buffer with the `buftype` option empty.
+> - Unlisted buffers can be toggled later directly inside the buffer list window.
 
 ### Example Mappings
 
@@ -109,21 +119,23 @@ By default the mark list window shows all global and local marks grouped by the 
 
 Once inside the window, the following mappings are available:
 
-- `q`, `<ESC>` Close the floating window
-- `<C-J>` Move to the next mark group (path header)
-- `<C-K>` Move to the previous mark group (path header)
-- `d` Delete the mark under cursor
-- `l`, `<CR>` Jump to the mark (or path) under cursor
-- `o` Jump to the mark under cursor (does not change the jump list)
-- `v` Open the mark under cursor in a vertical split
-- `V` Open the mark under cursor in a vertical split with (does not change the jump list)
-- `s` Open the mark under cursor in a horizontal split
-- `S` Open the mark under cursor in a horizontal split (does not change the jump list)
-- `t` Open the mark under cursor in a new tab
-- `T` Open the mark under cursor in a new tab (does not change the jump list)
-- `<SPACE>` Cycle sorting type. It will be remembered once you close and reopen the window.
-- `m{a-zA-Z}` Change the mark under cursor
-- `'{a-z-A-Z}` Jump directly to a mark
+| Mapping      | Action                                                                               |
+|--------------|--------------------------------------------------------------------------------------|
+| `q`, `<ESC>` | Close the floating window.                                                           |
+| `<C-J>`      | Move to the next mark group (path header).                                           |
+| `<C-K>`      | Move to the previous mark group (path header).                                       |
+| `d`          | Delete the mark under cursor.                                                        |
+| `l`, `<CR>`  | Jump to the mark (or path) under cursor.                                             |
+| `o`          | Jump to the mark under cursor (does not change the jump list).                       |
+| `v`          | Open the mark under cursor in a vertical split.                                      |
+| `V`          | Open the mark under cursor in a vertical split with (does not change the jump list). |
+| `s`          | Open the mark under cursor in a horizontal split.                                    |
+| `S`          | Open the mark under cursor in a horizontal split (does not change the jump list).    |
+| `t`          | Open the mark under cursor in a new tab.                                             |
+| `T`          | Open the mark under cursor in a new tab (does not change the jump list).             |
+| `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.      |
+| `m{a-zA-Z}`  | Change the mark under cursor.                                                        |
+| `'{a-z-A-Z}` | Jump directly to a mark.
 
 ### Jump List Window
 
@@ -131,11 +143,16 @@ By default the jump list window shows the entire jump list with jumps spanning m
 
 Once inside the window, the following mappings are available:
 
-- `l`, `<CR>` Jump to the line under cursor.
-- `q`, `<ESC>` Close the floating window.
-- `C` Clear the entire jump list.
-- `<C-O>` Move backwards in the jump list (towards the bottom). As a `count`, you can use the relative number displayed on the left column.
-- `<C-I>` Move forward in the jump list (towards the top). As a `count`, you can use the relative number displayed on the left column.
+| Mapping      | Action                                                |
+|--------------|-------------------------------------------------------|
+| `l`, `<CR>`  | Jump to the line under cursor.                        |
+| `q`, `<ESC>` | Close the floating window.                            |
+| `C`          | Clear the entire jump list.                           |
+| `<C-O>`      | Move backwards in the jump list (towards the bottom). |
+| `<C-I>`      | Move forward in the jump list (towards the top).      |
+
+> [!TIP]
+>  As a count to `<C-O>` and `<C-I>`, you can use the relative number displayed on the left column.
 
 > [!NOTE]
 > The relative positions you see by default on the left column are not the **real relative positions** you would use as a count outside the jump list window. This is because the list can be filtered and you could potentially see big gaps between these positions otherwise.
@@ -146,17 +163,19 @@ By default the buffer list window shows all the normal buffers with the `listed`
 
 Once inside the window, the following mappings are available:
 
-- `q`, `<esc>` Close the floating window,
-- `l`, `<cr>` Edit the buffer under cursor.
-- `t` Edit the buffer undeer cursor in a new tab.
-- `s` Edit the buffer under cursor in a horizontal split.
-- `v` Edit the buffer under cursor in a vertical split.
-- `d` Delete the buffer under cursor. Fails if there is any unsaved change. Executes `:bdelete` on the buffer.
-- `D` **Force** delete the buffer under cursor. **All unsaved changes will be lost!**. Executes `:bdelete!` on the buffer.
-- `w` Wipe buffer under cursor. Fails if there is any unsaved change. Executes `:bwipeout` on the buffer.
-- `W` **Force** wipe the buffer under cursor. **All unsaved changes will be lost!**. Executes `:bwipeout!` on the buffer.
-- `<space>` Cycle sorting type. It will be remembered once you close and reopen the window.
-- `a` Toggle showing *unlisted* buffers (`:bdelete`d buffers).
+| Mapping      | Action                                                                                                               |
+|--------------|----------------------------------------------------------------------------------------------------------------------|
+| `q`, `<ESC>` | Close the floating window,                                                                                           |
+| `l`, `<CR>`  | Edit the buffer under cursor.                                                                                        |
+| `t`          | Edit the buffer undeer cursor in a new tab.                                                                          |
+| `s`          | Edit the buffer under cursor in a horizontal split.                                                                  |
+| `v`          | Edit the buffer under cursor in a vertical split.                                                                    |
+| `d`          | Delete the buffer under cursor. Fails if there is any unsaved change. Executes `:bdelete` on the buffer.             |
+| `D`          | **Force** delete the buffer under cursor. **All unsaved changes will be lost!**. Executes `:bdelete!` on the buffer. |
+| `w`          | Wipe buffer under cursor. Fails if there is any unsaved change. Executes `:bwipeout` on the buffer.                  |
+| `W`          | **Force** wipe the buffer under cursor. **All unsaved changes will be lost!**. Executes `:bwipeout!` on the buffer.  |
+| `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.                                      |
+| `a`          | Toggle showing *unlisted* buffers (`:bdelete`d buffers).                                                             |
 
 > [!NOTE]
 > Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
@@ -167,13 +186,15 @@ All *API* functions take a single optional `opts` table argument if you want to 
 
 ### Mark List API
 
-- `vessel.view_marks(opts, filter_func)` Show all *global* (uppercase) and *local* marks (lowercase). With the optional `filter_func` function argument you can filter out mark entries.
-- `vessel.view_local_marks(opts)` Show only *local* (lowercase) marks.
-- `vessel.view_global_marks(opts)` Show only *global* (uppercase) marks.
-- `vessel.view_buffer_marks(opts)` Show both *local* and *global* marks in the current file.
-- `vessel.view_external_marks(opts)` Show only *global* marks belonging to different files.
-- `vessel.set_local_mark(opts)` Automatically set/unset a *local* mark on the current line.
-- `vessel.set_global_mark(opts)` Automatically set/unset a *global* mark on the current line.
+| Function                               | Action                                                       |
+|----------------------------------------|--------------------------------------------------------------|
+| `vessel.view_marks(opts, filter_func)` | Show all *global* (uppercase) and *local* marks (lowercase). |
+| `vessel.view_local_marks(opts)`        | Show only *local* (lowercase) marks.                         |
+| `vessel.view_global_marks(opts)`       | Show only *global* (uppercase) marks.                        |
+| `vessel.view_buffer_marks(opts)`       | Show both *local* and *global* marks in the current file.    |
+| `vessel.view_external_marks(opts)`     | Show only *global* marks belonging to different files.       |
+| `vessel.set_local_mark(opts)`          | Automatically set/unset a *local* mark on the current line.  |
+| `vessel.set_global_mark(opts)`         | Automatically set/unset a *global* mark on the current line. |
 
 `filter_func` is a function used to filter out entries in the mark list. If the function returns `false`, the mark won't be displayed. The function takes two arguments:
 
@@ -191,9 +212,11 @@ end)
 
 ### Jump List API
 
-- `vessel.view_jumps(opts, filter_func)` Show the whole jump list. With the optional `filter_func` function argument you can filter out jump entries.
-- `vessel.view_local_jumps(opts)` Show only jumps inside the current file.
-- `vessel.view_external_jumps(opts)` Show only jumps outside the current file.
+| Function                               | Action                                    |
+|----------------------------------------|------------------------------------------ |
+| `vessel.view_jumps(opts, filter_func)` | Show the whole jump list.                 |
+| `vessel.view_local_jumps(opts)`        | Show only jumps inside the current file.  |
+| `vessel.view_external_jumps(opts)`     | Show only jumps outside the current file. |
 
 `filter_func` is a function used to filter out entries in the jump list. If the function returns `false`, the entry won't be displayed. The function takes two arguments:
 
@@ -211,7 +234,13 @@ end)
 
 ### Buffer List API
 
-- `vessel.view_buffers(opts, filter_func)` Show the buffer list. Only normal listed buffers will be displayed. A normal buffer is a buffer with the `buftype` option empty. Unlisted buffers can be toggled later directly inside the buffer list window.
+| Function                                 | Action                                                                |
+|------------------------------------------|-----------------------------------------------------------------------|
+| `vessel.view_buffers(opts, filter_func)` | Show the buffer list. Only *normal listed* buffers will be displayed. |
+
+> [!NOTE]
+> - A *normal buffer* is a buffer with the `buftype` option empty.
+> - Unlisted buffers can be toggled later directly inside the buffer list window.
 
 `filter_func` is a function used to filter out entries in the buffer list. If the function returns `false`, the buffer won't be displayed. The function takes two arguments:
 
@@ -284,14 +313,16 @@ util.modes = {
 
 ### Autocommand Events
 
-The plugin triggers `User` autocommands on certain events:
+The plugin defines `User` autocommands for certain events:
 
-- `VesselBufferlistEnter` After the vessel buffer is created and the window opened but before any content is displayed in the buffer.
-- `VesselBufferlistChanged` Each time the buffer list window content changes.
-- `VesselMarklistEnter` After the vessel buffer is created and the window opened but before any content is displayed in the buffer.
-- `VesselMarklistChanged` Each time the mark list window content changes
-- `VesselJumplistEnter` After the vessel buffer is created and the window opened but before any content is displayed in the buffer.
-- `VesselJumplistChanged` Each time the jump list window content changes.
+| Autocommand                    | Description                                                                                                 |
+|--------------------------------|-------------------------------------------------------------------------------------------------------------|
+| `User VesselBufferlistEnter`   | After the vessel buffer is created and the window opened but before any content is displayed in the buffer. |
+| `User VesselBufferlistChanged` | Each time the buffer list window content changes.                                                           |
+| `User VesselMarklistEnter`     | After the vessel buffer is created and the window opened but before any content is displayed in the buffer. |
+| `User VesselMarklistChanged`   | Each time the mark list window content changes                                                              |
+| `User VesselJumplistEnter`     | After the vessel buffer is created and the window opened but before any content is displayed in the buffer. |
+| `User VesselJumplistChanged`   | Each time the jump list window content changes.
 
 #### How to Setup Custom Mappings
 
@@ -304,7 +335,6 @@ Specifically, with the snippet below we try to open a file browser directly from
 -- path as argument and open up a file browser in that path
 
 local vessel_aug = vim.api.nvim_create_augroup("VesselCustom", { clear = true })
--- notice the use of the "User" autocommand event
 vim.api.nvim_create_autocmd("User", {
   group = vessel_aug,
 
@@ -1240,13 +1270,20 @@ vessel.opt.marks.formatters.header = <function>
 
 Controls how each group header (file path) in the mark list is formatted. Takes the following four arguments:
 
-- `path` The full path being formatted.
-- `context` Table containing information about the current window/buffer. See the [context object](#context-object) section.
-- `config` Table containing the complete configuration.
-- `meta` Table containing additional contextual information. It has the following keys:
-  - `groups_count` Total number of groups.
-  - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
-  - `max_suffix` Maximum length among all suffixes above.
+| Parameter | Description                                                                                                      |
+|-----------|------------------------------------------------------------------------------------------------------------------|
+| `path`    | The full path being formatted.                                                                                   |
+| `context` | Table containing information about the current window/buffer. See the [context object](#context-object) section. |
+| `config`  | Table containing the complete configuration.                                                                     |
+| `meta`    | Table containing additional contextual information.                                                              |
+
+The `meta` table has the following keys:
+
+| Key            | Description                                                                 |
+|----------------|-----------------------------------------------------------------------------|
+| `groups_count` | Total number of groups.                                                     |
+| `suffixes`     | Table mapping each full path to its shortest unique suffix among all paths. |
+| `max_suffix`   | Maximum length among all suffixes above.                                    |
 
 #### marks.formatters.mark
 
@@ -1256,19 +1293,26 @@ vessel.opt.marks.formatters.mark = <function>
 
 Controls how each mark in the mark list is formatted. Takes the following four arguments:
 
-- `mark` The mark being formatted. See the [mark object](#mark-object) section.
-- `context` Table containing information about the current window/buffer. See the [context object](#context-object) section.
-- `config` Table containing the complete configuration
-- `meta` Table containing additional contextual information. It has the following keys:
-  - `pos` Position of the mark being formatted in the group.
-  - `is_last` Whether the mark being formatted is last in the group.
-  - `groups_count` Total number of mark groups.
-  - `max_lnum` Highest line number among all mark groups.
-  - `max_col` Highest column number among all mark groups.
-  - `max_group_lnum` Highest line number in the current group.
-  - `max_group_col` Highest column number in the group.
-  - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
-  - `max_suffix` Max string length among all suffixes above.
+| Parameter | Description                                                                                                      |
+|-----------|------------------------------------------------------------------------------------------------------------------|
+| `mark`    | The mark being formatted. See the [mark object](#mark-object) section.                                           |
+| `context` | Table containing information about the current window/buffer. See the [context object](#context-object) section. |
+| `config`  | Table containing the complete configuration.                                                                     |
+| `meta`    | Table containing additional contextual information.                                                              |
+
+ It `meta` table has the following keys:
+
+| Key              | Description                                                                 |
+|------------------|-----------------------------------------------------------------------------|
+| `pos`            | Position of the mark being formatted in the group.                          |
+| `is_last`        | Whether the mark being formatted is last in the group.                      |
+| `groups_count`   | Total number of mark groups.                                                |
+| `max_lnum`       | Highest line number among all mark groups.                                  |
+| `max_col`        | Highest column number among all mark groups.                                |
+| `max_group_lnum` | Highest line number in the current group.                                   |
+| `max_group_col`  | Highest column number in the group.                                         |
+| `suffixes`       | Table mapping each full path to its shortest unique suffix among all paths. |
+| `max_suffix`     | Max string length among all suffixes above.                                 |
 
 #### jumps.formatters.jump
 
@@ -1278,19 +1322,26 @@ vessel.opt.jumps.formatters.jump = <function>
 
 Controls how each line of the jump list is formatted. Takes the following four arguments:
 
-- `jump` The jump being formatted. See the [jump object](#jump-object) section.
-- `context` Table containing information about the current window/buffer. See the [context object](#context-object) section.
-- `config` Table containing the complete configuration.
-- `meta` Table containing additional contextual information. It has the following keys:
-  - `jumps_count` Total number of jumps.
-  - `current_line` Line number of the jump being formatted.
-  - `current_jump_line` Line number of the current jump position.
-  - `max_lnum` Max line number among all jumps.
-  - `max_col` Max column number among all jumps.
-  - `max_relpos` Max relative number among all jumps.
-  - `max_basename` Max basename length among all jumps paths.
-  - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
-  - `max_suffix` Max string length among all suffixes above.
+| Parameter | Description                                                                                                      |
+|-----------|------------------------------------------------------------------------------------------------------------------|
+| `jump`    | The jump being formatted. See the [jump object](#jump-object) section.                                           |
+| `context` | Table containing information about the current window/buffer. See the [context object](#context-object) section. |
+| `config`  | Table containing the complete configuration.                                                                     |
+| `meta`    | Table containing additional contextual information.                                                              |
+
+ It `meta` table has the following keys:
+
+| Key                 | Description                                                                 |
+|---------------------|-----------------------------------------------------------------------------|
+| `jumps_count`       | Total number of jumps.                                                      |
+| `current_line`      | Line number of the jump being formatted.                                    |
+| `current_jump_line` | Line number of the current jump position.                                   |
+| `max_lnum`          | Max line number among all jumps.                                            |
+| `max_col`           | Max column number among all jumps.                                          |
+| `max_relpos`        | Max relative number among all jumps.                                        |
+| `max_basename`      | Max basename length among all jumps paths.                                  |
+| `suffixes`          | Table mapping each full path to its shortest unique suffix among all paths. |
+| `max_suffix`        | Max string length among all suffixes above.                                 |
 
 #### buffers.formatters.buffer
 
@@ -1300,11 +1351,18 @@ vessel.opt.buffers.formatters.buffer = <function>
 
 Controls how each line of the buffer list is formatted. Takes the following four arguments:
 
-- `buffer` The buffer being formatted. See the [buffer object](#buffer-object) section.
-- `context` Table containing information about the current window/buffer. See the [context object](#context-object) section.
-- `config` Table containing the complete configuration.
-- `meta` Table containing additional contextual information. It has the following keys:
-  - `current_line` Line number of the buffer being formatted.
-  - `max_basename` Max basename length among all buffer paths.
-  - `suffixes` Table mapping each full path to its shortest unique suffix among all paths.
-  - `max_suffix` Max string length among all suffixes above.
+| Parameter | Description                                                                                                      |
+|-----------|------------------------------------------------------------------------------------------------------------------|
+| `buffer`  | The buffer being formatted. See the [buffer object](#buffer-object) section.                                     |
+| `context` | Table containing information about the current window/buffer. See the [context object](#context-object) section. |
+| `config`  | Table containing the complete configuration.                                                                     |
+| `meta`    | Table containing additional contextual information.                                                              |
+
+ It `meta` table has the following keys:
+
+| Key            | Description                                                                 |
+|----------------|-----------------------------------------------------------------------------|
+| `current_line` | Line number of the buffer being formatted.                                  |
+| `max_basename` | Max basename length among all buffer paths.                                 |
+| `suffixes`     | Table mapping each full path to its shortest unique suffix among all paths. |
+| `max_suffix`   | Max string length among all suffixes above.                                 |
