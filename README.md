@@ -164,8 +164,9 @@ Once inside the window, the following mappings are available:
 > [!NOTE]
 > The relative positions you see by default on the left column are not the **real relative positions** you would use as a count outside the jump list window. This is because the list can be filtered and you could potentially see big gaps between these positions otherwise.
 
-> [!NOTE]
-> By default, lines cannot be displayed for files that are not loaded in memory. You'll see instead the jump file path greyed out. To automatically load in memory all files for which jumps exist, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded in memory.
+#### Autoloding buffers
+
+By default, lines cannot be displayed for files that are not loaded in memory. You'll see instead the jump file path greyed out. To automatically load in memory all files for which jumps exist, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded in memory.
 
 ### Buffer List Window
 
@@ -173,26 +174,29 @@ By default the buffer list window shows all the normal buffers with the `listed`
 
 Once inside the window, the following mappings are available:
 
-| Mapping      | Action                                                                                                               |
-|--------------|----------------------------------------------------------------------------------------------------------------------|
-| `q`, `<ESC>` | Close the floating window,                                                                                           |
-| `l`, `<CR>`  | Edit the buffer under cursor.                                                                                        |
-| `t`          | Edit the buffer undeer cursor in a new tab.                                                                          |
-| `s`          | Edit the buffer under cursor in a horizontal split.                                                                  |
-| `v`          | Edit the buffer under cursor in a vertical split.                                                                    |
-| `d`          | Delete the buffer under cursor. Fails if there is any unsaved change. Executes `:bdelete` on the buffer.             |
-| `D`          | Force delete the buffer under cursor. **All unsaved changes will be lost!** Executes `:bdelete!` on the buffer.      |
-| `w`          | Wipe buffer under cursor. Fails if there is any unsaved change. Executes `:bwipeout` on the buffer.                  |
-| `W`          | Force wipe the buffer under cursor. **All unsaved changes will be lost!** Executes `:bwipeout!` on the buffer.       |
-| `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.                                      |
-| `a`          | Toggle showing *unlisted* buffers (`:bdelete`d buffers).                                                             |
-| `p`          | Pin/unpin the buffer under cursor.                                                                                   |
-| `<c-k>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                             |
-| `<c-j>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                           |
+| Mapping      | Action                                                                                                          |
+|--------------|-----------------------------------------------------------------------------------------------------------------|
+| `q`, `<ESC>` | Close the floating window,                                                                                      |
+| `l`, `<CR>`  | Edit the buffer under cursor. Takes a count.                                                                    |
+| `t`          | Edit the buffer undeer cursor in a new tab.                                                                     |
+| `s`          | Edit the buffer under cursor in a horizontal split.                                                             |
+| `v`          | Edit the buffer under cursor in a vertical split.                                                               |
+| `d`          | Delete the buffer under cursor. Fails if there is any unsaved change. Executes `:bdelete` on the buffer.        |
+| `D`          | Force delete the buffer under cursor. **All unsaved changes will be lost!** Executes `:bdelete!` on the buffer. |
+| `w`          | Wipe buffer under cursor. Fails if there is any unsaved change. Executes `:bwipeout` on the buffer.             |
+| `W`          | Force wipe the buffer under cursor. **All unsaved changes will be lost!** Executes `:bwipeout!` on the buffer.  |
+| `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.                                 |
+| `a`          | Toggle showing *unlisted* buffers (Buffers on which you executed `:bdelete`).                                   |
+| `p`          | Pin/unpin the buffer under cursor.                                                                              |
+| `<c-k>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                        |
+| `<c-j>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                      |
 
 
 > [!NOTE]
 > Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
+
+> [!TIP]
+> The mappings `l` or `<cr>` ([buffers.mappings.edit](#buffersmappingsedit)) take a line number as a count. When the [buffers.quickjump](#buffersquickjump) option is off and [line numbers are shown](#windownumber), you can simply type the line number and then press `l` or `<cr>` to instantly edit the buffer on that line.
 
 ### Pinned Buffers
 
@@ -313,6 +317,7 @@ The `Jump` object is `table` with the following keys:
 - `lnum` Jump line number
 - `col` Jump column number
 - `line` Line on which the jump is positioned
+- `loaded` Whether the file the jump refers to is loaded in memory
 
 ### Buffer Object
 
@@ -321,6 +326,7 @@ The `Buffer` object is `table` with the following keys:
 - `nr` Buffer number
 - `path` Buffer full path
 - `listed` Boolean flag indicating whether the buffer is listed
+- `pinpos` Position in the pinned list. `-1` if buffer is not pinned
 
 ### Modes
 
@@ -340,25 +346,22 @@ util.modes = {
 
 The plugin defines `User` autocommands for certain events:
 
-| Autocommand                    | Description                                                                                                 |
-|--------------------------------|-------------------------------------------------------------------------------------------------------------|
-| `User VesselBufferlistEnter`   | After the vessel buffer is created and the window opened but before any content is displayed in the buffer. |
-| `User VesselBufferlistChanged` | Each time the buffer list window content changes.                                                           |
-| `User VesselMarklistEnter`     | After the vessel buffer is created and the window opened but before any content is displayed in the buffer. |
-| `User VesselMarklistChanged`   | Each time the mark list window content changes                                                              |
-| `User VesselJumplistEnter`     | After the vessel buffer is created and the window opened but before any content is displayed in the buffer. |
-| `User VesselJumplistChanged`   | Each time the jump list window content changes.                                                             |
+| Autocommand                    | Description                                                                       |
+|--------------------------------|-----------------------------------------------------------------------------------|
+| `User VesselBufferlistEnter`   | After the window is opened but before any content is displayed in the buffer.     |
+| `User VesselBufferlistChanged` | Each time the buffer list window content changes.                                 |
+| `User VesselMarklistEnter`     | After the window is opened but before any content is displayed in the buffer.     |
+| `User VesselMarklistChanged`   | Each time the mark list window content changes                                    |
+| `User VesselJumplistEnter`     | After the the window is opened but before any content is displayed in the buffer. |
+| `User VesselJumplistChanged`   | Each time the jump list window content changes.                                   |
 
 #### How to Setup Custom Mappings
 
-The example below shows how you can setup your own mappings in the buffer window with the help of custom autocommand events.
+The example below shows how you can setup your own mappings in the buffer window with the help of custom autocommand events. Specifically, with the snippet below we try to open a file browser directly from the buffer list if we realize the buffer we're looking for is not in the list.
 
-Specifically, with the snippet below we try to open a file browser directly from the buffer list if we realize the buffer we're looking for is not in the list.
+In the example below we pretend `:FilExplorer` is a real command that takes a path as argument and opens up a file browser for that path.
 
 ```lua
--- In the example below we pretend :FilExplorer is an existing command that takes a
--- path as argument and open up a file browser in that path
-
 local vessel_aug = vim.api.nvim_create_augroup("VesselCustom", { clear = true })
 vim.api.nvim_create_autocmd("User", {
   group = vessel_aug,
@@ -393,7 +396,7 @@ For each list, the plugin sets a **buffer-local variable** named `vessel` that c
 - `close_window` Function to close the vessel window.
 
 > [!IMPORTANT]
-> This buffer-local variable is only **available after the events** `VesselMarklistChanged`, `VesselJumplistChanged` and `VesselBufferlistChanged`.
+> This buffer-local variable is only available after the events `VesselMarklistChanged`, `VesselJumplistChanged` and `VesselBufferlistChanged`.
 
 ## Configuration
 
@@ -425,7 +428,7 @@ vessel.opt.marks.mappings.close = { "Q" }
 vessel.opt.buffers.name_align = "right"
 ```
 
-The third way of setting options is by directly passing and option `table` argument to *API* functions. This options will override anything you passed previously to the `setup` function set via the `opt` interface object.
+The third way of setting options is by directly passing a `table` argument to *API* functions. These options will override anything you passed previously to the `setup` function or set via the `opt` interface object.
 
 ```lua
 vim.keymap.set("n", "g", function()
@@ -1050,7 +1053,7 @@ vessel.opt.buffers.quickjump = true
 
 #### buffers.directory_handler
 
-Function called for buffers that are directories (after splits). By default assumes Netrw is enabled (vim.gloaded_netrwPlugin == 1) and simply executes `:edit` command on the buffer.
+Function called for buffers that are directories. By default assumes Netrw is enabled (vim.g.loaded_netrwPlugin == 1) and simply executes `:edit` command on the buffer. Can be useful to open up your favorite file explorer or fuzzy finder.
 
 This function takes two parameters: `path` and [context](#context-object).
 
