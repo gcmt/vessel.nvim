@@ -112,7 +112,7 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 
 ### Mark List Window
 
-![Marklist](assets/marks.jpg "Mark list preview.")
+![Marklist](assets/marks_dark.png "Mark list preview.")
 
 By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. To change that, head over to the [configuration section](#mark-list-options) and look for the `sort_marks` option.
 
@@ -141,7 +141,7 @@ Once inside the window, the following mappings are available:
 
 ### Jump List Window
 
-![Jumplist](assets/jumps.jpg "Jump list preview.")
+![Jumplist](assets/jumps_dark.png "Jump list preview.")
 
 By default the jump list window shows the entire jump list with jumps spanning multiple files. Jumps are displayed top to bottom, with the most recent jump being on top. The cursor is automatically placed on the current position in the jump list. On the left column you can see jump positions relative to the current one. You can use those relative position as a count to `<c-o>` and `<c-i>`.
 
@@ -170,7 +170,7 @@ By default, lines cannot be displayed for files that are not loaded in memory. Y
 
 ### Buffer List Window
 
-![Jumplist](assets/buffers.jpg "Buffer list preview.")
+![Jumplist](assets/buffers_dark.png "Buffer list preview.")
 
 By default the buffer list window shows all the normal buffers with the `listed` option set. Showing *unlisted* buffers can be toggled with the press of a key. By default buffers are sorted by their directory name. Head over to the [configuration section](#buffer-list-options) and look for the `sort_buffers` option to see how you can customize buffer sorting.
 
