@@ -563,10 +563,10 @@ Example function:
 
 ```lua
 function sort_by_lnum()
-	local fn = function(a, b)
-		return a.lnum < b.lnum
-	end
-	return fn, "sorting by line number"
+  local fn = function(a, b)
+    return a.lnum < b.lnum
+  end
+  return fn, "sorting by line number"
 end
 ```
 
@@ -964,10 +964,10 @@ Example function:
 
 ```lua
 function sort_by_basename()
-	local fn = function(a, b)
-		return vim.fs.basename(a.path) < vim.fs.basename(b.path)
-	end
-	return fn, "sorting by basename"
+  local fn = function(a, b)
+    return vim.fs.basename(a.path) < vim.fs.basename(b.path)
+  end
+  return fn, "sorting by basename"
 end
 ```
 
