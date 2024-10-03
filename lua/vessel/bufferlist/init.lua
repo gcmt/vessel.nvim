@@ -205,8 +205,10 @@ function Bufferlist:_action_toggle_unlisted(map)
 	if not selected then
 		return
 	end
+	local line = vim.fn.line(".")
 	self._show_unlisted = not self._show_unlisted
 	local newmap = self:_render()
+	util.vcursor(line)
 	self:_follow_selected(selected, newmap)
 end
 
