@@ -900,7 +900,7 @@ vessel.opt.jumps.not_loaded = ""
 
 #### jumps.autoload_filter
 
-This function comes into play when [lazy_load_buffers](#lazy_load_buffers) is set to `false`, that is, when the plugin is instructed to load all files automatically in memory. This functions limits the buffers that are actually going to be loaded. By default, anything that does not reside in the *current working directory* gets filtered out.
+This function comes into play when [lazy_load_buffers](#lazy_load_buffers) is set to `false`, that is, when the plugin is instructed to load all files automatically in memory. This functions limits the buffers that are actually going to be loaded. By default, anything that does not reside in the *current working directory* won't be loaded automatically (but will still be visible in the list with the path greyed out).
 
 ```lua
 vessel.opt.jumps.not_loaded = function(bufnr, bufpath)
