@@ -609,7 +609,7 @@ end
 
 List of functions used to sort marks in the each groups. First item is the function used by default the first time you open the window.
 
-Each fucntion in this list must return two values:
+Each function in this list must return two values:
 - A function with the signature: `function(MarkA, MarkB) return boolean end`
 - A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
 
@@ -1067,7 +1067,7 @@ vessel.opt.buffers.directory_handler = <function>
 
 List of functions used to sort buffers. First item is the function used by default the first time you open the window.
 
-Each fucntion in this list must return two values:
+Each function in this list must return two values:
 - A function with the signature: `function(BufferA, BufferB) return boolean end`
 - A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
 
