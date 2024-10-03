@@ -1448,7 +1448,7 @@ Controls how each mark in the mark list is formatted. Takes the following four a
 | `config`  | Table containing the complete configuration.                                                                     |
 | `meta`    | Table containing additional contextual information.                                                              |
 
- It `meta` table has the following keys:
+ The `meta` table has the following keys:
 
 | Key              | Description                                                                 |
 |------------------|-----------------------------------------------------------------------------|
@@ -1477,7 +1477,7 @@ Controls how each line of the jump list is formatted. Takes the following four a
 | `config`  | Table containing the complete configuration.                                                                     |
 | `meta`    | Table containing additional contextual information.                                                              |
 
- It `meta` table has the following keys:
+ The `meta` table has the following keys:
 
 | Key                 | Description                                                                 |
 |---------------------|-----------------------------------------------------------------------------|
@@ -1506,7 +1506,7 @@ Controls how each line of the buffer list is formatted. Takes the following four
 | `config`  | Table containing the complete configuration.                                                                     |
 | `meta`    | Table containing additional contextual information.                                                              |
 
- It `meta` table has the following keys:
+ The `meta` table has the following keys:
 
 | Key            | Description                                                                 |
 |----------------|-----------------------------------------------------------------------------|
