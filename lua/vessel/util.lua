@@ -38,9 +38,11 @@ function M.keymap(mode, lhs, callback, opts)
 		end, opts)
 	elseif type(lhs) == "table" then
 		for _, mapping in pairs(lhs) do
-			vim.keymap.set(mode, mapping, function()
-				callback(mapping)
-			end, opts)
+			if mapping ~= "" then
+				vim.keymap.set(mode, mapping, function()
+					callback(mapping)
+				end, opts)
+			end
 		end
 	end
 end
