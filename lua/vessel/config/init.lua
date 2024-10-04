@@ -214,6 +214,7 @@ local _opt = {
 		bufname_align = "left",
 		bufname_style = "unique",
 		bufpath_style = "relcwd",
+		formatter_spacing = " ",
 		directory_handler = directory_handler,
 		mappings = {
 			cycle_sort = { "<space>" },

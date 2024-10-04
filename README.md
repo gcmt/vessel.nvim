@@ -198,7 +198,6 @@ Once inside the window, the following mappings are available:
 | `<c-k>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
 | `<c-j>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
 
-
 > [!NOTE]
 > Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
 
@@ -1170,6 +1169,17 @@ Buffer path style. Can be one of:
 
 ```lua
 vessel.opt.buffers.bufpath_style = "relcwd"
+```
+
+#### buffers.formatter_spacing
+
+Spacing between formatted items (line numbers, bufname and bufpath).
+
+> [!NOTE]
+> Has effect only when using the default formatter.
+
+```lua
+vessel.opt.buffers.formatter_spacing =  " "
 ```
 
 #### buffers.mappings.cycle_sort

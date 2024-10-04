@@ -158,6 +158,7 @@ return {
 	["buffers.quickjump"] = { "boolean" },
 	["buffers.show_pin_positions"] = { "boolean" },
 	["buffers.pin_separator"] = { "string" },
+	["buffers.formatter_spacing"] = { "string" },
 	["buffers.sort_buffers"] = listof("function", false),
 	["buffers.bufname_align"] = oneof("none", "left", "right"),
 	["buffers.bufname_style"] = oneof("basename", "unique", "hide"),
