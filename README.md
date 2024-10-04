@@ -194,7 +194,7 @@ Once inside the window, the following mappings are available:
 | `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.                                                         |
 | `a`          | Toggle showing *unlisted* buffers (Buffers on which you executed `:bdelete`).                                                           |
 | `p`          | Pin/unpin the buffer under cursor.                                                                                                      |
-| `P`          | Add to the buffer list the directory of the the buffer under cursor. Ueful with custom [directory handlers](#buffersdirectory_handler). |
+| `P`          | Add to the buffer list the directory of the the buffer under cursor. Useful with custom [directory handler](#buffersdirectory_handler). |
 | `<c-k>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
 | `<c-j>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
 
