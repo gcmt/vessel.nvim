@@ -152,6 +152,7 @@ return {
 	["jumps.highlights.line"] = { "string" },
 	["jumps.highlights.not_loaded"] = { "string" },
 
+	["buffers.wrap_around"] = { "boolean" },
 	["buffers.not_found"] = { "string" },
 	["buffers.unnamed_label"] = { "string" },
 	["buffers.quickjump"] = { "boolean" },

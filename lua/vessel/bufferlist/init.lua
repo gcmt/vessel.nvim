@@ -83,6 +83,50 @@ function Bufferlist:get_count()
 	return #self._buffers, 1
 end
 
+--- Return pinned buffer list
+---@return table
+function Bufferlist:get_pinned_list()
+	return Pinned
+end
+
+--- Return the next pinned buffer number
+---@param bufnr integer
+---@return integer?
+function Bufferlist:get_pinned_next(bufnr)
+	for i, nr in ipairs(Pinned) do
+		if nr == bufnr then
+			local index = i + 1
+			if index > #Pinned then
+				if not self._app.config.buffers.wrap_around then
+					return
+				else
+					index = 1
+				end
+			end
+			return Pinned[index]
+		end
+	end
+end
+
+--- Return the previous pinned buffer number
+---@param bufnr integer
+---@return integer?
+function Bufferlist:get_pinned_prev(bufnr)
+	for i, nr in ipairs(Pinned) do
+		if nr == bufnr then
+			local index = i - 1
+			if index < 1 then
+				if not self._app.config.buffers.wrap_around then
+					return
+				else
+					index = #Pinned
+				end
+			end
+			return Pinned[index]
+		end
+	end
+end
+
 --- Keep cursor on selected buffer
 ---@param selected Buffer Selected buffer
 ---@param map table New map table

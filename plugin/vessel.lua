@@ -7,6 +7,34 @@ vim.keymap.set("n", "<plug>(VesselViewBuffers)", function()
 	require("vessel").view_buffers()
 end)
 
+vim.keymap.set("n", "<plug>(VesselPinnedNext)", function()
+	local bufnr
+	local vessel = require("vessel")
+	local pinned = vessel.get_pinned_list()
+	if not vim.tbl_contains(pinned, vim.fn.bufnr("%")) then
+		bufnr = pinned[1]
+	else
+		bufnr = vessel.get_pinned_next()
+	end
+	if bufnr then
+		vim.cmd("buffer " .. bufnr)
+	end
+end)
+
+vim.keymap.set("n", "<plug>(VesselPinnedPrev)", function()
+	local bufnr
+	local vessel = require("vessel")
+	local pinned = vessel.get_pinned_list()
+	if not vim.tbl_contains(pinned, vim.fn.bufnr("%")) then
+		bufnr = pinned[#pinned]
+	else
+		bufnr = vessel.get_pinned_prev()
+	end
+	if bufnr then
+		vim.cmd("buffer " .. bufnr)
+	end
+end)
+
 vim.keymap.set("n", "<plug>(VesselViewMarks)", function()
 	require("vessel").view_marks()
 end)

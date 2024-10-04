@@ -204,6 +204,7 @@ local _opt = {
 
 	--- bufferlist-related options
 	buffers = {
+		wrap_around = true,
 		not_found = "Buffer list empty",
 		unnamed_label = "[no name]",
 		quickjump = true,

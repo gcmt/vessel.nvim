@@ -26,6 +26,35 @@ function M.view_buffers(opts, filter_func)
 	bufferlist:open()
 end
 
+--- Get pinned buffers list
+---@param opts table? Config overrides
+---@return table
+function M.get_pinned_list(opts)
+	local app = require("vessel.core"):new(require("vessel.config").get(opts))
+	local bufferlist = require("vessel.bufferlist"):new(app)
+	return bufferlist:get_pinned_list()
+end
+
+--- Get the next buffer number in the pinned list
+---@param bufnr integer? Return the buffer after the given one
+---@param opts table? Config overrides
+---@return integer?
+function M.get_pinned_next(bufnr, opts)
+	local app = require("vessel.core"):new(require("vessel.config").get(opts))
+	local bufferlist = require("vessel.bufferlist"):new(app)
+	return bufferlist:get_pinned_next(bufnr or vim.fn.bufnr("%"))
+end
+
+--- Get the previous buffer number in the pinned list
+---@param bufnr integer? Return the buffer before the given one
+---@param opts table? Config overrides
+---@return integer?
+function M.get_pinned_prev(bufnr, opts)
+	local app = require("vessel.core"):new(require("vessel.config").get(opts))
+	local bufferlist = require("vessel.bufferlist"):new(app)
+	return bufferlist:get_pinned_prev(bufnr or vim.fn.bufnr("%"))
+end
+
 --- Set/Unset a mark on the current line
 ---@param global boolean Whether the mark should be global or not
 ---@param opts table?  Config table

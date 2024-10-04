@@ -84,9 +84,15 @@ Calling the `setup` function is not required for using the plugin as internal `<
 
 ### Buffer List Mappings
 
-| Plug Mapping                | Action                                                                |
-|-----------------------------|-----------------------------------------------------------------------|
-| `<plug>(VesselViewBuffers)` | Show the buffer list. Only *normal listed buffers* will be displayed. |
+| Plug Mapping                | Action                                                                     |
+|-----------------------------|----------------------------------------------------------------------------|
+| `<plug>(VesselViewBuffers)` | Show the buffer list. Only *normal listed buffers* will be displayed.      |
+| `<plug>(VesselPinnedNext)`  | Switch to the next buffer in the pinned list (relative to buffer `%`).     |
+| `<plug>(VesselPinnedPrev)`  | Switch to the previous buffer in the pinned list (relative to buffer `%`). |
+
+Both `<plug>(VesselPinnedNext)` and `<plug>(VesselPinnedPrev)` will fallback to respectively to the first and last buffer in the pinned list in case the current buffer is not in the pinned list as well.
+
+See also option [buffers.wrap_around](#bufferswrap_around).
 
 > [!NOTE]
 > - A *normal buffer* is a buffer with the `buftype` option empty.
@@ -266,9 +272,13 @@ end)
 
 ### Buffer List API
 
-| Function                                 | Action                                                                |
-|------------------------------------------|-----------------------------------------------------------------------|
-| `vessel.view_buffers(opts, filter_func)` | Show the buffer list. Only *normal listed* buffers will be displayed. |
+| Function                                       | Action                                                                                       |
+|------------------------------------------------|----------------------------------------------------------------------------------------------|
+| `vessel.view_buffers(opts?, filter_func?)`     | Show the buffer list. Only *normal listed* buffers will be displayed.                        |
+| `vessel.get_pinned(N, opts?)`                  | Get buffer number of the Nth position in the pinned list.                                    |
+| `vessel.get_pinned_next(bufnr?, opts?)`        | Get buffer number of the buffer after `bufnr` (deafults to buffer `%`) in the pinned list.   |
+| `vessel.get_pinned_prev(bufnr?, opts?)`        | Get buffer number of the buffer before `bufnr` (deafults to buffer `%`) in the pinned list.  |
+| `vessel.get_pinned_list(opts?)`                | Get list of all buffer numbers in the pinned list.                                           |
 
 > [!NOTE]
 > - A *normal buffer* is a buffer with the `buftype` option empty.
@@ -1029,6 +1039,14 @@ vessel.opt.jumps.highlights.line = "Normal"
 ```
 
 ### Buffer List Options
+
+#### buffers.wrap_around
+
+When navigating to next/previous buffers in the pinned list with the [*API*](#buffer-list-api) or [`<plug>`](#buffer-list-mappings) mappings, wrap around the list when reaching its start or end.
+
+```lua
+vessel.opt.buffers.wrap_around = true
+```
 
 #### buffers.not_found
 
