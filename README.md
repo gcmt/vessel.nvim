@@ -84,15 +84,13 @@ Calling the `setup` function is not required for using the plugin as internal `<
 
 ### Buffer List Mappings
 
-| Plug Mapping                | Action                                                                     |
-|-----------------------------|----------------------------------------------------------------------------|
-| `<plug>(VesselViewBuffers)` | Show the buffer list. Only *normal listed buffers* will be displayed.      |
-| `<plug>(VesselPinnedNext)`  | Switch to the next buffer in the pinned list (relative to buffer `%`).     |
-| `<plug>(VesselPinnedPrev)`  | Switch to the previous buffer in the pinned list (relative to buffer `%`). |
+| Plug Mapping                | Action                                                                                                            |
+|-----------------------------|-------------------------------------------------------------------------------------------------------------------|
+| `<plug>(VesselViewBuffers)` | Show the buffer list. Only *normal listed buffers* will be displayed.                                             |
+| `<plug>(VesselPinnedNext)`  | Switch to the next buffer in the pinned list (relative to buffer `%`). See [Pinned Buffers](#pinned-buffers).     |
+| `<plug>(VesselPinnedPrev)`  | Switch to the previous buffer in the pinned list (relative to buffer `%`). See [Pinned Buffers](#pinned-buffers). |
 
-Both `<plug>(VesselPinnedNext)` and `<plug>(VesselPinnedPrev)` will fallback to respectively to the first and last buffer in the pinned list in case the current buffer is not in the pinned list as well.
-
-See also option [buffers.wrap_around](#bufferswrap_around).
+Both `<plug>(VesselPinnedNext)` and `<plug>(VesselPinnedPrev)` will fallback to respectively to the first and last buffer in the pinned list in case the current buffer is not in the pinned list as well. See also option [buffers.wrap_around](#bufferswrap_around).
 
 > [!NOTE]
 > - A *normal buffer* is a buffer with the `buftype` option empty.
@@ -182,23 +180,23 @@ By default the buffer list window shows all the normal buffers with the `listed`
 
 Once inside the window, the following mappings are available:
 
-| Mapping      | Action                                                                                                          |
-|--------------|-----------------------------------------------------------------------------------------------------------------|
-| `q`, `<ESC>` | Close the floating window,                                                                                      |
-| `l`, `<CR>`  | Edit the buffer under cursor. Takes a count.                                                                    |
-| `t`          | Edit the buffer undeer cursor in a new tab.                                                                     |
-| `s`          | Edit the buffer under cursor in a horizontal split.                                                             |
-| `v`          | Edit the buffer under cursor in a vertical split.                                                               |
-| `d`          | Delete the buffer under cursor. Fails if there is any unsaved change. Executes `:bdelete` on the buffer.        |
-| `D`          | Force delete the buffer under cursor. **All unsaved changes will be lost!** Executes `:bdelete!` on the buffer. |
-| `w`          | Wipe buffer under cursor. Fails if there is any unsaved change. Executes `:bwipeout` on the buffer.             |
-| `W`          | Force wipe the buffer under cursor. **All unsaved changes will be lost!** Executes `:bwipeout!` on the buffer.  |
-| `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.                                 |
-| `a`          | Toggle showing *unlisted* buffers (Buffers on which you executed `:bdelete`).                                   |
-| `p`          | Pin/unpin the buffer under cursor.                                                                              |
-| `P`          | Pin directory of the buffer under cursor (adds directory to the buffer list).                                   |
-| `<c-k>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                        |
-| `<c-j>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                      |
+| Mapping      | Action                                                                                                                                  |
+|--------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| `q`, `<ESC>` | Close the floating window,                                                                                                              |
+| `l`, `<CR>`  | Edit the buffer under cursor. Takes a count.                                                                                            |
+| `t`          | Edit the buffer undeer cursor in a new tab.                                                                                             |
+| `s`          | Edit the buffer under cursor in a horizontal split.                                                                                     |
+| `v`          | Edit the buffer under cursor in a vertical split.                                                                                       |
+| `d`          | Delete the buffer under cursor. Fails if there is any unsaved change. Executes `:bdelete` on the buffer.                                |
+| `D`          | Force delete the buffer under cursor. **All unsaved changes will be lost!** Executes `:bdelete!` on the buffer.                         |
+| `w`          | Wipe buffer under cursor. Fails if there is any unsaved change. Executes `:bwipeout` on the buffer.                                     |
+| `W`          | Force wipe the buffer under cursor. **All unsaved changes will be lost!** Executes `:bwipeout!` on the buffer.                          |
+| `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.                                                         |
+| `a`          | Toggle showing *unlisted* buffers (Buffers on which you executed `:bdelete`).                                                           |
+| `p`          | Pin/unpin the buffer under cursor.                                                                                                      |
+| `P`          | Add to the buffer list the directory of the the buffer under cursor. Ueful with custom [directory handlers](#buffersdirectory_handler). |
+| `<c-k>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
+| `<c-j>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
 
 
 > [!NOTE]
