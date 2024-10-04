@@ -83,12 +83,12 @@ function M.buffer_formatter(buffer, meta, context, config)
 	bufpath = bufpath ~= "" and " " .. bufpath or ""
 
 	local hl_bufname = config.buffers.highlights.bufname
-	if vim.fn.isdirectory(buffer.path) == 1 then
+	if vim.fn.buflisted(buffer.nr) == 0 then
+		hl_bufname = config.buffers.highlights.unlisted
+	elseif vim.fn.isdirectory(buffer.path) == 1 then
 		hl_bufname = config.buffers.highlights.directory
 	elseif vim.fn.getbufvar(buffer.nr, "&modified") == 1 then
 		hl_bufname = config.buffers.highlights.modified
-	elseif vim.fn.buflisted(buffer.nr) == 0 then
-		hl_bufname = config.buffers.highlights.unlisted
 	end
 
 	return util.format(
