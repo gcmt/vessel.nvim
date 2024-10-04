@@ -186,15 +186,15 @@ function Bufferlist:_action_toggle_pin(map)
 	self:_refresh()
 end
 
---- Pin directory of the buffer under cursor
+--- Add to the buffer list the directory of the buffer under cursor
 ---@param map table
-function Bufferlist:_action_pin_directory(map)
+function Bufferlist:_action_add_directory(map)
 	local selected = map[vim.fn.line(".")]
 	if selected then
 		local bufnr = vim.fn.bufadd(vim.fs.dirname(selected.path))
 		vim.fn.setbufvar(bufnr, "&buflisted", 1)
-		table.insert(Pinned, bufnr)
-		self:_refresh()
+		local newmap = self:_refresh()
+		self:_follow_selected(Buffer:new(bufnr), newmap)
 	end
 end
 
@@ -309,8 +309,8 @@ function Bufferlist:_setup_mappings(map)
 	util.keymap("n", self._app.config.buffers.mappings.toggle_pin, function()
 		self:_action_toggle_pin(map)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.pin_directory, function()
-		self:_action_pin_directory(map)
+	util.keymap("n", self._app.config.buffers.mappings.add_directory, function()
+		self:_action_add_directory(map)
 	end)
 	util.keymap("n", self._app.config.buffers.mappings.delete, function()
 		self:_action_delete(map, "bdelete", false)

@@ -166,7 +166,7 @@ return {
 	["buffers.mappings.pin_increment"] = listof("string"),
 	["buffers.mappings.pin_decrement"] = listof("string"),
 	["buffers.mappings.toggle_pin"] = listof("string"),
-	["buffers.mappings.pin_directory"] = listof("string"),
+	["buffers.mappings.add_directory"] = listof("string"),
 	["buffers.mappings.toggle_unlisted"] = listof("string"),
 	["buffers.mappings.edit"] = listof("string"),
 	["buffers.mappings.close"] = listof("string"),
