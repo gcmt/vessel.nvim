@@ -544,54 +544,13 @@ Enable/disable `relativenumber` *neovim* option in the popup window
 vessel.opt.window.relativenumber = false
 ```
 
-#### popup options
+#### window.options
 
 Control how the popup looks. This options are passed directly to the `vim.api.nvim_open_win()` function. See `:help api-floatwin`.
 
-`heigh`, `width`, `row` and `col` may be either a number or function. In the latter case the function is evaluated and its return value (must be a number) used as the option value. See section below for their default implementations.
-
 ```lua
-vessel.opt.window.options.relative = "editor"
-vessel.opt.window.options.anchor = "NW"
 vessel.opt.window.options.style = "minimal"
 vessel.opt.window.options.border = "single"
-vessel.opt.window.options.width = popup_width
-vessel.opt.window.options.height = popup_height
-vessel.opt.window.options.row = popup_row
-vessel.opt.window.options.col = popup_col
-```
-
-#### default popup size and positioning functions
-
-```lua
----@param list Marklist|Jumplist
-local function popup_height(list, config)
-  -- list:get_count() returns the number of entries + the number of groups
-  -- (always 1 for the jump list)
-  local item_count, group_count = list:get_count()
-  local max_lines = item_count + group_count
-  local max = math.floor(vim.o.lines * config.window.max_height / 100)
-  return math.min(max_lines, max)
-end
-
-local function popup_width(config)
-  local ui = vim.api.nvim_list_uis()[1]
-  return math.floor(ui.width * (ui.width < 120 and 90 or 70) / 100)
-end
-
----@param width integer The 'width' previously computed
----@param height integer The 'height' previously computed
-local function popup_row(width, height)
-  return math.floor((vim.o.lines / 2) - ((height + 2) / 2)) - 1
-end
-
----@param width integer The 'width' previously computed
----@param height integer The 'height' previously computed
-local function popup_col(width, height)
-  local ui = vim.api.nvim_list_uis()[1]
-  return math.floor((ui.width / 2) - (width / 2))
-end
-
 ```
 
 ### Mark List Options
