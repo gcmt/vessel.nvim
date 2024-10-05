@@ -1152,7 +1152,12 @@ See also [buffers.mappings.cycle_sort](#buffersmappingscycle_sort).
 
 ```lua
 local sorters = require("vessel.config.sorters")
-vessel.opt.buffers.sort_buffers = { sorters.buffers.by_path, sorters.buffers.by_basename }
+vessel.opt.buffers.sort_buffers = {
+  sorters.buffers.by_path,
+  sorters.buffers.by_basename,
+  sorters.buffers.by_lastused,
+  sorters.buffers.by_changes,
+}
 ```
 
 Available sorters are:
