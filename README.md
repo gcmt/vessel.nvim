@@ -287,10 +287,9 @@ end)
 | Function                                       | Action                                                                                       |
 |------------------------------------------------|----------------------------------------------------------------------------------------------|
 | `vessel.view_buffers(opts?, filter_func?)`     | Show the buffer list. Only *normal listed* buffers will be displayed.                        |
-| `vessel.get_pinned(N, opts?)`                  | Get buffer number of the Nth position in the pinned list.                                    |
-| `vessel.get_pinned_next(bufnr?, opts?)`        | Get buffer number of the buffer after `bufnr` (deafults to buffer `%`) in the pinned list.   |
-| `vessel.get_pinned_prev(bufnr?, opts?)`        | Get buffer number of the buffer before `bufnr` (deafults to buffer `%`) in the pinned list.  |
-| `vessel.get_pinned_list(opts?)`                | Get list of all buffer numbers in the pinned list.                                           |
+| `vessel.get_pinned_next(bufnr?)`               | Get buffer number of the buffer after `bufnr` (deafults to buffer `%`) in the pinned list.   |
+| `vessel.get_pinned_prev(bufnr?)`               | Get buffer number of the buffer before `bufnr` (deafults to buffer `%`) in the pinned list.  |
+| `vessel.get_pinned_list()`                     | Get list of all buffer numbers in the pinned list.                                           |
 
 > [!NOTE]
 > - A *normal buffer* is a buffer with the `buftype` option empty.
