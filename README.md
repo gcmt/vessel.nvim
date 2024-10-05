@@ -180,7 +180,7 @@ By default, lines cannot be displayed for files that are not loaded in memory (i
 
 By default both mark and jump lists have the preview window enabled. In this window you can see context of the line under cursor. To disable the preview windows you can use respectively the option [marks.preview](#markspreview) and [jumps.preview](#jumpspreview).
 
-See also the [Preview Window Options](#preview-window-options) section for all the options related to the preview window. The option [window.gravity](#window.gravity) might also be useful to control how both the windows are positioned relative to each other.
+See also the [Preview Window Options](#preview-window-options) section for all the options related to the preview window. The option [window.gravity](#windowgravity) might also be useful to control how both the windows are positioned relative to each other.
 
 ### Buffer List Window
 
