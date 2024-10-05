@@ -153,16 +153,16 @@ By default the jump list window shows the entire jump list with jumps spanning m
 
 Once inside the window, the following mappings are available:
 
-| Mapping      | Action                                                         |
-|--------------|----------------------------------------------------------------|
-| `l`, `<CR>`  | Jump to the line under cursor.                                 |
-| `q`, `<ESC>` | Close the floating window.                                     |
-| `C`          | Clear the entire jump list.                                    |
-| `<C-O>`      | Move backwards in the jump list (towards the bottom).          |
-| `<C-I>`      | Move forward in the jump list (towards the top).               |
-| `r`          | Load the file under cursor in memory.                          |
-| `R`          | Load all files in memory.                                      |
-| `W`          | Load in memory all files inside the current working directory. |
+| Mapping      | Action                                                                                         |
+|--------------|------------------------------------------------------------------------------------------------|
+| `l`, `<CR>`  | Jump to the line under cursor.                                                                 |
+| `q`, `<ESC>` | Close the floating window.                                                                     |
+| `C`          | Clear the entire jump list.                                                                    |
+| `<C-O>`      | Move backwards in the jump list (towards the bottom).                                          |
+| `<C-I>`      | Move forward in the jump list (towards the top).                                               |
+| `r`          | Load the file under cursor in memory and add it to the buffer list.                            |
+| `R`          | Load all files in memory and add them to the buffer list.                                      |
+| `W`          | Load in memory all files inside the current working directory and add them to the buffer list. |
 
 > [!TIP]
 >  As a count to `<C-O>` and `<C-I>`, you can use the relative number displayed on the left column.
@@ -172,15 +172,15 @@ Once inside the window, the following mappings are available:
 
 #### Autoloading buffers
 
-By default, lines cannot be displayed for files that are not loaded in memory (in the buffer list). You'll see instead the jump file path greyed out. To automatically load in memory all files for which jumps exist and add them to the buffer list, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded.
+By default, lines cannot be displayed for files that are not loaded in memory, that is, that are not in the buffer list. You'll see instead the jump file path greyed out. To automatically load in memory all files for which jumps exist and add them to the buffer list, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded.
 
 ### Preview Window
 
 ![Preview Window](assets/preview_dark.png "Preview window.")
 
-By default both mark and jump lists have the preview window enabled. In this window you can see context of the line under cursor. To disable the preview windows you can use respectively the option [marks.preview](#markspreview) and [jumps.preview](#jumpspreview).
+By default both mark and jump lists have the preview window enabled. In this window you can see context of the line under cursor. To disable this feature you can use respectively the options [marks.preview](#markspreview) and [jumps.preview](#jumpspreview).
 
-See also the [Preview Window Options](#preview-window-options) section for all the options related to the preview window. The option [window.gravity](#windowgravity) might also be useful to control how both the windows are positioned relative to each other.
+See also the [Preview Window Options](#preview-window-options). The option [window.gravity](#windowgravity) might be useful to control how both the windows are positioned relative to each other.
 
 ### Buffer List Window
 
@@ -574,7 +574,7 @@ vessel.opt.window.relativenumber = false
 
 #### window.options
 
-Control how the popup looks. This options are passed directly to the `vim.api.nvim_open_win()` function. See `:help api-floatwin`.
+Control how the popup looks. These options are passed directly to the `vim.api.nvim_open_win()` function. See `:help api-floatwin`.
 
 ```lua
 vessel.opt.window.options.style = "minimal"
@@ -583,7 +583,7 @@ vessel.opt.window.options.border = "single"
 
 #### window.width
 
-Width of the popup window as a percentage of the *Neovim* UI. can be either be a number or a function. Even when a function, it must return a number that will be then used as a percentage.
+Width of the popup window as a percentage of the *Neovim* UI. Can be either be a number or a function. When a function, it must return a number that will be then used as a percentage.
 
 ```lua
 vessel.opt.window.width = <function>
@@ -607,7 +607,7 @@ end
 
 #### preview.options
 
-Control how the preview popup looks. This options are passed directly to the `vim.api.nvim_open_win()` function. See `:help api-floatwin`.
+Control how the preview popup looks. These options are passed directly to the `vim.api.nvim_open_win()` function. See `:help api-floatwin`.
 
 ```lua
 vessel.opt.preview.options.style = "minimal"
