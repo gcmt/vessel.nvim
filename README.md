@@ -125,22 +125,22 @@ By default the mark list window shows all global and local marks grouped by the 
 
 Once inside the window, the following mappings are available:
 
-| Mapping      | Action                                                                               |
-|--------------|--------------------------------------------------------------------------------------|
-| `q`, `<ESC>` | Close the floating window.                                                           |
-| `<C-J>`      | Move to the next mark group (path header).                                           |
-| `<C-K>`      | Move to the previous mark group (path header).                                       |
-| `d`          | Delete the mark under cursor.                                                        |
-| `l`, `<CR>`  | Jump to the mark (or path) under cursor.                                             |
-| `o`          | Jump to the mark under cursor (does not change the jump list).                       |
-| `v`          | Open the mark under cursor in a vertical split.                                      |
-| `V`          | Open the mark under cursor in a vertical split with (does not change the jump list). |
-| `s`          | Open the mark under cursor in a horizontal split.                                    |
-| `S`          | Open the mark under cursor in a horizontal split (does not change the jump list).    |
-| `t`          | Open the mark under cursor in a new tab.                                             |
-| `T`          | Open the mark under cursor in a new tab (does not change the jump list).             |
-| `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.      |
-| `m{a-zA-Z}`  | Change the mark under cursor.                                                        |
+| Mapping      | Action                                                                                    |
+|--------------|-------------------------------------------------------------------------------------------|
+| `q`, `<ESC>` | Close the floating window.                                                                |
+| `<C-J>`      | Move to the next mark group (path header).                                                |
+| `<C-K>`      | Move to the previous mark group (path header).                                            |
+| `d`          | Delete the mark under cursor. Pressing `d` on the file path will delete all of its marks. |
+| `l`, `<CR>`  | Jump to the mark (or path) under cursor.                                                  |
+| `o`          | Jump to the mark under cursor (does not change the jump list).                            |
+| `v`          | Open the mark under cursor in a vertical split.                                           |
+| `V`          | Open the mark under cursor in a vertical split with (does not change the jump list).      |
+| `s`          | Open the mark under cursor in a horizontal split.                                         |
+| `S`          | Open the mark under cursor in a horizontal split (does not change the jump list).         |
+| `t`          | Open the mark under cursor in a new tab.                                                  |
+| `T`          | Open the mark under cursor in a new tab (does not change the jump list).                  |
+| `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.           |
+| `m{a-zA-Z}`  | Change the mark under cursor.                                                             |
 | `'{a-z-A-Z}` | Jump directly to a mark.
 
 > [!NOTE]
