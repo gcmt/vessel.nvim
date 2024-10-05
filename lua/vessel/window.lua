@@ -138,7 +138,7 @@ function Window:_get_popup_options(est_height, show_preview)
 	main.width = floor(ui.width * p / 100)
 
 	-- main popup height
-	main.height = self:_cap_height(est_height)
+	main.height = math.max(self:_cap_height(est_height), 1)
 
 	-- center the main popup horizontally
 	main.col = floor((ui.width / 2) - (main.width / 2))
