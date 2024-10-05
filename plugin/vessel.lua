@@ -11,6 +11,10 @@ vim.keymap.set("n", "<plug>(VesselPinnedNext)", function()
 	local bufnr
 	local vessel = require("vessel")
 	local pinned = vessel.get_pinned_list()
+	if #pinned == 0 then
+		require("vessel.logger").info("vessel: empty pinned list")
+		return
+	end
 	if not vim.tbl_contains(pinned, vim.fn.bufnr("%")) then
 		bufnr = pinned[1]
 	else
@@ -25,6 +29,10 @@ vim.keymap.set("n", "<plug>(VesselPinnedPrev)", function()
 	local bufnr
 	local vessel = require("vessel")
 	local pinned = vessel.get_pinned_list()
+	if #pinned == 0 then
+		require("vessel.logger").info("vessel: empty pinned list")
+		return
+	end
 	if not vim.tbl_contains(pinned, vim.fn.bufnr("%")) then
 		bufnr = pinned[#pinned]
 	else
