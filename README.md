@@ -179,9 +179,9 @@ By default, lines cannot be displayed for files that are not loaded in memory, t
 
 ![Preview Window](assets/preview_dark.png "Preview window.")
 
-By default both mark and jump lists have the preview window enabled. In this window you can see context of the line under cursor. To disable this feature you can use respectively the options [marks.preview](#markspreview) and [jumps.preview](#jumpspreview).
+By default both mark and jump lists have the preview window enabled. In this window you can see context of the line under cursor. To disable this feature you can use respectively the options [marks.preview](#markspreview) and [jumps.preview](#jumpspreview). The option [window.gravity](#windowgravity) controls how both the windows are positioned relative to each other.
 
-See also the [Preview Window Options](#preview-window-options). The option [window.gravity](#windowgravity) might be useful to control how both the windows are positioned relative to each other.
+See also [Preview Window Options](#preview-window-options).
 
 ### Buffer List Window
 
@@ -205,7 +205,7 @@ Once inside the window, the following mappings are available:
 | `<SPACE>`    | Cycle sorting type. It will be remembered once you close and reopen the window.                                                         |
 | `a`          | Toggle showing *unlisted* buffers (Buffers on which you executed `:bdelete`).                                                           |
 | `p`          | Pin/unpin the buffer under cursor.                                                                                                      |
-| `P`          | Add to the buffer list the directory of the the buffer under cursor. Useful with custom [directory handler](#buffersdirectory_handler). |
+| `P`          | Add to the buffer list the directory of the the buffer under cursor. See also [directory handler](#buffersdirectory_handler).           |
 | `<c-k>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
 | `<c-j>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
 
@@ -228,7 +228,7 @@ The order of buffers in the *pinned list* can be manually adjusted. See mappings
 
 #### Pinned buffers navigation
 
-You can switch to *pinned buffers* even from outside the buffer list window. Use the provided [mappings](#buffer-list-mappings) `<plug>(VesselPinnedNext)` and `<plug>(VesselPinnedPrev)` or directly use the [Buffers API](#buffer-list-api). See also the option [buffers.wrap_around](#bufferswrap_around).
+You can switch to *pinned buffers* even from outside the buffer list window. Use the provided [mappings](#buffer-list-mappings) `<plug>(VesselPinnedNext)` and `<plug>(VesselPinnedPrev)` or directly use the [Buffers API](#buffer-list-api). See also option [buffers.wrap_around](#bufferswrap_around).
 
 ## API
 
@@ -1198,7 +1198,7 @@ vessel.opt.buffers.show_pin_positions = true
 
 Character used as separator between the *pinned list* and the rest of the buffers. Use an empty string to hide the separator. Its color is controlled by the option [buffers.highlights.pin_separator](#buffershighlights).
 
-See also [Pinned Buffers](#pinned-buffers) section.
+See also [Pinned Buffers](#pinned-buffers).
 
 ```lua
 vessel.opt.buffers.pin_separator = "─"
@@ -1271,7 +1271,7 @@ vessel.opt.buffers.mappings.cycle_sort = { "<space>" }
 
 Toggle pinned status on the buffer under cursor.
 
-See also [Pinned Buffers](#pinned-buffers) section.
+See also [Pinned Buffers](#pinned-buffers).
 
 ```lua
 vessel.opt.buffers.mappings.toggle_pin = { "p" }
@@ -1287,12 +1287,12 @@ vessel.opt.buffers.mappings.add_directory = { "P" }
 
 #### buffers.mappings.pin_increment
 
-Move the buffer under cursor down in the *pinned list*. If the buffer is pinned if not already in the *pinned list*.
+Move the buffer under cursor down in the *pinned list*. The buffer is pinned if not already in the *pinned list*.
 
 > [!NOTE]
->  Pinned buffers are displayed in decresing order, so incrementing the position essentially moves the buffer down the list.
+>  Incrementing the position essentially moves the buffer down.
 
-See also [pinned buffers](#pinned-buffers) section.
+See also [Pinned Buffers](#pinned-buffers).
 
 ```lua
 vessel.opt.buffers.mappings.pin_increment = { "<c-j>" }
@@ -1300,12 +1300,12 @@ vessel.opt.buffers.mappings.pin_increment = { "<c-j>" }
 
 #### buffers.mappings.pin_decrement
 
-Move the buffer under cursor up in the *pinned list*. If the buffer is pinned if not already in the *pinned list*.
+Move the buffer under cursor up in the *pinned list*. The buffer is pinned if not already in the *pinned list*.
 
 > [!NOTE]
-> Pinned buffers are displayed in decresing order, so incrementing the position essentially moves the buffer up.
+> Decrementing the position essentially moves the buffer up.
 
-See also [Pinned Buffers](#pinned-buffers) section.
+See also [Pinned Buffers](#pinned-buffers).
 
 ```lua
 vessel.opt.buffers.mappings.pin_decrement = { "<c-k>" }
