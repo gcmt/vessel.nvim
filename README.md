@@ -170,7 +170,7 @@ Once inside the window, the following mappings are available:
 
 #### Autoloading buffers
 
-By default, lines cannot be displayed for files that are not loaded in memory. You'll see instead the jump file path greyed out. To automatically load in memory all files for which jumps exist, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded in memory.
+By default, lines cannot be displayed for files that are not loaded in memory (in the buffer list). You'll see instead the jump file path greyed out. To automatically load in memory all files for which jumps exist and add them to the buffer list, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded.
 
 ### Buffer List Window
 
