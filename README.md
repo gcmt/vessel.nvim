@@ -581,6 +581,28 @@ vessel.opt.window.options.style = "minimal"
 vessel.opt.window.options.border = "single"
 ```
 
+#### window.width
+
+Width of the popup window as a percentage of the *Neovim* UI. can be either be a number or a function. Even when a function, it must return a number that will be then used as a percentage.
+
+```lua
+vessel.opt.window.width = <function>
+```
+Below the default implementation:
+
+```lua
+---@param preview_enabled boolean Wheter the preview window is enabled
+---@return integer Width as a percentage
+function popup_width(preview_enabled)
+  local ui = vim.api.nvim_list_uis()[1]
+  if preview_enabled then
+    return 90 -- 90% of the screen width when the preview is enabled
+  end
+    -- adjust width according to the available screen space
+  return ui.width < 120 and 90 or 75
+end
+```
+
 ### Preview Window Options
 
 #### preview.options
@@ -590,6 +612,14 @@ Control how the preview popup looks. This options are passed directly to the `vi
 ```lua
 vessel.opt.preview.options.style = "minimal"
 vessel.opt.preview.options.border = "single"
+```
+
+#### preview.width
+
+Width of the preview window as a percentage of [window.width](#windowwidth).
+
+```lua
+vessel.opt.preview.width = 50
 ```
 
 #### preview.min_height
@@ -939,7 +969,7 @@ This function comes into play when [lazy_load_buffers](#lazy_load_buffers) is se
 
 ```lua
 vessel.opt.jumps.not_loaded = function(bufnr, bufpath)
-	return vim.startswith(bufpath, vim.fn.getcwd() .. "/")
+  return vim.startswith(bufpath, vim.fn.getcwd() .. "/")
 end
 ```
 

@@ -133,7 +133,8 @@ function Window:_get_popup_options(est_height, show_preview)
 	local prev = self.preview:default_opts()
 
 	-- main popup width dependent on screen width
-	local p = ui.width < 120 and 90 or 80
+	local width = self.config.window.width
+	local p = type(width) == "number" and width or width(show_preview)
 	main.width = floor(ui.width * p / 100)
 
 	-- main popup height
@@ -155,7 +156,7 @@ function Window:_get_popup_options(est_height, show_preview)
 
 	if show_preview then
 		-- make preview popup half the total width
-		prev.width = floor(main.width * 50 / 100)
+		prev.width = floor(main.width * self.config.preview.width / 100)
 		-- make space for the preview
 		main.width = main.width - prev.width
 		-- move preview popup to the right side of the main popup

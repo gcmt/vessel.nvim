@@ -61,6 +61,7 @@ return {
 	["jump_callback"] = { "function" },
 
 	["window"] = { "table" },
+	["window.width"] = { "number", "function" },
 	["window.gravity"] = oneof("center", "top"),
 	["window.max_height"] = { "number" },
 	["window.cursorline"] = { "boolean" },
@@ -71,6 +72,7 @@ return {
 	["window.options.border"] = { "string" },
 
 	["preview"] = { "table" },
+	["preview.width"] = { "number" },
 	["preview.min_height"] = { "number" },
 	["preview.options"] = { "table" },
 	["preview.options.style"] = { "string" },

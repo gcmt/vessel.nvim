@@ -46,6 +46,17 @@ local function autoload_filter(bufnr, bufpath)
 	return vim.startswith(bufpath, vim.fn.getcwd() .. "/")
 end
 
+--- Return the width of the popup
+---@param preview_enabled boolean Wheter the preview window is shown
+---@return integer Width as a percentage
+local function popup_width(preview_enabled)
+	local ui = vim.api.nvim_list_uis()[1]
+	if preview_enabled then
+		return 90
+	end
+	return ui.width < 120 and 90 or 75
+end
+
 --- Default plugin options
 local _opt = {
 
@@ -58,6 +69,7 @@ local _opt = {
 
 	--- floating window options
 	window = {
+		width = popup_width,
 		gravity = "center",
 		max_height = 75, -- % of the vim ui
 		cursorline = true,
@@ -73,6 +85,7 @@ local _opt = {
 	--- preview floating window options
 	preview = {
 		min_height = 25, -- lines
+		width = 50, -- percentage of the main popup
 		options = {
 			border = "single",
 			style = "minimal",
