@@ -84,6 +84,7 @@ end
 
 --- Strip $HOME or CWD from the given path
 ---@param path string
+---@param cwd string?
 ---@return string
 function M.prettify_path(path, cwd)
 	cwd = cwd or vim.fn.getcwd()
