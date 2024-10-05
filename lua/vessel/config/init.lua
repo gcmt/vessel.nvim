@@ -73,7 +73,6 @@ local _opt = {
 	--- preview floating window options
 	preview = {
 		min_height = 25, -- lines
-		gravity = "center",
 		options = {
 			border = "single",
 			style = "minimal",

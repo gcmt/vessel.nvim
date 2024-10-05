@@ -47,17 +47,6 @@ function M.keymap(mode, lhs, callback, opts)
 	end
 end
 
---- Resize the current window height to fit its content,
---- up to max_height % of the total lines
----@param max_height integer
----@return integer
-function M.fit_content(max_height)
-	local max = math.floor(vim.o.lines * max_height / 100)
-	local size = math.min(vim.fn.line("$"), max)
-	vim.cmd("resize " .. size)
-	return size
-end
-
 --- Move the cursor to the given position (virtual column)
 ---Note: vim.fn.cursor() takes a byte count
 ---@param line integer

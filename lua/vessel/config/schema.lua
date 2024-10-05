@@ -71,7 +71,6 @@ return {
 	["window.options.border"] = { "string" },
 
 	["preview"] = { "table" },
-	["preview.gravity"] = oneof("center", "none"),
 	["preview.min_height"] = { "number" },
 	["preview.options"] = { "table" },
 	["preview.options.style"] = { "string" },

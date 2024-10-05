@@ -89,54 +89,13 @@ function Window:_set_buffer_data(map)
 	})
 end
 
---- Compute the 'height' of the main popup window
---- This function returns an estimate only. This is needed only for correct
---- positioning on the screen. The actual height will adjust to the content later
---- up to the max_height option
----@param est_height integer Estimated height
----@return integer Number of lines
-function Window:_popup_height(est_height)
-	local max = math.floor(vim.o.lines - 2 * self.config.window.max_height / 100)
-	return math.max(math.min(est_height, max), 1)
-end
-
---- Compute the 'width' of the main popup window
----@param show_preview boolean Whether the preview popup window is enabled
+--- Cap height to not exceed window.max_height
+---@param height integer
 ---@return integer
-function Window:_popup_width(show_preview)
-	local percentage
-	local ui = vim.api.nvim_list_uis()[1]
-	if show_preview then
-		-- use 90% of the wisth to accomodate the popup
-		percentage = 90
-	else
-		percentage = ui.width < 120 and 90 or 70
-	end
-	return math.floor(ui.width * percentage / 100)
-end
-
---- Compute the 'row' position for the popup
----@param height integer The height of the popup window
----@return integer
-function Window:_popup_row(height)
-	if self.config.window.gravity == "top" then
-		-- move the popup to the top
-		local max_height = math.floor(vim.o.lines * self.config.window.max_height / 100)
-		return math.floor((vim.o.lines - max_height) / 2) - 1
-	elseif self.config.window.gravity == "center" then
-		-- center the popup vertically
-		return math.floor((vim.o.lines / 2) - ((height + 2) / 2)) - 1
-	end
-	return 1
-end
-
---- Compute the 'col' position for the popup
----@param width integer The width of the popup window
----@return integer
-function Window:_popup_col(width)
-	-- Center the popup horizontally
-	local ui = vim.api.nvim_list_uis()[1]
-	return math.floor((ui.width / 2) - (width / 2))
+function Window:_cap_height(height)
+	-- take into account statusline and commandline
+	local max = math.floor((vim.o.lines - 3) * self.config.window.max_height / 100)
+	return math.min(height, max)
 end
 
 --- Return default options for the main popup window
@@ -148,63 +107,74 @@ function Window:_default_opts()
 	})
 end
 
+--- Resize the current window height to fit its content,
+--- up to max_height % of the total lines
+---@return integer
+function Window:fit_content()
+	local bufinfo = vim.fn.getbufinfo(self.bufnr)[1]
+	local size = self:_cap_height(bufinfo.linecount)
+	vim.fn.win_execute(self.winid, "resize " .. size)
+	return size
+end
+
 --- Compute options for both main and preview window
 ---@param est_height integer
 ---@param show_preview boolean
 ---@return table, table
 function Window:_get_popup_options(est_height, show_preview)
+	local ui = vim.api.nvim_list_uis()[1]
+	local gravity = self.config.window.gravity
+	local min_preview_height = self.config.preview.min_height
+	local floor = math.floor
+
+	-- main popup options
 	local main = self:_default_opts()
+	-- preview popup options
 	local prev = self.preview:default_opts()
 
-	main.width = self:_popup_width(show_preview)
-	main.height = self:_popup_height(est_height)
-	main.row = self:_popup_row(main.height)
-	main.col = self:_popup_col(main.width)
+	-- main popup width dependent on screen width
+	local p = ui.width < 120 and 90 or 80
+	main.width = floor(ui.width * p / 100)
+
+	-- main popup height
+	main.height = self:_cap_height(est_height)
+
+	-- center the main popup horizontally
+	main.col = floor((ui.width / 2) - (main.width / 2))
+
+	if self.config.window.gravity == "top" then
+		-- move the popup to the top
+		local max_height = floor((ui.height - 3) * self.config.window.max_height / 100)
+		main.row = floor((ui.height - max_height) / 2) - 1
+	elseif self.config.window.gravity == "center" then
+		-- center the popup vertically
+		main.row = floor((ui.height / 2) - ((main.height + 2) / 2)) - 1
+	else
+		main.row = 1
+	end
 
 	if show_preview then
-		local lines = vim.o.lines
-		local gravity = self.config.window.gravity
-		local preview_gravity = self.config.preview.gravity
-		local min_preview_height = self.config.preview.min_height
-
 		-- make preview popup half the total width
-		prev.width = math.floor(main.width * 50 / 100)
+		prev.width = floor(main.width * 50 / 100)
 		-- make space for the preview
 		main.width = main.width - prev.width
 		-- move preview popup to the right side of the main popup
 		prev.col = main.width + 1
 
-		if preview_gravity == "none" then
-			-- preview popup will span the whole height
-			prev.height = lines - 4
-			prev.row = -main.row - 1
-		elseif preview_gravity == "center" then
-			-- align both heights unless the main popup height is < min_preview_height
-			prev.height = math.max(min_preview_height, main.height)
-			if gravity == "top" then
-				-- preview popup will have the top margin aligned to the main popup
-				prev.row = -1
-				-- consider the tallest window when centering vertically
-				-- main.row = math.floor((lines / 2) - ((math.max(main.height, prev.height) + 2) / 2))
-				-- - 1
-				main.row = math.floor((lines / 2) - ((prev.height + 2) / 2)) - 1
-			elseif gravity == "center" then
-				-- venter the popups vertically indipendently
-				main.row = math.floor((lines / 2) - ((main.height + 2) / 2)) - 1
-				prev.row = math.floor((lines / 2) - ((prev.height + 2) / 2)) - 1
-				-- set offset (main.row is always >= prev.row)
-				prev.row = prev.row - main.row - 1
-				print(
-					"main height =",
-					main.height,
-					"prev height =",
-					prev.height,
-					"main row =",
-					main.row,
-					"prev.row",
-					prev.row
-				)
-			end
+		-- align both heights unless the main popup height is < preview.min_height
+		prev.height = math.max(min_preview_height, main.height)
+
+		if gravity == "top" then
+			-- preview popup will have the top margin aligned to the main popup
+			prev.row = -1
+			-- consider the tallest window when centering vertically
+			main.row = floor((ui.height / 2) - ((prev.height + 2) / 2)) - 1
+		elseif gravity == "center" then
+			-- center the popups vertically indipendently
+			main.row = floor((ui.height / 2) - ((main.height + 2) / 2)) - 1
+			prev.row = floor((ui.height / 2) - ((prev.height + 2) / 2)) - 1
+			-- set offset (main.row is always >= prev.row)
+			prev.row = prev.row - main.row - 1
 		end
 	end
 
