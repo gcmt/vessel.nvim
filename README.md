@@ -601,15 +601,14 @@ vessel.opt.window.width = <function>
 Below the default implementation:
 
 ```lua
----@param preview_enabled boolean Wheter the preview window is enabled
+---@param preview_enabled boolean Whether the preview window is enabled
 ---@return integer Width as a percentage
 function popup_width(preview_enabled)
-  local ui = vim.api.nvim_list_uis()[1]
   if preview_enabled then
     return 90 -- 90% of the screen width when the preview is enabled
   end
     -- adjust width according to the available screen space
-  return ui.width < 120 and 90 or 75
+  return vim.o.columns < 120 and 90 or 75
 end
 ```
 

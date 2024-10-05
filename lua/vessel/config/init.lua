@@ -50,11 +50,10 @@ end
 ---@param preview_enabled boolean Wheter the preview window is shown
 ---@return integer Width as a percentage
 local function popup_width(preview_enabled)
-	local ui = vim.api.nvim_list_uis()[1]
 	if preview_enabled then
 		return 90
 	end
-	return ui.width < 120 and 90 or 75
+	return vim.o.columns < 120 and 90 or 75
 end
 
 --- Default plugin options
