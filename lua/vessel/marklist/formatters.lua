@@ -49,8 +49,12 @@ function M.mark_formatter(mark, meta, context, config)
 		line = string.gsub(line, "^%s+", "")
 	end
 	local line_hl = { line, config.marks.highlights.line }
-	if not mark.loaded then
-		line = util.prettify_path(mark.file)
+	if not mark.valid or not mark.loaded then
+		if not mark.valid then
+			line = mark.err and "invalid: " .. mark.err or "invalid"
+		else
+			line = util.prettify_path(mark.file)
+		end
 		line_hl = { line, config.marks.highlights.not_loaded }
 	end
 

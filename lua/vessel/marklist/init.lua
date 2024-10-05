@@ -15,6 +15,8 @@ local Sort_func
 ---@field line string Line on which the mark is positioned
 ---@field file string File the mark belongs to
 ---@field loaded boolean Whether the file is actually loaded in memory
+---@field valid boolean Whether the file is valid (file exists)
+---@field err string? Why the mark is invalid
 local Mark = {}
 Mark.__index = Mark
 
@@ -30,6 +32,7 @@ function Mark:new(letter)
 	mark.line = ""
 	mark.file = ""
 	mark.loaded = false
+	mark.valid = false
 	return mark
 end
 
@@ -187,8 +190,13 @@ function Marklist:_get_marks(bufnr)
 		mark.lnum = item.pos[2]
 		mark.col = item.pos[3]
 		mark.file = item.file
+		mark.valid = true
 		mark.loaded = true
-		if vim.fn.bufloaded(mark.file) == 0 then
+		if vim.fn.filereadable(mark.file) == 0 then
+			mark.valid = false
+			mark.loaded = false
+			mark.err = "file does not exist"
+		elseif vim.fn.bufloaded(mark.file) == 0 then
 			-- If the buffer is in the buffer list, load it anyway
 			if not self.config.lazy_load_buffers or vim.fn.buflisted(mark.file) == 1 then
 				vim.fn.bufload(vim.fn.bufadd(mark.file))
@@ -198,7 +206,13 @@ function Marklist:_get_marks(bufnr)
 			end
 		end
 		if mark.loaded then
-			mark.line = vim.fn.getbufoneline(mark.file, mark.lnum)
+			local line = vim.fn.getbufline(mark.file, mark.lnum)
+			if #line == 0 then
+				mark.valid = false
+				mark.err = "line does not exist"
+			else
+				mark.line = line[1]
+			end
 		end
 		if self:_filter(mark, self.context) then
 			if not groups[mark.file] then
