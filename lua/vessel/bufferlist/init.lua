@@ -14,7 +14,13 @@ local Pinned = {}
 ---@class Buffer
 ---@field nr integer Buffer number
 ---@field path string Buffer full path
+---@field isdirectory boolean Whether the buffer is a directory
 ---@field listed boolean Whether the buffer is listed
+---@field modified boolean Whether the buffer is modified/changed
+---@field changedtick integer Number total changes made to the buffer
+---@field loaded boolean Whether the buffer is loaded
+---@field hidden boolean Whether the buffer is hidden
+---@field lastused integer When the buffer  was last used (unix timestamp)
 ---@field pinpos integer > 0 for pinned buffers
 local Buffer = {}
 Buffer.__index = Buffer
@@ -28,6 +34,12 @@ function Buffer:new(bufnr)
 	buffer.nr = bufnr or -1
 	buffer.path = ""
 	buffer.listed = false
+	buffer.modified = false
+	buffer.changedtick = 0
+	buffer.loaded = false
+	buffer.isdirectory = false
+	buffer.hidden = false
+	buffer.lastused = 0
 	buffer.pinpos = -1
 	return buffer
 end
@@ -399,18 +411,24 @@ function Bufferlist:_get_buffers()
 	end
 
 	local buffers = {}
-	for bufnr = 1, vim.fn.bufnr("$") do
-		if vim.fn.bufexists(bufnr) == 0 or vim.fn.getbufvar(bufnr, "&buftype") ~= "" then
-			if pinpos[bufnr] then
-				table.remove(Pinned, pinpos[bufnr])
+	for _, b in pairs(vim.fn.getbufinfo()) do
+		if vim.fn.getbufvar(b.bufnr, "&buftype") ~= "" then
+			if pinpos[b.bufnr] then
+				table.remove(Pinned, pinpos[b.bufnr])
 			end
 			goto continue
 		end
 
-		local buffer = Buffer:new(bufnr)
-		buffer.path = vim.api.nvim_buf_get_name(bufnr)
-		buffer.listed = vim.fn.buflisted(bufnr) == 1
-		buffer.pinpos = pinpos[bufnr] or -1
+		local buffer = Buffer:new(b.bufnr)
+		buffer.path = b.name
+		buffer.listed = b.listed == 1
+		buffer.modified = b.changed == 1
+		buffer.changedtick = b.changedtick
+		buffer.loaded = b.loaded == 1
+		buffer.hidden = b.hidden == 1
+		buffer.lastused = b.lastused
+		buffer.isdirectory = vim.fn.isdirectory(b.name) == 1
+		buffer.pinpos = pinpos[b.bufnr] or -1
 
 		if self:_filter(buffer, self.context) then
 			table.insert(buffers, buffer)

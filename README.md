@@ -322,35 +322,41 @@ Throughout the *API* documentation we will refer to the `context` as something t
 
 The `Mark` object is `table` with the following keys:
 
-- `mark` Mark letter
-- `lnum` Mark line number
-- `col` Mark column number
-- `line` Line on which the mark is positioned
-- `file` File the mark belongs to
-- `loaded` Whether the file is actually loaded in memory
+- `mark` Mark letter.
+- `lnum` Mark line number.
+- `col` Mark column number.
+- `line` Line on which the mark is positioned.
+- `file` File the mark belongs to.
+- `loaded` Whether the file is actually loaded in memory.
 
 ### Jump Object
 
 The `Jump` object is `table` with the following keys:
 
-- `current` Whether this jump is the current position in the jump list
-- `pos` Position of the jump in the jump list
-- `relpos` Position of the jump relative to the current position in the jump list
-- `bufnr` Buffer number
-- `bufpath` Buffer full path
-- `lnum` Jump line number
-- `col` Jump column number
-- `line` Line on which the jump is positioned
-- `loaded` Whether the file the jump refers to is loaded in memory
+- `current` Whether this jump is the current position in the jump list.
+- `pos` Position of the jump in the jump list.
+- `relpos` Position of the jump relative to the current position in the jump list.
+- `bufnr` Buffer number.
+- `bufpath` Buffer full path.
+- `lnum` Jump line number.
+- `col` Jump column number.
+- `line` Line on which the jump is positioned.
+- `loaded` Whether the file the jump refers to is loaded in memory.
 
 ### Buffer Object
 
 The `Buffer` object is `table` with the following keys:
 
-- `nr` Buffer number
-- `path` Buffer full path
-- `listed` Boolean flag indicating whether the buffer is listed
-- `pinpos` Position in the pinned list. `-1` if buffer is not pinned
+- `nr` Buffer number.
+- `path` Buffer full path.
+- `pinpos` Position in the pinned list. `-1` if buffer is not pinned.
+- `listed` Whether the buffer is listed (visible in the buffer list).
+- `isdirectory` Whether the buffer is a directory.
+- `modified` Whether the buffer is modified/changed.
+- `changedtick` Number total changes made to the buffer.
+- `loaded` Whether the buffer is loaded.
+- `hidden` Whether the buffer is hidden.
+- `lastused` When the buffer was last used (unix time).
 
 ### Modes
 

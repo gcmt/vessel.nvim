@@ -84,11 +84,11 @@ function M.buffer_formatter(buffer, meta, context, config)
 	bufname = bufname ~= "" and bufname .. config.buffers.formatter_spacing or ""
 
 	local hl_bufname = config.buffers.highlights.bufname
-	if vim.fn.buflisted(buffer.nr) == 0 then
+	if not buffer.listed then
 		hl_bufname = config.buffers.highlights.unlisted
-	elseif vim.fn.isdirectory(buffer.path) == 1 then
+	elseif buffer.isdirectory then
 		hl_bufname = config.buffers.highlights.directory
-	elseif vim.fn.getbufvar(buffer.nr, "&modified") == 1 then
+	elseif buffer.modified then
 		hl_bufname = config.buffers.highlights.modified
 	end
 
