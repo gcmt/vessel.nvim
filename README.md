@@ -7,6 +7,7 @@ On a quest to bring better ergonomics around *Neovim* native lists. This plugin 
 - Provides useful shortcuts for **setting marks automatically** without having to pick a letter by yourself.
 - Allow **changing and deleting marks** more effectively directly from the interactive mark list window.
 - Allow **deleting and "resurrecting" buffers** directly from the buffer list window.
+- Provides the ability to [*pin* important buffers](#pinned-buffers) and quickly navigate to them even from outside the buffer list window.
 
 ## Table of Contents
 
