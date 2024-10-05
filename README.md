@@ -222,12 +222,12 @@ This list is particularly useful when combined with the [buffers.quickjump](#buf
 
 The order of buffers in the *pinned list* can be manually adjusted. See mappings [buffers.pin_increase](#bufferspin_increase) and [buffers.pin_decrease](#bufferspin_decrease).
 
+> [!NOTE]
+> When enabled, the `buffers.quickjump` also works for unpinned buffers, but it's going to be less effective since you can't control the buffers positions unless they are in the *pinned list*.
+
 #### Pinned buffers navigation
 
 You can switch to *pinned buffers* even from outside the buffer list window. Use the provided [mappings](#buffer-list-mappings) `<plug>(VesselPinnedNext)` and `<plug>(VesselPinnedPrev)` or directly use the [Buffers API](#buffer-list-api). See also the option [buffers.wrap_around](#bufferswrap_around).
-
-> [!NOTE]
-> When enabled, the `buffers.quickjump` also works for unpinned buffers, but it's going to be less effective since you can't control the buffers positions unless they are in the *pinned list*.
 
 ## API
 
