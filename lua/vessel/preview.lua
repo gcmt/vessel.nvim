@@ -65,9 +65,13 @@ function Preview:make_writer(max_lnums)
 		if self._cache[path] then
 			lines = self._cache[path]
 		else
-			local max_lnum = (max_lnums[path] or 1) + (self.wininfo.height * 2)
-			lines = vim.fn.readfile(path, max_lnum)
-			self._cache[path] = lines
+			if vim.fn.bufloaded(path) == 1 then
+				lines = vim.fn.getbufline(path, 1, "$")
+			else
+				local max_lnum = (max_lnums[path] or 1) + (self.wininfo.height * 2)
+				lines = vim.fn.readfile(path, max_lnum)
+				self._cache[path] = lines
+			end
 		end
 		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines)
 		vim.fn.win_execute(self.winid, lnum)
