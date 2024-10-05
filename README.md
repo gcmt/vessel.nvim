@@ -14,6 +14,7 @@ On a quest to bring better ergonomics around *Neovim* native lists. This plugin 
 - [Windows](#windows)
   - [Mark List Window](#mark-list-window)
   - [Jump List Window](#jump-list-window)
+  - [Preview Window](#preview-window)
   - [Buffer List Window](#buffer-list-window)
   - [Pinned Buffers](#pinned-buffers)
 - [API](#api)
@@ -30,6 +31,7 @@ On a quest to bring better ergonomics around *Neovim* native lists. This plugin 
   - [Generic Options](#generic-options)
   - [Commands Options](#commands-options)
   - [Window Options](#window-options)
+  - [Preview Window Options](#preview-window-options)
   - [Jump List Options](#jump-list-options)
   - [Mark List Options](#mark-list-options)
   - [Buffer List Options](#buffer-list-options)
@@ -171,6 +173,14 @@ Once inside the window, the following mappings are available:
 #### Autoloading buffers
 
 By default, lines cannot be displayed for files that are not loaded in memory (in the buffer list). You'll see instead the jump file path greyed out. To automatically load in memory all files for which jumps exist and add them to the buffer list, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded.
+
+### Preview Window
+
+![Preview Window](assets/preview_dark.png "Preview window.")
+
+By default both mark and jump lists have the preview window enabled. In this window you can see context of the line under cursor. To disable the preview windows you can use respectively the option [marks.preview](#markspreview) and [jumps.preview](#jumpspreview).
+
+See also the [Preview Window Options](#preview-window-options) section for all the options related to the preview window. The option [window.gravity](#window.gravity) might also be useful to control how both the windows are positioned relative to each other.
 
 ### Buffer List Window
 
@@ -514,6 +524,22 @@ vessel.opt.commands.view_buffers = "Buffers"
 
 ### Window Options
 
+#### window.gravity
+
+Controls the positioning of the main popup window. This option have different effects whether the preview window is enabled or not.
+
+Without the preview window enabled:
+- `center` The window is centered vertically in the screen.
+- `top` The window is positioned towards the top of the screen. The max top position is determined by the [window.max_height](#windowmax_height) option. The more this option is closer to `100` (100%), the highest the window will be positioned.
+
+With the preview window enabled:
+- `center`: When the preview window height is higher than the main popup window height, the latter will be vertically centered relative to the preview window.
+- `top`: When the preview window height is higher than the main popup window height, the top margin of both windows will be aligned.
+
+```lua
+vessel.opt.window.gravity = "center"
+```
+
 #### window.max_height
 
 Control the maximum height of the popup window as a percentage of the nvim UI.
@@ -521,6 +547,7 @@ Control the maximum height of the popup window as a percentage of the nvim UI.
 ```lua
 vessel.opt.window.max_height = 80
 ```
+
 #### window.cursorline
 
 Enable/disable `cursorline` *neovim* option in the window.
@@ -528,6 +555,7 @@ Enable/disable `cursorline` *neovim* option in the window.
 ```lua
 vessel.opt.window.cursorline = true
 ```
+
 #### window.number
 
 Enable/disable `number` *neovim* option in the window.
@@ -553,7 +581,34 @@ vessel.opt.window.options.style = "minimal"
 vessel.opt.window.options.border = "single"
 ```
 
+### Preview Window Options
+
+#### preview.options
+
+Control how the preview popup looks. This options are passed directly to the `vim.api.nvim_open_win()` function. See `:help api-floatwin`.
+
+```lua
+vessel.opt.preview.options.style = "minimal"
+vessel.opt.preview.options.border = "single"
+```
+
+#### preview.min_height
+
+Minimum height of the preview window, expressed in lines.
+
+```lua
+vessel.opt.preview.min_height = 25
+```
+
 ### Mark List Options
+
+#### marks.preview
+
+Enable or disable preview window. See the [Preview Window Options](#preview-window-options) section for how to customize it.
+
+```lua
+vessel.opt.marks.preview = true
+```
 
 #### marks.locals and maks.globals
 
@@ -829,6 +884,14 @@ vessel.opt.marks.mappings.cycle_sort = { "<SPACE>" }
 ```
 
 ### Jump List Options
+
+#### jumps.preview
+
+Enable or disable preview window. See the [Preview Window Options](#preview-window-options) section for how to customize it.
+
+```lua
+vessel.opt.jumps.preview = true
+```
 
 #### jumps.real_positions
 
