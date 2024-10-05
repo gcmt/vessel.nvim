@@ -13,6 +13,24 @@ function M.buffers.by_path()
 	return fn, "sorting by path"
 end
 
+--- Sort buffers by last used timestamp (unix time)
+---@return function, string
+function M.buffers.by_lastused()
+	local fn = function(a, b)
+		return a.lastused > b.lastused
+	end
+	return fn, "sorting by last used time"
+end
+
+--- Sort buffers by number of changes in the buffeer
+---@return function, string
+function M.buffers.by_changes()
+	local fn = function(a, b)
+		return a.changedtick > b.changedtick
+	end
+	return fn, "sorting by number of changes"
+end
+
 --- Sort buffers by basename
 ---@return function, string
 function M.buffers.by_basename()

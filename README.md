@@ -671,16 +671,19 @@ end
 
 List of functions used to sort marks in the each groups. First item is the function used by default the first time you open the window.
 
-Each function in this list must return two values:
-- A function with the signature: `function(MarkA, MarkB) return boolean end`
-- A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
-
 See also [marks.mappings.cycle_sort](#marksmappingscycle_sort).
 
 ```lua
 local sorters = require("vessel.config.sorters")
 vessel.opt.marks.sort_marks = { sorters.marks.by_lnum, sorters.marks.by_mark }
 ```
+Available sorters are:
+- `sorters.marks.by_lnum` Sort by mark line number.
+- `sorters.marks.by_mark` Sort by mark letter (capitals first).
+
+You can also define your own *sorter function*. The function must return two values:
+- A function with the signature: `function(MarkA, MarkB) return boolean end`
+- A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
 
 Example function:
 
@@ -1145,17 +1148,25 @@ vessel.opt.buffers.directory_handler = <function>
 
 List of functions used to sort buffers. First item is the function used by default the first time you open the window.
 
-Each function in this list must return two values:
-- A function with the signature: `function(BufferA, BufferB) return boolean end`
-- A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
-
 See also [buffers.mappings.cycle_sort](#buffersmappingscycle_sort).
 
 ```lua
+local sorters = require("vessel.config.sorters")
 vessel.opt.buffers.sort_buffers = { sorters.buffers.by_path, sorters.buffers.by_basename }
 ```
 
-Example function:
+Available sorters are:
+- `sorters.buffers.by_path` Sort by buffer directory.
+- `sorters.buffers.by_basename` Sort by buffer basename.
+- `sorters.buffers.by_lastused` Sort by last time the buffer was used/visited.
+- `sorters.buffers.by_changes` Sort by the total number of changes made in the buffer.
+
+
+You can also define your own *sorter function*. The function must return two values:
+- A function with the signature: `function(BufferA, BufferB) return boolean end`
+- A description string that will be used to give feedback to the user when cycling between these function, or empty string for no feedback
+
+Example sorter function:
 
 ```lua
 function sort_by_basename()

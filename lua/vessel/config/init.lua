@@ -192,7 +192,12 @@ local _opt = {
 		quickjump = true,
 		show_pin_positions = true,
 		pin_separator = "─",
-		sort_buffers = { sorters.buffers.by_path, sorters.buffers.by_basename },
+		sort_buffers = {
+			sorters.buffers.by_path,
+			sorters.buffers.by_basename,
+			sorters.buffers.by_lastused,
+			sorters.buffers.by_changes,
+		},
 		bufname_align = "left",
 		bufname_style = "unique",
 		bufpath_style = "relcwd",
