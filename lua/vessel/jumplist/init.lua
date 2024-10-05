@@ -382,6 +382,7 @@ function Jumplist:_render()
 	vim.fn.setbufvar(self.bufnr, "&modifiable", 1)
 	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
 	vim.api.nvim_buf_clear_namespace(self.bufnr, self.nsid, 1, -1)
+	local preview_aug = vim.api.nvim_create_augroup("VesselPreview", { clear = true })
 
 	if #self.jumps == 0 then
 		vim.fn.setbufline(self.bufnr, 1, self.config.jumps.not_found)
@@ -390,6 +391,8 @@ function Jumplist:_render()
 		util.fit_content(self.config.window.max_height)
 		self.window:_set_buffer_data({})
 		vim.cmd("doau User VesselJumplistChanged")
+		-- clear preview window
+		self.window.preview:make_writer({})()
 		return {}
 	end
 
@@ -430,11 +433,10 @@ function Jumplist:_render()
 
 	if self.config.jumps.preview then
 		-- Show the file under cursor content in the preview popup
-		local aug = vim.api.nvim_create_augroup("VesselPreview", { clear = true })
 		local write_preview = self.window.preview:make_writer(meta.max_lnums)
 		vim.api.nvim_create_autocmd("CursorMoved", {
 			desc = "Write to the preview window on every movement",
-			group = aug,
+			group = preview_aug,
 			buffer = self.bufnr,
 			callback = function()
 				local jump = map[vim.fn.line(".")]

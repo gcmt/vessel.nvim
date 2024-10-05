@@ -57,7 +57,7 @@ function Preview:make_writer(max_lnums)
 	local cache = {}
 	return function(path, lnum)
 		if not path then
-			vim.api.nvim_buf_set_lines(self.bufnr, 1, -1, false, {})
+			vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
 			return
 		end
 		local lines

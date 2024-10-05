@@ -586,6 +586,7 @@ function Marklist:_render()
 	vim.fn.setbufvar(self.bufnr, "&modifiable", 1)
 	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
 	vim.api.nvim_buf_clear_namespace(self.bufnr, self.nsid, 1, -1)
+	local preview_aug = vim.api.nvim_create_augroup("VesselPreview", { clear = true })
 
 	if next(self.marks) == nil then
 		vim.fn.setbufline(self.bufnr, 1, self.config.marks.not_found)
@@ -594,6 +595,8 @@ function Marklist:_render()
 		util.fit_content(self.config.window.max_height)
 		self.window:_set_buffer_data({})
 		vim.cmd("doau User VesselMarklistChanged")
+		-- clear preview window
+		self.window.preview:make_writer({})()
 		return {}
 	end
 
@@ -680,10 +683,9 @@ function Marklist:_render()
 	if self.config.marks.preview then
 		-- Show the file under cursor content in the preview popup
 		local write_preview = self.window.preview:make_writer(meta.max_lnums)
-		local aug = vim.api.nvim_create_augroup("VesselPreview", { clear = true })
 		vim.api.nvim_create_autocmd("CursorMoved", {
 			desc = "Write to the preview window on every movement",
-			group = aug,
+			group = preview_aug,
 			buffer = self.bufnr,
 			callback = function()
 				local mark = map[vim.fn.line(".")]
