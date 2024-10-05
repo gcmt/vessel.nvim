@@ -8,6 +8,7 @@ local util = require("vessel.util")
 ---@field wininfo table
 ---@field bufnr integer
 ---@field winid integer
+---@field _cache table
 local Preview = {}
 Preview.__index = Preview
 
@@ -22,6 +23,7 @@ function Preview:new(config)
 	preview.wininfo = {}
 	preview.bufnr = -1
 	preview.winid = -1
+	preview._cache = {}
 	return preview
 end
 
@@ -54,19 +56,18 @@ end
 ---@param max_lnums table
 ---@return function
 function Preview:make_writer(max_lnums)
-	local cache = {}
 	return function(path, lnum)
 		if not path then
 			vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
 			return
 		end
 		local lines
-		if cache[path] then
-			lines = cache[path]
+		if self._cache[path] then
+			lines = self._cache[path]
 		else
 			local max_lnum = (max_lnums[path] or 1) + (self.wininfo.height * 2)
 			lines = vim.fn.readfile(path, max_lnum)
-			cache[path] = lines
+			self._cache[path] = lines
 		end
 		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines)
 		vim.fn.win_execute(self.winid, lnum)
