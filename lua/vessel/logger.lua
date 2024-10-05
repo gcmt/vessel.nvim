@@ -24,28 +24,28 @@ end
 function M.err(fmt, ...)
 	if M.log_level <= vim.log.levels.ERROR then
 		local prefix = _get_prefix("err")
-		vim.notify_once(prefix .. string.format(fmt, ...), vim.log.levels.ERROR)
+		vim.notify(prefix .. string.format(fmt, ...), vim.log.levels.ERROR)
 	end
 end
 
 function M.warn(fmt, ...)
 	if M.log_level <= vim.log.levels.WARN then
 		local prefix = _get_prefix("warn")
-		vim.notify_once(prefix .. string.format(fmt, ...), vim.log.levels.WARN)
+		vim.notify(prefix .. string.format(fmt, ...), vim.log.levels.WARN)
 	end
 end
 
 function M.info(fmt, ...)
 	if M.log_level <= vim.log.levels.INFO then
 		local prefix = _get_prefix("info")
-		vim.notify_once(prefix .. string.format(fmt, ...), vim.log.levels.INFO)
+		vim.notify(prefix .. string.format(fmt, ...), vim.log.levels.INFO)
 	end
 end
 
 function M.debug(fmt, ...)
 	if M.log_level <= vim.log.levels.DEBUG then
 		local prefix = _get_prefix("debug")
-		vim.notify_once(prefix .. string.format(fmt, ...), vim.log.levels.DEBUG)
+		vim.notify(prefix .. string.format(fmt, ...), vim.log.levels.DEBUG)
 	end
 end
 
