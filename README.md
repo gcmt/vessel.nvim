@@ -143,7 +143,7 @@ Once inside the window, the following mappings are available:
 | `'{a-z-A-Z}` | Jump directly to a mark.
 
 > [!NOTE]
-> By default, lines cannot be displayed for files that are not loaded in memory. You'll see instead the mark file path greyed out. To automatically load in memory all files for which marks exist, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`.
+> By default, lines cannot be displayed for files that are not loaded in memory and are not in the vim buffer list. You'll see the mark file path greyed out instead. To automatically load in memory all files for which marks exist, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false` (files will be automatically added to the buffer list).
 
 ### Jump List Window
 
@@ -172,7 +172,7 @@ Once inside the window, the following mappings are available:
 
 #### Autoloading buffers
 
-By default, lines cannot be displayed for files that are not loaded in memory, that is, that are not in the buffer list. You'll see instead the jump file path greyed out. To automatically load in memory all files for which jumps exist and add them to the buffer list, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded.
+By default, lines cannot be displayed for files that are not loaded in memory, that is, that are not in the buffer list. You'll see the jump file path greyed out insted. To automatically load in memory all files for which jumps exist and add them to the buffer list, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded.
 
 ### Preview Window
 
