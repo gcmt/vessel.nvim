@@ -56,11 +56,9 @@ local _opt = {
 	highlight_timeout = 250,
 	jump_callback = jump_callback,
 
-	--- floating window-related options
+	--- floating window options
 	window = {
 		gravity = "center",
-		preview_gravity = "center",
-		min_preview_height = 25, -- lines
 		max_height = 75, -- % of the vim ui
 		cursorline = true,
 		number = false,
@@ -70,7 +68,13 @@ local _opt = {
 			style = "minimal",
 			border = "single",
 		},
-		preview = {
+	},
+
+	--- preview floating window options
+	preview = {
+		min_height = 25, -- lines
+		gravity = "center",
+		options = {
 			border = "single",
 			style = "minimal",
 		},

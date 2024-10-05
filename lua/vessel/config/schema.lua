@@ -62,8 +62,6 @@ return {
 
 	["window"] = { "table" },
 	["window.gravity"] = oneof("center", "top"),
-	["window.preview_gravity"] = oneof("center", "none"),
-	["window.min_preview_height"] = { "number" },
 	["window.max_height"] = { "number" },
 	["window.cursorline"] = { "boolean" },
 	["window.number"] = { "boolean" },
@@ -71,9 +69,13 @@ return {
 	["window.options"] = { "table" },
 	["window.options.style"] = { "string" },
 	["window.options.border"] = { "string" },
-	["window.preview"] = { "table" },
-	["window.preview.style"] = { "string" },
-	["window.preview.border"] = { "string" },
+
+	["preview"] = { "table" },
+	["preview.gravity"] = oneof("center", "none"),
+	["preview.min_height"] = { "number" },
+	["preview.options"] = { "table" },
+	["preview.options.style"] = { "string" },
+	["preview.options.border"] = { "string" },
 
 	["create_commands"] = { "boolean" },
 	["commands"] = { "table" },

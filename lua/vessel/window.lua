@@ -164,8 +164,8 @@ function Window:_get_popup_options(est_height, show_preview)
 	if show_preview then
 		local lines = vim.o.lines
 		local gravity = self.config.window.gravity
-		local preview_gravity = self.config.window.preview_gravity
-		local min_preview_height = self.config.window.min_preview_height
+		local preview_gravity = self.config.preview.gravity
+		local min_preview_height = self.config.preview.min_height
 
 		-- make preview popup half the total width
 		prev.width = math.floor(main.width * 50 / 100)

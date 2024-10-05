@@ -39,7 +39,7 @@ end
 --- Return options for the preview window
 ---@return table
 function Preview:default_opts()
-	return vim.tbl_extend("force", self.config.window.preview, {
+	return vim.tbl_extend("force", self.config.preview.options, {
 		win = -1,
 		relative = "win",
 		anchor = "NW",
