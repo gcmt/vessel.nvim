@@ -24,7 +24,7 @@ On a quest to bring better ergonomics around *Neovim* native lists. This plugin 
   - [Buffer List API](#buffer-list-api)
   - [Mark Object](#mark-object)
   - [Jump Object](#jump-object)
-  - [Buffer Object](#mark-object)
+  - [Buffer Object](#buffer-object)
   - [Modes](#modes)
   - [Autocommand Events](#autocommand-events)
 - [Configuration](#configuration)
