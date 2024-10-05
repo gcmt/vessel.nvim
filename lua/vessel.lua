@@ -21,8 +21,8 @@ M.opt = lazy_opt()
 ---@param opts table? Config overrides
 ---@param filter_func function?
 function M.view_buffers(opts, filter_func)
-	local app = require("vessel.core"):new(require("vessel.config").get(opts))
-	local bufferlist = require("vessel.bufferlist"):new(app, filter_func)
+	local config = require("vessel.config").get(opts)
+	local bufferlist = require("vessel.bufferlist"):new(config, filter_func)
 	bufferlist:open()
 end
 
@@ -30,8 +30,8 @@ end
 ---@param opts table? Config overrides
 ---@return table
 function M.get_pinned_list(opts)
-	local app = require("vessel.core"):new(require("vessel.config").get(opts))
-	local bufferlist = require("vessel.bufferlist"):new(app)
+	local config = require("vessel.config").get(opts)
+	local bufferlist = require("vessel.bufferlist"):new(config)
 	return bufferlist:get_pinned_list()
 end
 
@@ -40,8 +40,8 @@ end
 ---@param opts table? Config overrides
 ---@return integer?
 function M.get_pinned_next(bufnr, opts)
-	local app = require("vessel.core"):new(require("vessel.config").get(opts))
-	local bufferlist = require("vessel.bufferlist"):new(app)
+	local config = require("vessel.config").get(opts)
+	local bufferlist = require("vessel.bufferlist"):new(config)
 	return bufferlist:get_pinned_next(bufnr or vim.fn.bufnr("%"))
 end
 
@@ -50,8 +50,8 @@ end
 ---@param opts table? Config overrides
 ---@return integer?
 function M.get_pinned_prev(bufnr, opts)
-	local app = require("vessel.core"):new(require("vessel.config").get(opts))
-	local bufferlist = require("vessel.bufferlist"):new(app)
+	local config = require("vessel.config").get(opts)
+	local bufferlist = require("vessel.bufferlist"):new(config)
 	return bufferlist:get_pinned_prev(bufnr or vim.fn.bufnr("%"))
 end
 
@@ -60,8 +60,8 @@ end
 ---@param opts table?  Config table
 ---@return boolean If the mark has been successfully set
 local function set_mark(global, opts)
-	local app = require("vessel.core"):new(require("vessel.config").get(opts))
-	local marklist = require("vessel.marklist"):new(app):init()
+	local config = require("vessel.config").get(opts)
+	local marklist = require("vessel.marklist"):new(config):init()
 	return marklist:set_mark(global)
 end
 
@@ -83,8 +83,8 @@ end
 ---@param opts table? Config overrides
 ---@param filter_func function?
 function M.view_marks(opts, filter_func)
-	local app = require("vessel.core"):new(require("vessel.config").get(opts))
-	local marklist = require("vessel.marklist"):new(app, filter_func)
+	local config = require("vessel.config").get(opts)
+	local marklist = require("vessel.marklist"):new(config, filter_func)
 	marklist:open()
 end
 
@@ -124,8 +124,8 @@ end
 ---@param opts table? Config overrides
 ---@param filter_func function?
 function M.view_jumps(opts, filter_func)
-	local app = require("vessel.core"):new(require("vessel.config").get(opts))
-	local jumplist = require("vessel.jumplist"):new(app, filter_func)
+	local config = require("vessel.config").get(opts)
+	local jumplist = require("vessel.jumplist"):new(config, filter_func)
 	jumplist:open()
 end
 

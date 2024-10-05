@@ -1,5 +1,6 @@
----@module "jumplist"
-
+---@module "jumplist
+local Context = require("vessel.context")
+local Window = require("vessel.window")
 local logger = require("vessel.logger")
 local util = require("vessel.util")
 
@@ -46,59 +47,57 @@ end
 --- even though getjumplist() returns the last jumplist index + 1, that is, len(getjumplist()).
 ---
 ---@class Jumplist
----@field _nsid integer Namespace id for highlighting
----@field _app App Reference to the main app
----@field _bufft string Buffer filetype
----@field _bufnr integer Where jumps will be rendered
----@field _jumps table Jumps list (unfiltered)
----@field _filter_func function?
+---@field nsid integer Namespace id for highlighting
+---@field bufft string Buffer filetype
+---@field config table Gloabl config
+---@field context Context Info about the current buffer/window
+---@field window Window The main popup window
+---@field bufnr integer Where jumps will be displayed
+---@field jumps table Jumps list
+---@field filter_func function?
 local Jumplist = {}
 Jumplist.__index = Jumplist
 
 --- Return a new Jumplist instance
----@param app App
+---@param config table
 ---@param filter_func function?
 ---@return Jumplist
-function Jumplist:new(app, filter_func)
+function Jumplist:new(config, filter_func)
 	local jumps = {}
 	setmetatable(jumps, Jumplist)
-	jumps._nsid = vim.api.nvim_create_namespace("__vessel__")
-	jumps._app = app
-	jumps._bufft = "jumplist"
-	jumps._bufnr = -1
-	jumps._jumps = {}
-	jumps._filter_func = filter_func
+	jumps.nsid = vim.api.nvim_create_namespace("__vessel__")
+	jumps.bufft = "jumplist"
+	jumps.config = config
+	jumps.context = Context:new()
+	jumps.window = Window:new(config, jumps.context)
+	jumps.bufnr = -1
+	jumps.jumps = {}
+	jumps.filter_func = filter_func
 	return jumps
 end
 
 --- Initialize Jumplist
 ---@return Jumplist
 function Jumplist:init()
-	self._jumps = self:_get_jumps()
+	self.jumps = self:_get_jumps()
 	return self
 end
 
 --- Open the window and render the content
 function Jumplist:open()
 	self:init()
-	local ok
-	self._bufnr, ok = self._app:open_window(self)
+	local bufnr, ok = self.window:open(#self.jumps, self.config.jumps.preview)
 	if ok then
-		vim.fn.setbufvar(self._bufnr, "&filetype", self._bufft)
+		self.bufnr = bufnr
+		vim.fn.setbufvar(bufnr, "&filetype", self.bufft)
 		vim.cmd("doau User VesselJumplistEnter")
 		self:_render()
 	end
 end
 
---- Return total jumps count
----@return integer, integer
-function Jumplist:get_count()
-	return #self._jumps, 1
-end
-
 --- Close the jump list window
 function Jumplist:_action_close()
-	self._app:_close_window()
+	self.window:_close_window()
 end
 
 --- Load in memory buffers that match condition
@@ -133,11 +132,11 @@ function Jumplist:_action_jump(mode, map)
 		vim.cmd(string.format('exec "norm! %s%s"', math.abs(selected.relpos), cmd))
 	end
 
-	if self._app.config.jump_callback then
-		self._app.config.jump_callback(mode, self._app.context)
+	if self.config.jump_callback then
+		self.config.jump_callback(mode, self.context)
 	end
-	if self._app.config.highlight_on_jump then
-		util.cursorline(self._app.config.highlight_timeout)
+	if self.config.highlight_on_jump then
+		util.cursorline(self.config.highlight_timeout)
 	end
 end
 
@@ -147,7 +146,7 @@ function Jumplist:_action_clear(map)
 	if not selected then
 		return
 	end
-	vim.fn.win_execute(self._app.context.wininfo.winid, "clearjumps")
+	vim.fn.win_execute(self.context.wininfo.winid, "clearjumps")
 	self:_refresh()
 end
 
@@ -167,9 +166,9 @@ function Jumplist:_get_real_count(map, count, mapping)
 		end
 	end
 	mapping = string.gsub(mapping, "\\", "")
-	if mapping == self._app.config.jumps.mappings.ctrl_o then
+	if mapping == self.config.jumps.mappings.ctrl_o then
 		line = line + count
-	elseif mapping == self._app.config.jumps.mappings.ctrl_i then
+	elseif mapping == self.config.jumps.mappings.ctrl_i then
 		line = line - count
 	end
 	if line < 1 or line > vim.fn.line("$") then
@@ -186,7 +185,7 @@ end
 ---@param mapping string
 function Jumplist:_action_passthrough(map, mapping)
 	local count = vim.v.count1
-	if not self._app.config.jumps.real_positions then
+	if not self.config.jumps.real_positions then
 		local ok, val = pcall(Jumplist._get_real_count, self, map, count, mapping)
 		if not ok then
 			logger.warn(val)
@@ -196,41 +195,41 @@ function Jumplist:_action_passthrough(map, mapping)
 	end
 	self:_action_close()
 	local cmd = string.format('execute "normal! %s%s"', count, mapping)
-	vim.fn.win_execute(self._app.context.wininfo.winid, cmd)
+	vim.fn.win_execute(self.context.wininfo.winid, cmd)
 end
 
 --- Setup mappings for the jumplist window
 ---@param map table
 function Jumplist:_setup_mappings(map)
-	util.keymap("n", self._app.config.jumps.mappings.close, function()
+	util.keymap("n", self.config.jumps.mappings.close, function()
 		self:_action_close()
 	end)
-	util.keymap("n", self._app.config.jumps.mappings.clear, function()
+	util.keymap("n", self.config.jumps.mappings.clear, function()
 		self:_action_clear(map)
 	end)
-	util.keymap("n", self._app.config.jumps.mappings.ctrl_o, function(mapping)
+	util.keymap("n", self.config.jumps.mappings.ctrl_o, function(mapping)
 		local ctrl_o = string.gsub(mapping, "%b<>", "\\%1")
 		self:_action_passthrough(map, ctrl_o)
 	end)
-	util.keymap("n", self._app.config.jumps.mappings.ctrl_i, function(mapping)
+	util.keymap("n", self.config.jumps.mappings.ctrl_i, function(mapping)
 		local ctrl_i = string.gsub(mapping, "%b<>", "\\%1")
 		self:_action_passthrough(map, ctrl_i)
 	end)
-	util.keymap("n", self._app.config.jumps.mappings.jump, function()
+	util.keymap("n", self.config.jumps.mappings.jump, function()
 		self:_action_jump(util.modes.BUFFER, map)
 	end)
-	if self._app.config.lazy_load_buffers then
-		util.keymap("n", self._app.config.jumps.mappings.load_buffer, function()
+	if self.config.lazy_load_buffers then
+		util.keymap("n", self.config.jumps.mappings.load_buffer, function()
 			self:_action_load_buffers(map, function(jump, sel)
 				return sel and jump.bufnr == sel.bufnr
 			end)
 		end)
-		util.keymap("n", self._app.config.jumps.mappings.load_cwd, function()
+		util.keymap("n", self.config.jumps.mappings.load_cwd, function()
 			self:_action_load_buffers(map, function(jump, sel)
 				return vim.startswith(jump.bufpath, vim.fn.getcwd() .. "/")
 			end)
 		end)
-		util.keymap("n", self._app.config.jumps.mappings.load_all, function()
+		util.keymap("n", self.config.jumps.mappings.load_all, function()
 			self:_action_load_buffers(map)
 		end)
 	end
@@ -242,7 +241,7 @@ function Jumplist:_get_jumps()
 	local jumps = {}
 	-- when not currently traversing th jump,list with ctrl-o or ctrl-i,
 	-- #len == _curpos, otherwise '_curpos' is a valid 'list' index
-	local list, _curpos = unpack(vim.fn.getjumplist(self._app.context.wininfo.winid))
+	local list, _curpos = unpack(vim.fn.getjumplist(self.context.wininfo.winid))
 	local len = #list
 	local curpos = math.max(len - _curpos, 1)
 
@@ -268,8 +267,8 @@ function Jumplist:_get_jumps()
 
 		if vim.fn.bufloaded(jump.bufnr) == 0 then
 			if
-				not self._app.config.lazy_load_buffers
-				and self._app.config.jumps.autoload_filter(jump.bufnr, jump.bufpath)
+				not self.config.lazy_load_buffers
+				and self.config.jumps.autoload_filter(jump.bufnr, jump.bufpath)
 			then
 				vim.fn.bufload(jump.bufnr)
 			else
@@ -284,7 +283,7 @@ function Jumplist:_get_jumps()
 			jump.line = line[1]
 		end
 
-		if self:_filter(jump, self._app.context) or curpos == jump.pos then
+		if self:_filter(jump, self.context) or curpos == jump.pos then
 			table.insert(jumps, jump)
 		end
 
@@ -304,10 +303,10 @@ end
 ---@param context Context
 ---@return boolean
 function Jumplist:_filter(jump, context)
-	if self._app.config.jumps.filter_empty_lines and vim.trim(jump.line) == "" then
+	if self.config.jumps.filter_empty_lines and vim.trim(jump.line) == "" then
 		return false
 	end
-	if self._filter_func and not self._filter_func(jump, context) then
+	if self.filter_func and not self.filter_func(jump, context) then
 		return false
 	end
 	return true
@@ -323,81 +322,86 @@ function Jumplist:_refresh()
 	return map
 end
 
+--- Get metadata table
+---@param jumps Jumplist
+---@return table
+local function _get_meta(jumps)
+	local meta = {
+		jumps_count = #jumps,
+		current_jump_line = 1,
+		max_basename = 0,
+		max_lnum = 0,
+		max_col = 0,
+		max_relpos = 0,
+		--- Maps each path to max jump lnum inside the file
+		max_lnums = {},
+		-- Maps each path to its shortest unique suffix
+		suffixes = {},
+		max_suffix = 0,
+	}
+
+	local paths = {}
+	for i, jump in ipairs(jumps) do
+		table.insert(paths, jump.bufpath)
+		if jump.current then
+			meta.current_jump_line = i
+		end
+		if not meta.max_lnum or jump.lnum > meta.max_lnum then
+			meta.max_lnum = jump.lnum
+		end
+		if not meta.max_col or jump.col > meta.max_col then
+			meta.max_col = jump.col
+		end
+		local rel = math.abs(jump.relpos)
+		if not meta.max_relpos or rel > meta.max_relpos then
+			meta.max_relpos = rel
+		end
+		local basename = vim.fn.strchars(vim.fs.basename(jump.bufpath))
+		if not meta.max_basename or basename > meta.max_basename then
+			meta.max_basename = basename
+		end
+		if not meta.max_lnums[jump.bufpath] or jump.lnum > meta.max_lnums[jump.bufpath] then
+			meta.max_lnums[jump.bufpath] = jump.lnum
+		end
+	end
+
+	meta.suffixes = util.unique_suffixes(paths)
+	for _, suffix in pairs(meta.suffixes) do
+		local suffix_len = vim.fn.strchars(suffix)
+		if not meta.max_suffix or suffix_len > meta.max_suffix then
+			meta.max_suffix = suffix_len
+		end
+	end
+
+	return meta
+end
+
 --- Render the jump list in the given buffer
 ---@return table Table mapping each line to the jump displayed on it
 function Jumplist:_render()
-	vim.fn.setbufvar(self._bufnr, "&modifiable", 1)
-	vim.cmd('sil! keepj norm! gg"_dG')
-	vim.api.nvim_buf_clear_namespace(self._bufnr, self._nsid, 1, -1)
+	vim.fn.setbufvar(self.bufnr, "&modifiable", 1)
+	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
+	vim.api.nvim_buf_clear_namespace(self.bufnr, self.nsid, 1, -1)
 
-	if #self._jumps == 0 then
-		vim.fn.setbufline(self._bufnr, 1, self._app.config.jumps.not_found)
-		vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
+	if #self.jumps == 0 then
+		vim.fn.setbufline(self.bufnr, 1, self.config.jumps.not_found)
+		vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
 		self:_setup_mappings({})
-		util.fit_content(self._app.config.window.max_height)
-		self._app:_set_buffer_data({})
+		util.fit_content(self.config.window.max_height)
+		self.window:_set_buffer_data({})
 		vim.cmd("doau User VesselJumplistChanged")
 		return {}
 	end
 
 	local map = {}
-	local jump_formatter = self._app.config.jumps.formatters.jump
-	local jumps_count = #self._jumps
-	local current_jump_line
-	local max_basename
-	local max_suffix
-	local max_lnum
-	local max_col
-	local max_relpos
-
-	local paths = {}
-	for _, jump in pairs(self._jumps) do
-		table.insert(paths, jump.bufpath)
-	end
-
-	-- find for each path the shortest unique suffix
-	local suffixes = util.unique_suffixes(paths)
-	for _, suffix in pairs(suffixes) do
-		local suffix_len = vim.fn.strchars(suffix)
-		if not max_suffix or suffix_len > max_suffix then
-			max_suffix = suffix_len
-		end
-	end
-
-	for i, jump in ipairs(self._jumps) do
-		if jump.current then
-			current_jump_line = i
-		end
-		if not max_lnum or jump.lnum > max_lnum then
-			max_lnum = jump.lnum
-		end
-		if not max_col or jump.col > max_col then
-			max_col = jump.col
-		end
-		local rel = math.abs(jump.relpos)
-		if not max_relpos or rel > max_relpos then
-			max_relpos = rel
-		end
-		local basename = vim.fn.strchars(vim.fs.basename(jump.bufpath))
-		if not max_basename or basename > max_basename then
-			max_basename = basename
-		end
-	end
+	local formatter = self.config.jumps.formatters.jump
+	local meta = _get_meta(self.jumps)
 
 	local i = 0
-	for _, jump in ipairs(self._jumps) do
+	for _, jump in ipairs(self.jumps) do
 		i = i + 1
-		local ok, line, matches = pcall(jump_formatter, jump, {
-			current_line = i,
-			current_jump_line = current_jump_line,
-			jumps_count = jumps_count,
-			max_lnum = max_lnum,
-			max_col = max_col,
-			max_relpos = max_relpos,
-			max_basename = max_basename,
-			max_suffix = max_suffix,
-			suffixes = suffixes,
-		}, self._app.context, self._app.config)
+		meta.current_line = i
+		local ok, line, matches = pcall(formatter, jump, meta, self.context, self.config)
 		if not ok or not line then
 			local msg
 			if not line then
@@ -405,24 +409,41 @@ function Jumplist:_render()
 			else
 				msg = string.gsub(tostring(line), "^.*:%s+", "")
 			end
-			self._app:_close_window()
+			self.window:_close_window()
 			logger.err("formatter error: %s", msg)
 			return {}
 		end
 		map[i] = jump
-		vim.fn.setbufline(self._bufnr, i, line)
+		vim.fn.setbufline(self.bufnr, i, line)
 		if matches then
-			util.set_matches(matches, i, self._bufnr, self._nsid)
+			util.set_matches(matches, i, self.bufnr, self.nsid)
 		end
 	end
 
-	vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
+	vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
 
 	self:_setup_mappings(map)
-	util.fit_content(self._app.config.window.max_height)
-	util.cursor(current_jump_line)
-	self._app:_set_buffer_data(map)
+	util.fit_content(self.config.window.max_height)
+	util.cursor(meta.current_jump_line)
+	self.window:_set_buffer_data(map)
 	vim.cmd("doau User VesselJumplistChanged")
+
+	if self.config.jumps.preview then
+		-- Show the file under cursor content in the preview popup
+		local aug = vim.api.nvim_create_augroup("VesselPreview", { clear = true })
+		local write_preview = self.window.preview:make_writer(meta.max_lnums)
+		vim.api.nvim_create_autocmd("CursorMoved", {
+			desc = "Write to the preview window on every movement",
+			group = aug,
+			buffer = self.bufnr,
+			callback = function()
+				local jump = map[vim.fn.line(".")]
+				if jump then
+					write_preview(jump.bufpath, jump.lnum)
+				end
+			end,
+		})
+	end
 
 	return map
 end

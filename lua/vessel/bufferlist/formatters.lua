@@ -19,7 +19,7 @@ local function format_bufname(path, meta, config)
 	local name = ""
 	local bname_fmt = "%s"
 	if config.buffers.bufname_style == "unique" then
-		name = meta.suffixes[path]
+		name = meta.suffixes[path] or path
 		bname_fmt = align .. meta.max_suffix .. "s"
 	elseif config.buffers.bufname_style == "basename" then
 		name = vim.fs.basename(path)
@@ -63,7 +63,7 @@ end
 function M.buffer_formatter(buffer, meta, context, config)
 	local bufname, bufpath
 	if buffer.path == "" then
-		bufname = config.buffers.unnamed_label
+		bufname = format_bufname(config.buffers.unnamed_label, meta, config)
 		bufpath = buffer.nr
 	else
 		bufname = format_bufname(buffer.path, meta, config)

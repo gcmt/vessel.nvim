@@ -1,12 +1,14 @@
 ---@module "bufferlist"
 
+local Context = require("vessel.context")
+local Window = require("vessel.window")
 local logger = require("vessel.logger")
 local util = require("vessel.util")
 
--- Stateful sort type
+-- For stateful sorting
 local Sort_func
 
--- List of pinned buffers
+-- List of pinned buffers (only numbers)
 local Pinned = {}
 
 ---@class Buffer
@@ -31,56 +33,54 @@ function Buffer:new(bufnr)
 end
 
 ---@class Bufferlist
----@field _nsid integer Namespace id for highlighting
----@field _app App Reference to the main app
----@field _bufnr integer Buffer number where buffers will be displayed
----@field _bufft string Buffer filetype
----@field _buffers table Buffer list (unfiltered)
----@field _show_unlisted boolean Show/hide unlisted buffers
----@field _filter_func function?
+---@field nsid integer Namespace id for highlighting
+---@field bufft string Buffer filetype
+---@field config table Gloabl config
+---@field context Context Info about the current buffer/window
+---@field window Window The main popup window
+---@field bufnr integer Where jumps will be displayed
+---@field buffers table Buffer list
+---@field show_unlisted boolean Show/hide unlisted buffers
+---@field filter_func function?
 local Bufferlist = {}
 Bufferlist.__index = Bufferlist
 
 --- Return a new Bufferlist instance
----@param app App
+---@param config table
 ---@param filter_func function?
 ---@return Bufferlist
-function Bufferlist:new(app, filter_func)
+function Bufferlist:new(config, filter_func)
 	local buffers = {}
 	setmetatable(buffers, Bufferlist)
-	buffers._nsid = vim.api.nvim_create_namespace("__vessel__")
-	buffers._app = app
-	buffers._bufft = "bufferlist"
-	buffers._bufnr = -1
-	buffers._buffers = {}
-	buffers._show_unlisted = false
-	buffers._filter_func = filter_func
+	buffers.nsid = vim.api.nvim_create_namespace("__vessel__")
+	buffers.bufft = "bufferlist"
+	buffers.config = config
+	buffers.context = Context:new()
+	buffers.window = Window:new(config, buffers.context)
+	buffers.bufnr = -1
+	buffers.buffers = {}
+	buffers.show_unlisted = false
+	buffers.filter_func = filter_func
 	return buffers
 end
 
 --- Initialize Bufferlist
 ---@return Bufferlist
 function Bufferlist:init()
-	self._buffers = self:_get_buffers()
+	self.buffers = self:_get_buffers()
 	return self
 end
 
 --- Open the window and render the content
 function Bufferlist:open()
 	self:init()
-	local ok
-	self._bufnr, ok = self._app:open_window(self)
+	local bufnr, ok = self.window:open(#self.buffers, false)
 	if ok then
-		vim.fn.setbufvar(self._bufnr, "&filetype", self._bufft)
+		self.bufnr = bufnr
+		vim.fn.setbufvar(bufnr, "&filetype", self.bufft)
 		vim.cmd("doau User VesselBufferlistEnter")
 		self:_set_cursor(self:_render())
 	end
-end
-
---- Return total buffers count
----@return integer, integer
-function Bufferlist:get_count()
-	return #self._buffers, 1
 end
 
 --- Return pinned buffer list
@@ -97,7 +97,7 @@ function Bufferlist:get_pinned_next(bufnr)
 		if nr == bufnr then
 			local index = i + 1
 			if index > #Pinned then
-				if not self._app.config.buffers.wrap_around then
+				if not self.config.buffers.wrap_around then
 					return
 				else
 					index = 1
@@ -116,7 +116,7 @@ function Bufferlist:get_pinned_prev(bufnr)
 		if nr == bufnr then
 			local index = i - 1
 			if index < 1 then
-				if not self._app.config.buffers.wrap_around then
+				if not self.config.buffers.wrap_around then
 					return
 				else
 					index = #Pinned
@@ -141,7 +141,7 @@ end
 
 --- Close the buffer list window
 function Bufferlist:_action_close()
-	self._app:_close_window()
+	self.window:_close_window()
 end
 
 --- Edit the buffer under cursor
@@ -174,7 +174,7 @@ function Bufferlist:_action_edit(map, mode, line)
 	end
 
 	if vim.fn.isdirectory(selected.path) == 1 then
-		self._app.config.buffers.directory_handler(selected.path, self._app.context)
+		self.config.buffers.directory_handler(selected.path, self.context)
 		return
 	elseif vim.fn.buflisted(selected.nr) == 1 then
 		vim.cmd("buffer " .. selected.nr)
@@ -184,12 +184,12 @@ function Bufferlist:_action_edit(map, mode, line)
 		vim.cmd("edit " .. vim.fn.fnameescape(selected.path))
 	end
 
-	if self._app.config.jump_callback then
-		self._app.config.jump_callback(mode, self._app.context)
+	if self.config.jump_callback then
+		self.config.jump_callback(mode, self.context)
 	end
 
-	if self._app.config.highlight_on_jump then
-		util.cursorline(self._app.config.highlight_timeout)
+	if self.config.highlight_on_jump then
+		util.cursorline(self.config.highlight_timeout)
 	end
 end
 
@@ -316,7 +316,7 @@ function Bufferlist:_action_cycle_sort(map)
 	if not selected then
 		return
 	end
-	local funcs = self._app.config.buffers.sort_buffers
+	local funcs = self.config.buffers.sort_buffers
 	local index = 1
 	for i = 1, #funcs do
 		-- Sort_func is module-local
@@ -335,53 +335,53 @@ end
 --- Setup mappings for the buffer list window
 ---@param map table
 function Bufferlist:_setup_mappings(map)
-	util.keymap("n", self._app.config.buffers.mappings.close, function()
+	util.keymap("n", self.config.buffers.mappings.close, function()
 		self:_action_close()
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.cycle_sort, function()
+	util.keymap("n", self.config.buffers.mappings.cycle_sort, function()
 		self:_action_cycle_sort(map)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.toggle_unlisted, function()
+	util.keymap("n", self.config.buffers.mappings.toggle_unlisted, function()
 		self:_action_toggle_unlisted(map)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.pin_increment, function()
+	util.keymap("n", self.config.buffers.mappings.pin_increment, function()
 		self:_action_increment_pin_pos(map, 1)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.pin_decrement, function()
+	util.keymap("n", self.config.buffers.mappings.pin_decrement, function()
 		self:_action_increment_pin_pos(map, -1)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.toggle_pin, function()
+	util.keymap("n", self.config.buffers.mappings.toggle_pin, function()
 		self:_action_toggle_pin(map)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.add_directory, function()
+	util.keymap("n", self.config.buffers.mappings.add_directory, function()
 		self:_action_add_directory(map)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.delete, function()
+	util.keymap("n", self.config.buffers.mappings.delete, function()
 		self:_action_delete(map, "bdelete", false)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.force_delete, function()
+	util.keymap("n", self.config.buffers.mappings.force_delete, function()
 		self:_action_delete(map, "bdelete", true)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.wipe, function()
+	util.keymap("n", self.config.buffers.mappings.wipe, function()
 		self:_action_delete(map, "bwipe", false)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.force_wipe, function()
+	util.keymap("n", self.config.buffers.mappings.force_wipe, function()
 		self:_action_delete(map, "bwipe", true)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.edit, function()
+	util.keymap("n", self.config.buffers.mappings.edit, function()
 		self:_action_edit(map, util.modes.BUFFER)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.tab, function()
+	util.keymap("n", self.config.buffers.mappings.tab, function()
 		self:_action_edit(map, util.modes.TAB)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.split, function()
+	util.keymap("n", self.config.buffers.mappings.split, function()
 		self:_action_edit(map, util.modes.SPLIT)
 	end)
-	util.keymap("n", self._app.config.buffers.mappings.vsplit, function()
+	util.keymap("n", self.config.buffers.mappings.vsplit, function()
 		self:_action_edit(map, util.modes.VSPLIT)
 	end)
 	-- quick edit for the 9 buffers at the top of the list
-	if self._app.config.buffers.quickjump then
+	if self.config.buffers.quickjump then
 		for i = 1, 9 do
 			util.keymap("n", tostring(i), function()
 				self:_action_edit(map, util.modes.BUFFER, i)
@@ -412,7 +412,7 @@ function Bufferlist:_get_buffers()
 		buffer.listed = vim.fn.buflisted(bufnr) == 1
 		buffer.pinpos = pinpos[bufnr] or -1
 
-		if self:_filter(buffer, self._app.context) then
+		if self:_filter(buffer, self.context) then
 			table.insert(buffers, buffer)
 		end
 
@@ -427,7 +427,7 @@ end
 ---@param context Context
 ---@return boolean
 function Bufferlist:_filter(buffer, context)
-	if self._filter_func and not self._filter_func(buffer, context) then
+	if self.filter_func and not self.filter_func(buffer, context) then
 		return false
 	end
 	return true
@@ -439,7 +439,7 @@ end
 function Bufferlist:_set_cursor(map)
 	vim.fn.cursor(1, 1)
 	for line, buffer in pairs(map or {}) do
-		if buffer.path == self._app.context.bufpath then
+		if buffer.path == self.context.bufpath then
 			vim.fn.cursor(line, 1)
 			break
 		end
@@ -456,46 +456,58 @@ function Bufferlist:_refresh()
 	return map
 end
 
+--- Get metadata table
+---@param buffers Bufferlist
+---@return table
+local function _get_meta(buffers)
+	local meta = {
+		max_basename = 0,
+		pinned_count = #Pinned,
+		-- Maps each path to its shortest unique suffix
+		suffixes = {},
+		max_suffix = 0,
+	}
+
+	local paths = {}
+	for _, buffer in pairs(buffers) do
+		table.insert(paths, buffer.path)
+		local basename_len = #vim.fs.basename(buffer.path)
+		if not meta.max_basename or basename_len > meta.max_basename then
+			meta.max_basename = basename_len
+		end
+	end
+
+	meta.suffixes = util.unique_suffixes(paths)
+	for _, suffix in pairs(meta.suffixes) do
+		local suffix_len = vim.fn.strchars(suffix)
+		if not meta.max_suffix or suffix_len > meta.max_suffix then
+			meta.max_suffix = suffix_len
+		end
+	end
+
+	return meta
+end
+
 --- Render the buffer list in the given buffer
 ---@return table Table Maps each line to the buffer displayed on it
 function Bufferlist:_render()
-	vim.fn.setbufvar(self._bufnr, "&modifiable", 1)
-	vim.cmd('sil! keepj norm! gg"_dG')
-	vim.api.nvim_buf_clear_namespace(self._bufnr, self._nsid, 1, -1)
+	vim.fn.setbufvar(self.bufnr, "&modifiable", 1)
+	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
+	vim.api.nvim_buf_clear_namespace(self.bufnr, self.nsid, 1, -1)
 
-	if #self._buffers == 0 then
-		vim.fn.setbufline(self._bufnr, 1, self._app.config.buffers.not_found)
-		vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
+	if #self.buffers == 0 then
+		vim.fn.setbufline(self.bufnr, 1, self.config.buffers.not_found)
+		vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
 		self:_setup_mappings({})
-		util.fit_content(self._app.config.window.max_height)
-		self._app:_set_buffer_data({})
+		util.fit_content(self.config.window.max_height)
+		self.window:_set_buffer_data({})
 		vim.cmd("doau User VesselBufferlistChanged")
 		return {}
 	end
 
 	local map = {}
-	local max_suffix
-	local max_basename
-	local pinned_count = #Pinned
-	local buf_formatter = self._app.config.buffers.formatters.buffer
-
-	local paths = {}
-	for _, buffer in pairs(self._buffers) do
-		table.insert(paths, buffer.path)
-		local basename_len = #vim.fs.basename(buffer.path)
-		if not max_basename or basename_len > max_basename then
-			max_basename = basename_len
-		end
-	end
-
-	-- find for each path the shortest unique suffix
-	local suffixes = util.unique_suffixes(paths)
-	for _, suffix in pairs(suffixes) do
-		local suffix_len = vim.fn.strchars(suffix)
-		if not max_suffix or suffix_len > max_suffix then
-			max_suffix = suffix_len
-		end
-	end
+	local formatter = self.config.buffers.formatters.buffer
+	local meta = _get_meta(self.buffers)
 
 	local _render = function(start, buffers)
 		local i = start
@@ -504,13 +516,8 @@ function Bufferlist:_render()
 				goto continue
 			end
 			i = i + 1
-			local ok, line, matches = pcall(buf_formatter, buffer, {
-				current_line = i,
-				max_basename = max_basename,
-				max_suffix = max_suffix,
-				pinned_count = pinned_count,
-				suffixes = suffixes,
-			}, self._app.context, self._app.config)
+			meta.current_line = i
+			local ok, line, matches = pcall(formatter, buffer, meta, self.context, self.config)
 			if not ok or not line then
 				local msg
 				if not line then
@@ -518,14 +525,14 @@ function Bufferlist:_render()
 				else
 					msg = string.gsub(tostring(line), "^.*:%s+", "")
 				end
-				self._app:_close_window()
+				self.window:_close_window()
 				logger.err("formatter error: %s", msg)
 				return {}
 			end
 			map[i] = buffer
-			vim.fn.setbufline(self._bufnr, i, line)
+			vim.fn.setbufline(self.bufnr, i, line)
 			if matches then
-				util.set_matches(matches, i, self._bufnr, self._nsid)
+				util.set_matches(matches, i, self.bufnr, self.nsid)
 			end
 			::continue::
 		end
@@ -534,7 +541,7 @@ function Bufferlist:_render()
 
 	local pinned = vim.tbl_filter(function(buffer)
 		return buffer.pinpos > 0
-	end, self._buffers)
+	end, self.buffers)
 
 	table.sort(pinned, function(a, b)
 		return a.pinpos < b.pinpos
@@ -542,14 +549,14 @@ function Bufferlist:_render()
 
 	local unpinned = vim.tbl_filter(function(buffer)
 		return buffer.pinpos < 0
-	end, self._buffers)
+	end, self.buffers)
 
 	local unpinned_listed = vim.tbl_filter(function(buffer)
 		return buffer.listed
 	end, unpinned)
 
-	local sort_func = Sort_func or self._app.config.buffers.sort_buffers[1]
-	local func, description = sort_func()
+	local sort_func = Sort_func or self.config.buffers.sort_buffers[1]
+	local func, _ = sort_func()
 	local ok, err = pcall(table.sort, unpinned, func)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
@@ -561,25 +568,25 @@ function Bufferlist:_render()
 	local i = _render(0, pinned)
 
 	-- render the separator
-	local separator = self._app.config.buffers.pin_separator
+	local separator = self.config.buffers.pin_separator
 	if i > 0 and separator ~= "" and #unpinned_listed > 0 then
 		i = i + 1
-		vim.fn.setbufline(self._bufnr, i, string.rep(separator, vim.fn.winwidth(0)))
+		vim.fn.setbufline(self.bufnr, i, string.rep(separator, vim.fn.winwidth(0)))
 		local match = {
-			hlgroup = self._app.config.buffers.highlights.pin_separator,
+			hlgroup = self.config.buffers.highlights.pin_separator,
 			startpos = 1,
 			endpos = -1,
 		}
-		util.set_matches({ match }, i, self._bufnr, self._nsid)
+		util.set_matches({ match }, i, self.bufnr, self.nsid)
 	end
 
 	-- render the rest of the buffers
 	_render(i, unpinned)
 
-	vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
+	vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
 	self:_setup_mappings(map)
-	util.fit_content(self._app.config.window.max_height)
-	self._app:_set_buffer_data(map)
+	util.fit_content(self.config.window.max_height)
+	self.window:_set_buffer_data(map)
 	vim.cmd("doau User VesselBufferlistChanged")
 
 	return map

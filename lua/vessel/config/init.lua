@@ -11,43 +11,6 @@ local validate = require("vessel.config.validate")
 
 local M = {}
 
---- Compute the 'height' of the popup
---- This function should return an estimate only. This is needed only for correct
---- positioning on the screen. The actual height will adjust to the content later
---- up to the max_height option
----@param list Marklist|Jumplist
----@return integer Number of lines
-local function popup_height(list, config)
-	local item_count, group_count = list:get_count()
-	local max_lines = item_count + group_count
-	local max = math.floor(vim.o.lines * config.window.max_height / 100)
-	return math.min(max_lines, max)
-end
-
---- Compute the 'width' of the popup window as a percentage of the nvim window
----@return integer
-local function popup_width(config)
-	local ui = vim.api.nvim_list_uis()[1]
-	return math.floor(ui.width * (ui.width < 120 and 90 or 70) / 100)
-end
-
---- Compute the 'row' position for the popup
----@param width integer The width of the window
----@param height integer The height of the window
----@return integer
-local function popup_row(width, height)
-	return math.floor((vim.o.lines / 2) - ((height + 2) / 2)) - 1
-end
-
---- Compute the 'col' position for the popup
----@param width integer The width of the window
----@param height integer The height of the window
----@return integer
-local function popup_col(width, height)
-	local ui = vim.api.nvim_list_uis()[1]
-	return math.floor((ui.width / 2) - (width / 2))
-end
-
 --- Callback function executed after each jump
 ---@param mode string
 ---@param context Context
@@ -95,20 +58,21 @@ local _opt = {
 
 	--- floating window-related options
 	window = {
-		max_height = 80, -- % of the vim ui
+		gravity = "center",
+		preview_gravity = "center",
+		min_preview_height = 25, -- lines
+		max_height = 75, -- % of the vim ui
 		cursorline = true,
 		number = false,
 		relativenumber = false,
 		--- same as :help api-floatwin
 		options = {
-			relative = "editor",
-			anchor = "NW",
 			style = "minimal",
 			border = "single",
-			width = popup_width,
-			height = popup_height,
-			row = popup_row,
-			col = popup_col,
+		},
+		preview = {
+			border = "single",
+			style = "minimal",
 		},
 	},
 
@@ -122,6 +86,7 @@ local _opt = {
 
 	--- marklist-related options
 	marks = {
+		preview = true,
 		locals = "abcdefghijklmnopqrstuvwxyz",
 		globals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 		sort_marks = { sorters.marks.by_lnum, sorters.marks.by_mark },
@@ -169,6 +134,7 @@ local _opt = {
 
 	--- jumplist-related options
 	jumps = {
+		preview = true,
 		real_positions = false,
 		strip_lines = false,
 		filter_empty_lines = true,

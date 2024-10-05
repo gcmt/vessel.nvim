@@ -236,4 +236,25 @@ function M.format(fmt, ...)
 	return ret, matches
 end
 
+--- Reset window
+---@param winid integer
+function M.reset_window(winid)
+	local wininfo = vim.fn.getwininfo(winid)
+	local bufnr = wininfo[1].bufnr
+	local winnr = wininfo[1].winnr
+	vim.fn.setbufvar(bufnr, "&buftype", "nofile")
+	vim.fn.setbufvar(bufnr, "&bufhidden", "delete")
+	vim.fn.setbufvar(bufnr, "&buflisted", 0)
+	vim.fn.setwinvar(winnr, "&cursorcolumn", 0)
+	vim.fn.setwinvar(winnr, "&colorcolumn", 0)
+	vim.fn.setwinvar(winnr, "&signcolumn", "no")
+	vim.fn.setwinvar(winnr, "&wrap", 0)
+	vim.fn.setwinvar(winnr, "&list", 0)
+	vim.fn.setwinvar(winnr, "&textwidth", 0)
+	vim.fn.setwinvar(winnr, "&undofile", 0)
+	vim.fn.setwinvar(winnr, "&backup", 0)
+	vim.fn.setwinvar(winnr, "&swapfile", 0)
+	vim.fn.setwinvar(winnr, "&spell", 0)
+end
+
 return M

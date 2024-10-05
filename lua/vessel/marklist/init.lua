@@ -1,5 +1,7 @@
 ---@module "marklist"
 
+local Context = require("vessel.context")
+local Window = require("vessel.window")
 local logger = require("vessel.logger")
 local util = require("vessel.util")
 
@@ -32,59 +34,63 @@ function Mark:new(letter)
 end
 
 ---@class Marklist
----@field _nsid integer
----@field _app App
----@field _marks table Marks grouped by file
----@field _bufnr integer
----@field _bufft string
----@field _filter_func function?
+---@field nsid integer Namespace id for highlighting
+---@field bufft string Buffer filetype
+---@field config table Gloabl config
+---@field context Context Info about the current buffer/window
+---@field window Window The main popup window
+---@field bufnr integer Buffer where marks will be displayed
+---@field marks table Marks grouped by file
+---@field filter_func function?
 local Marklist = {}
 Marklist.__index = Marklist
 
 --- Return a new Marklist instance
----@param app App
+---@param config table
 ---@param filter_func function?
 ---@return Marklist
-function Marklist:new(app, filter_func)
+function Marklist:new(config, filter_func)
 	local marks = {}
 	setmetatable(marks, Marklist)
-	marks._bufft = "marklist"
-	marks._nsid = vim.api.nvim_create_namespace("__vessel__")
-	marks._app = app
-	marks._marks = {}
-	marks._bufnr = -1
-	marks._filter_func = filter_func
+	marks.nsid = vim.api.nvim_create_namespace("__vessel__")
+	marks.bufft = "marklist"
+	marks.config = config
+	marks.context = Context:new()
+	marks.window = Window:new(config, marks.context)
+	marks.bufnr = -1
+	marks.marks = {}
+	marks.filter_func = filter_func
 	return marks
 end
 
 --- Initialize Markslist
 ---@return Marklist
 function Marklist:init()
-	self._marks = self:_get_marks(self._app.context.bufnr)
+	self.marks = self:_get_marks(self.context.bufnr)
 	return self
 end
 
 --- Open the window and render the content
 function Marklist:open()
 	self:init()
-	local ok
-	self._bufnr, ok = self._app:open_window(self)
+	local bufnr, ok = self.window:open(self:_get_count(), self.config.marks.preview)
 	if ok then
-		vim.fn.setbufvar(self._bufnr, "&filetype", self._bufft)
+		self.bufnr = bufnr
+		vim.fn.setbufvar(bufnr, "&filetype", self.bufft)
 		vim.cmd("doau User VesselMarklistEnter")
 		self:_set_cursor(self:_render())
 	end
 end
 
 --- Return total marks and groups count
----@return integer, integer
-function Marklist:get_count()
+---@return integer
+function Marklist:_get_count()
 	local marks_count, groups_count = 0, 0
-	for _, group in pairs(self._marks) do
+	for _, group in pairs(self.marks) do
 		groups_count = groups_count + 1
 		marks_count = marks_count + #group
 	end
-	return marks_count, groups_count
+	return marks_count + groups_count
 end
 
 --- Set a mark on the current line by choosing a letter automatically.
@@ -93,11 +99,11 @@ end
 ---@param global boolean Whether or not the mark should be global
 ---@return boolean
 function Marklist:set_mark(global)
-	local lnum = self._app.context.curpos[2]
-	local bufpath = self._app.context.bufpath
+	local lnum = self.context.curpos[2]
+	local bufpath = self.context.bufpath
 
 	local marks = {}
-	for _, group in pairs(self._marks) do
+	for _, group in pairs(self.marks) do
 		for _, m in pairs(group) do
 			marks[m.mark] = m
 		end
@@ -106,7 +112,7 @@ function Marklist:set_mark(global)
 	-- Check if the mark is already set on the current line and if so, delete it
 	for _, mark in pairs(marks) do
 		if mark.file == bufpath and mark.lnum == lnum then
-			if not self._app.config.marks.toggle_mark then
+			if not self.config.marks.toggle_mark then
 				logger.info('line "%s" already marked with [%s]', lnum, mark.mark)
 				return false
 			end
@@ -117,7 +123,7 @@ function Marklist:set_mark(global)
 	end
 
 	-- Mark the current line with the first available letter
-	local chars = global and self._app.config.marks.globals or self._app.config.marks.locals
+	local chars = global and self.config.marks.globals or self.config.marks.locals
 	for _, c in pairs(vim.split(chars, "")) do
 		if not marks[c] then
 			vim.cmd.mark(c)
@@ -164,7 +170,7 @@ end
 ---@param context Context
 ---@return boolean
 function Marklist:_filter(mark, context)
-	if self._filter_func and not self._filter_func(mark, context) then
+	if self.filter_func and not self.filter_func(mark, context) then
 		return false
 	end
 	return true
@@ -184,7 +190,7 @@ function Marklist:_get_marks(bufnr)
 		mark.loaded = true
 		if vim.fn.bufloaded(mark.file) == 0 then
 			-- If the buffer is in the buffer list, load it anyway
-			if not self._app.config.lazy_load_buffers or vim.fn.buflisted(mark.file) == 1 then
+			if not self.config.lazy_load_buffers or vim.fn.buflisted(mark.file) == 1 then
 				vim.fn.bufload(vim.fn.bufadd(mark.file))
 				mark.loaded = true
 			else
@@ -194,7 +200,7 @@ function Marklist:_get_marks(bufnr)
 		if mark.loaded then
 			mark.line = vim.fn.getbufoneline(mark.file, mark.lnum)
 		end
-		if self:_filter(mark, self._app.context) then
+		if self:_filter(mark, self.context) then
 			if not groups[mark.file] then
 				groups[mark.file] = {}
 			end
@@ -202,7 +208,7 @@ function Marklist:_get_marks(bufnr)
 		end
 	end
 
-	local sort_func = Sort_func or self._app.config.marks.sort_marks[1]
+	local sort_func = Sort_func or self.config.marks.sort_marks[1]
 	local func, description = sort_func()
 	local ok, err = pcall(sort_marks, groups, func)
 	if not ok then
@@ -221,7 +227,7 @@ end
 ---@param mark string
 ---@return boolean
 function Marklist:_mark_exists(mark)
-	for _, group in pairs(self._marks) do
+	for _, group in pairs(self.marks) do
 		for _, m in pairs(group) do
 			if m.mark == mark then
 				return true
@@ -258,7 +264,7 @@ function Marklist:_set_cursor(map)
 
 	local header_line, first_line
 	local closest_line, closest_distance
-	local bufpath = self._app.context.bufpath
+	local bufpath = self.context.bufpath
 
 	for i, item in pairs(map) do
 		if not header_line and type(item) == "string" and item == bufpath then
@@ -268,11 +274,11 @@ function Marklist:_set_cursor(map)
 				if not first_line then
 					first_line = i
 				end
-				local distance = math.abs(item.lnum - self._app.context.curpos[2])
+				local distance = math.abs(item.lnum - self.context.curpos[2])
 				if
 					not closest_distance
 					or distance < closest_distance
-						and distance < self._app.config.marks.proximity_threshold
+						and distance < self.config.marks.proximity_threshold
 				then
 					closest_line = i
 					closest_distance = distance
@@ -281,9 +287,9 @@ function Marklist:_set_cursor(map)
 		end
 	end
 
-	if closest_line and self._app.config.marks.move_to_closest_mark then
+	if closest_line and self.config.marks.move_to_closest_mark then
 		util.cursor(closest_line)
-	elseif first_line and self._app.config.marks.move_to_first_mark then
+	elseif first_line and self.config.marks.move_to_first_mark then
 		util.cursor(first_line)
 	elseif header_line then
 		util.cursor(header_line)
@@ -294,7 +300,7 @@ end
 
 --- Close the mark list window
 function Marklist:_action_close()
-	self._app:_close_window()
+	self.window:_close_window()
 end
 
 --- Jump to the mark on the current line
@@ -328,13 +334,13 @@ function Marklist:_action_jump(mode, map, keepjumps)
 			vim.cmd(keepj .. "edit " .. vim.fn.fnameescape(selected))
 		end
 	else
-		local type = self._app.config.marks.use_backtick and "`" or "'"
+		local type = self.config.marks.use_backtick and "`" or "'"
 		vim.cmd(keepj .. "norm! " .. type .. selected.mark)
-		if self._app.config.jump_callback then
-			self._app.config.jump_callback(mode, self._app.context)
+		if self.config.jump_callback then
+			self.config.jump_callback(mode, self.context)
 		end
-		if self._app.config.highlight_on_jump then
-			util.cursorline(self._app.config.highlight_timeout)
+		if self.config.highlight_on_jump then
+			util.cursorline(self.config.highlight_timeout)
 		end
 	end
 end
@@ -348,7 +354,7 @@ function Marklist:_action_delete(map)
 	end
 
 	local delmark = function(mark)
-		vim.fn.win_execute(self._app.context.wininfo.winid, "delmarks " .. mark)
+		vim.fn.win_execute(self.context.wininfo.winid, "delmarks " .. mark)
 	end
 
 	if type(selected) == "string" then
@@ -386,7 +392,7 @@ end
 function Marklist:_action_passthrough(mapping)
 	self:_action_close()
 	local cmd = string.format('execute "normal! %s%s"', vim.v.count1, mapping)
-	vim.fn.win_execute(self._app.context.wininfo.winid, cmd)
+	vim.fn.win_execute(self.context.wininfo.winid, cmd)
 end
 
 --- Allow jumping to marks with the classic '
@@ -420,11 +426,11 @@ function Marklist:_action_change_mark(map, mark)
 	end
 	if selected.loaded then
 		local mark_bufnr = vim.fn.bufnr(selected.file)
-		if string.match(mark, "%l") and mark_bufnr ~= self._app.context.bufnr then
+		if string.match(mark, "%l") and mark_bufnr ~= self.context.bufnr then
 			logger.err("local marks can be set only for the current buffer")
 			return
 		end
-		vim.fn.win_execute(self._app.context.wininfo.winid, "delmarks " .. selected.mark)
+		vim.fn.win_execute(self.context.wininfo.winid, "delmarks " .. selected.mark)
 		vim.api.nvim_buf_set_mark(mark_bufnr, mark, selected.lnum, selected.col, {})
 		local newmap = self:_refresh()
 		self:_follow_selected(Mark:new(mark), newmap)
@@ -441,7 +447,7 @@ function Marklist:_action_cycle_sort(map)
 		return
 	end
 
-	local funcs = self._app.config.marks.sort_marks
+	local funcs = self.config.marks.sort_marks
 	local index = 1
 	for i = 1, #funcs do
 		if Sort_func == funcs[i] then
@@ -458,47 +464,47 @@ end
 --- Setup mappings for the mark window
 ---@param map table
 function Marklist:_setup_mappings(map)
-	util.keymap("n", self._app.config.marks.mappings.cycle_sort, function()
+	util.keymap("n", self.config.marks.mappings.cycle_sort, function()
 		self:_action_cycle_sort(map)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.close, function()
+	util.keymap("n", self.config.marks.mappings.close, function()
 		self:_action_close()
 	end)
-	util.keymap("n", self._app.config.marks.mappings.delete, function()
+	util.keymap("n", self.config.marks.mappings.delete, function()
 		self:_action_delete(map)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.next_group, function()
+	util.keymap("n", self.config.marks.mappings.next_group, function()
 		self:_action_next_group(map, false)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.prev_group, function()
+	util.keymap("n", self.config.marks.mappings.prev_group, function()
 		self:_action_next_group(map, true)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.jump, function()
+	util.keymap("n", self.config.marks.mappings.jump, function()
 		self:_action_jump(util.modes.BUFFER, map, false)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.keepj_jump, function()
+	util.keymap("n", self.config.marks.mappings.keepj_jump, function()
 		self:_action_jump(util.modes.BUFFER, map, true)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.tab, function()
+	util.keymap("n", self.config.marks.mappings.tab, function()
 		self:_action_jump(util.modes.TAB, map, false)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.keepj_tab, function()
+	util.keymap("n", self.config.marks.mappings.keepj_tab, function()
 		self:_action_jump(util.modes.TAB, map, true)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.split, function()
+	util.keymap("n", self.config.marks.mappings.split, function()
 		self:_action_jump(util.modes.SPLIT, map, false)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.keepj_split, function()
+	util.keymap("n", self.config.marks.mappings.keepj_split, function()
 		self:_action_jump(util.modes.SPLIT, map, true)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.vsplit, function()
+	util.keymap("n", self.config.marks.mappings.vsplit, function()
 		self:_action_jump(util.modes.VSPLIT, map, false)
 	end)
-	util.keymap("n", self._app.config.marks.mappings.keepj_vsplit, function()
+	util.keymap("n", self.config.marks.mappings.keepj_vsplit, function()
 		self:_action_jump(util.modes.VSPLIT, map, true)
 	end)
 
-	local marks = self._app.config.marks.globals .. self._app.config.marks.locals
+	local marks = self.config.marks.globals .. self.config.marks.locals
 	for _, mark in pairs(vim.split(marks, "")) do
 		util.keymap("n", "m" .. mark, function()
 			self:_action_change_mark(map, mark)
@@ -522,84 +528,101 @@ function Marklist:_refresh()
 	return map
 end
 
+--- Get metadata tables for all marka and each group
+---@param marks Marklist
+---@return table, table
+function Marklist:_get_meta(marks)
+	local meta = {
+		max_col = 0,
+		max_lnum = 0,
+		groups_count = 0,
+		--- Maps each path to max mark lnum inside the file
+		max_lnums = {},
+		-- Maps each path the its shortest unique suffix
+		suffixes = {},
+		max_suffix = 0,
+	}
+
+	local paths = {}
+	local groups_meta = {}
+
+	for path, group in pairs(self.marks) do
+		groups_meta[path] = {}
+		table.insert(paths, path)
+		meta.groups_count = meta.groups_count + 1
+		for _, mark in pairs(group) do
+			if not meta.max_lnum or mark.lnum > meta.max_lnum then
+				meta.max_lnum = mark.lnum
+			end
+			if not meta.max_col or mark.col > meta.max_col then
+				meta.max_col = mark.col
+			end
+			if not groups_meta[path].max_col or mark.col > groups_meta[path].max_col then
+				groups_meta[path].max_col = mark.col
+			end
+			if not groups_meta[path].max_lnum or mark.lnum > groups_meta[path].max_lnum then
+				groups_meta[path].max_lnum = mark.lnum
+			end
+			if not meta.max_lnums[mark.file] or mark.lnum > meta.max_lnums[mark.file] then
+				meta.max_lnums[mark.file] = mark.lnum
+			end
+		end
+	end
+
+	meta.suffixes = util.unique_suffixes(paths)
+	for _, suffix in pairs(meta.suffixes) do
+		local suffix_len = vim.fn.strchars(suffix)
+		if not meta.max_suffix or suffix_len > meta.max_suffix then
+			meta.max_suffix = suffix_len
+		end
+	end
+
+	return meta, groups_meta
+end
+
 --- Render the marks
 ---@return table Table mapping each line to the mark displayed on it
 function Marklist:_render()
-	vim.fn.setbufvar(self._bufnr, "&modifiable", 1)
-	-- Note: vim.fn.deletebufline(self._bufnr, 1, "$") produces an unwanted message
-	vim.cmd('sil! keepj norm! gg"_dG')
-	vim.api.nvim_buf_clear_namespace(self._bufnr, self._nsid, 1, -1)
+	vim.fn.setbufvar(self.bufnr, "&modifiable", 1)
+	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
+	vim.api.nvim_buf_clear_namespace(self.bufnr, self.nsid, 1, -1)
 
-	if next(self._marks) == nil then
-		vim.fn.setbufline(self._bufnr, 1, self._app.config.marks.not_found)
-		vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
+	if next(self.marks) == nil then
+		vim.fn.setbufline(self.bufnr, 1, self.config.marks.not_found)
+		vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
 		self:_setup_mappings({})
-		util.fit_content(self._app.config.window.max_height)
-		self._app:_set_buffer_data({})
+		util.fit_content(self.config.window.max_height)
+		self.window:_set_buffer_data({})
 		vim.cmd("doau User VesselMarklistChanged")
 		return {}
 	end
 
-	local paths = vim.tbl_keys(self._marks)
-	local ok, err = pcall(table.sort, paths, self._app.config.marks.sort_groups)
+	local paths = vim.tbl_keys(self.marks)
+	local ok, err = pcall(table.sort, paths, self.config.marks.sort_groups)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
 		logger.err("error while sorting groups: %s", msg)
-		self._app:_close_window()
+		self.window:_close_window()
 		return {}
-	end
-
-	local max_suffix
-	-- find for each path the shortest unique suffix
-	local suffixes = util.unique_suffixes(paths)
-
-	for _, suffix in pairs(suffixes) do
-		local suffix_len = vim.fn.strchars(suffix)
-		if not max_suffix or suffix_len > max_suffix then
-			max_suffix = suffix_len
-		end
-	end
-
-	local max_col
-	local max_lnum
-	local groups_max = {}
-	local groups_count = 0
-
-	for path, group in pairs(self._marks) do
-		groups_max[path] = {}
-		groups_count = groups_count + 1
-		for _, mark in pairs(group) do
-			if not max_lnum or mark.lnum > max_lnum then
-				max_lnum = mark.lnum
-			end
-			if not max_col or mark.col > max_col then
-				max_col = mark.col
-			end
-			if not groups_max[path].max_lnum or mark.lnum > groups_max[path].max_lnum then
-				groups_max[path].max_lnum = mark.lnum
-			end
-			if not groups_max[path].max_col or mark.col > groups_max[path].max_col then
-				groups_max[path].max_col = mark.col
-			end
-		end
 	end
 
 	local i = 0
 	local map = {}
+	local meta, groups_meta = self:_get_meta(self.marks)
 
-	local mark_formatter = self._app.config.marks.formatters.mark
-	local header_formatter = self._app.config.marks.formatters.header
+	local mark_formatter = self.config.marks.formatters.mark
+	local header_formatter = self.config.marks.formatters.header
 
 	for _, path in pairs(paths) do
-		local group = self._marks[path]
+		local group = self.marks[path]
 
 		local ok, line, matches = pcall(header_formatter, path, {
-			groups_count = groups_count,
-			suffixes = suffixes,
-			max_suffix = max_suffix,
-		}, self._app.context, self._app.config)
+			groups_count = meta.groups_count,
+			suffixes = meta.suffixes,
+			max_suffix = meta.max_suffix,
+		}, self.context, self.config)
 		if not ok then
-			self._app:_close_window()
+			self.window:_close_window()
 			local msg = string.gsub(tostring(line), "^.*:%s+", "")
 			logger.err("header formatter error: %s", msg)
 			return {}
@@ -607,9 +630,9 @@ function Marklist:_render()
 		if line then
 			i = i + 1
 			map[i] = path
-			vim.fn.setbufline(self._bufnr, i, line)
+			vim.fn.setbufline(self.bufnr, i, line)
 			if matches then
-				util.set_matches(matches, i, self._bufnr, self._nsid)
+				util.set_matches(matches, i, self.bufnr, self.nsid)
 			end
 		end
 
@@ -619,14 +642,14 @@ function Marklist:_render()
 			ok, line, matches = pcall(mark_formatter, mark, {
 				pos = k,
 				is_last = k == #group,
-				groups_count = groups_count,
-				max_lnum = max_lnum,
-				max_col = max_col,
-				max_group_lnum = groups_max[path].max_lnum,
-				max_group_col = groups_max[path].max_col,
-				suffixes = suffixes,
-				max_suffix = max_suffix,
-			}, self._app.context, self._app.config)
+				groups_count = meta.groups_count,
+				max_lnum = meta.max_lnum,
+				max_col = meta.max_col,
+				max_group_lnum = groups_meta[path].max_lnum,
+				max_group_col = groups_meta[path].max_col,
+				suffixes = meta.suffixes,
+				max_suffix = meta.max_suffix,
+			}, self.context, self.config)
 			if not ok or not line then
 				local msg
 				if not line then
@@ -634,25 +657,46 @@ function Marklist:_render()
 				else
 					msg = string.gsub(tostring(line), "^.*:%s+", "")
 				end
-				self._app:_close_window()
+				self.window:_close_window()
 				logger.err("formatter error: %s", msg)
 				return {}
 			end
 			i = i + 1
 			map[i] = mark
-			vim.fn.setbufline(self._bufnr, i, line)
+			vim.fn.setbufline(self.bufnr, i, line)
 			if matches then
-				util.set_matches(matches, i, self._bufnr, self._nsid)
+				util.set_matches(matches, i, self.bufnr, self.nsid)
 			end
 		end
 	end
 
-	vim.fn.setbufvar(self._bufnr, "&modifiable", 0)
+	vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
 
 	self:_setup_mappings(map)
-	util.fit_content(self._app.config.window.max_height)
-	self._app:_set_buffer_data(map)
+	util.fit_content(self.config.window.max_height)
+	self.window:_set_buffer_data(map)
 	vim.cmd("doau User VesselMarklistChanged")
+
+	if self.config.marks.preview then
+		-- Show the file under cursor content in the preview popup
+		local write_preview = self.window.preview:make_writer(meta.max_lnums)
+		local aug = vim.api.nvim_create_augroup("VesselPreview", { clear = true })
+		vim.api.nvim_create_autocmd("CursorMoved", {
+			desc = "Write to the preview window on every movement",
+			group = aug,
+			buffer = self.bufnr,
+			callback = function()
+				local mark = map[vim.fn.line(".")]
+				if mark then
+					if type(mark) == "table" then
+						write_preview(mark.file, mark.lnum)
+					else
+						write_preview(mark, 1)
+					end
+				end
+			end,
+		})
+	end
 
 	return map
 end

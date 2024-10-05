@@ -1,0 +1,96 @@
+---@module "preview"
+
+local util = require("vessel.util")
+
+---@class Preview
+---@field config table
+---@field buffer_name string
+---@field wininfo table
+---@field bufnr integer
+---@field winid integer
+local Preview = {}
+Preview.__index = Preview
+
+--- Create new Preview instance
+---@param config table
+---@return Preview
+function Preview:new(config)
+	local preview = {}
+	setmetatable(preview, Preview)
+	preview.buffer_name = "__vessel_preview__"
+	preview.config = config
+	preview.wininfo = {}
+	preview.bufnr = -1
+	preview.winid = -1
+	return preview
+end
+
+--- Create buffer for the preview window
+---@return integer
+function Preview:_create_buffer()
+	local bufnr = vim.fn.bufnr(self.buffer_name)
+	if bufnr == -1 then
+		bufnr = vim.api.nvim_create_buf(false, false)
+		vim.api.nvim_buf_set_name(bufnr, self.buffer_name)
+	end
+	return bufnr
+end
+
+--- Return options for the preview window
+---@return table
+function Preview:default_opts()
+	return vim.tbl_extend("force", self.config.window.preview, {
+		win = -1,
+		relative = "win",
+		anchor = "NW",
+	})
+end
+
+--- Return a function that can be used to read files into the preview buffer.
+---
+--- `max_lnums' maps each path to the max jump line inside that file.
+--- This is useful for optimizing the amount of lines read for each file.
+---
+---@param max_lnums table
+---@return function
+function Preview:make_writer(max_lnums)
+	local cache = {}
+	return function(path, lnum)
+		if not path then
+			vim.api.nvim_buf_set_lines(self.bufnr, 1, -1, false, {})
+			return
+		end
+		local lines
+		if cache[path] then
+			lines = cache[path]
+		else
+			local max_lnum = (max_lnums[path] or 1) + (self.wininfo.height * 2)
+			lines = vim.fn.readfile(path, max_lnum)
+			cache[path] = lines
+		end
+		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines)
+		vim.fn.win_execute(self.winid, lnum)
+		vim.fn.win_execute(self.winid, "norm! zz")
+	end
+end
+
+--- Open the preview window
+---@param opts table Preview window options
+---@return integer
+function Preview:open(opts)
+	self.bufnr = self:_create_buffer()
+	self.winid = vim.api.nvim_open_win(self.bufnr, false, opts)
+	self.wininfo = vim.fn.getwininfo(self.winid)[1]
+	util.reset_window(self.winid)
+	vim.api.nvim_set_option_value("cursorline", true, { win = self.winid })
+	vim.api.nvim_set_option_value("number", true, { win = self.winid })
+	return self.bufnr
+end
+
+--- Close the preview window
+function Preview:close()
+	pcall(vim.fn.win_execute, self.winid, "close")
+	pcall(vim.api.nvim_buf_delete, self.bufnr, {})
+end
+
+return Preview
