@@ -69,7 +69,11 @@ function Preview:make_writer(max_lnums)
 				lines = vim.fn.getbufline(path, 1, "$")
 			else
 				local max_lnum = (max_lnums[path] or 1) + (self.wininfo.height * 2)
-				lines = vim.fn.readfile(path, max_lnum)
+				if vim.fn.filereadable(path) == 1 then
+					lines = vim.fn.readfile(path, max_lnum)
+				else
+					lines = { "File does not exist: " .. path }
+				end
 				self._cache[path] = lines
 			end
 		end

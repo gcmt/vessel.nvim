@@ -122,6 +122,11 @@ function Jumplist:_action_jump(mode, map)
 		return
 	end
 
+	if vim.fn.filereadable(selected.bufpath) == 0 then
+		logger.err("file does not exist: %s", selected.bufpath)
+		return
+	end
+
 	self:_action_close()
 
 	if selected.relpos == 0 then

@@ -313,6 +313,11 @@ function Marklist:_action_jump(mode, map, keepjumps)
 		return
 	end
 
+	if type(selected) == "table" and vim.fn.filereadable(selected.file) == 0 then
+		logger.err("file does not exist: %s", selected.file)
+		return
+	end
+
 	self:_action_close()
 
 	local keepj = keepjumps and "keepj " or ""
@@ -335,7 +340,11 @@ function Marklist:_action_jump(mode, map, keepjumps)
 		end
 	else
 		local type = self.config.marks.use_backtick and "`" or "'"
-		vim.cmd(keepj .. "norm! " .. type .. selected.mark)
+		local ok, err = pcall(vim.cmd, keepj .. "norm! " .. type .. selected.mark)
+		if not ok then
+			logger.err(string.gsub(err, "^.*Vim%(%a+%):", ""))
+			return
+		end
 		if self.config.jump_callback then
 			self.config.jump_callback(mode, self.context)
 		end
