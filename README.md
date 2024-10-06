@@ -93,7 +93,7 @@ Calling the `setup` function is not required for using the plugin as internal `<
 | `<plug>(VesselPinnedNext)`  | Switch to the next buffer in the pinned list (relative to buffer `%`). See [Pinned Buffers](#pinned-buffers).     |
 | `<plug>(VesselPinnedPrev)`  | Switch to the previous buffer in the pinned list (relative to buffer `%`). See [Pinned Buffers](#pinned-buffers). |
 
-Both `<plug>(VesselPinnedNext)` and `<plug>(VesselPinnedPrev)` will fallback to respectively to the first and last buffer in the pinned list in case the current buffer is not in the pinned list as well. See also option [buffers.wrap_around](#bufferswrap_around).
+Both `<plug>(VesselPinnedNext)` and `<plug>(VesselPinnedPrev)` will fall back respectively to the first and last buffer in the pinned list in case the current buffer is not in the pinned list as well. See also option [buffers.wrap_around](#bufferswrap_around).
 
 > [!NOTE]
 > - A *normal buffer* is a buffer with the `buftype` option empty.
