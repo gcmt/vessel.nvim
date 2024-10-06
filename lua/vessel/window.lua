@@ -112,7 +112,10 @@ end
 ---@return integer
 function Window:fit_content()
 	local bufinfo = vim.fn.getbufinfo(self.bufnr)[1]
-	local size = self:_cap_height(bufinfo.linecount)
+	-- make sure window does not overflow at the bottom
+	-- necessary with many unlisted buffers
+	local row = vim.fn.getwininfo(self.winid)[1].winrow
+	local size = math.min(self:_cap_height(bufinfo.linecount), vim.o.lines - row - 3)
 	vim.fn.win_execute(self.winid, "resize " .. size)
 	return size
 end
