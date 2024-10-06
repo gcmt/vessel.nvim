@@ -121,7 +121,7 @@ nnoremap m, <plug>(VesselSetGlobalMark)
 
 ![Marklist](assets/marks_dark.png "Mark list preview.")
 
-By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. To change that, head over to the [configuration section](#mark-list-options) and look for the `sort_marks` option.
+By default the mark list window shows all global and local marks grouped by the file they belong to. By default, marks are sorted by line number. You can change the default sorting with the [marks.sort_marks](#markssort_marks) option.
 
 Once inside the window, the following mappings are available:
 
