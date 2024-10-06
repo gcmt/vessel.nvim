@@ -86,7 +86,13 @@ end
 --- Open the window and render the content
 function Bufferlist:open()
 	self:init()
-	local bufnr, ok = self.window:open(#self.buffers, false)
+	local listed = 0
+	for _, buf in pairs(self.buffers) do
+		if buf.listed then
+			listed = listed + 1
+		end
+	end
+	local bufnr, ok = self.window:open(math.max(listed, 1), false)
 	if ok then
 		self.bufnr = bufnr
 		vim.fn.setbufvar(bufnr, "&filetype", self.bufft)
