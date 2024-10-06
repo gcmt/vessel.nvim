@@ -206,8 +206,8 @@ Once inside the window, the following mappings are available:
 | `a`          | Toggle showing *unlisted* buffers (Buffers on which you executed `:bdelete`).                                                           |
 | `p`          | Pin/unpin the buffer under cursor.                                                                                                      |
 | `P`          | Add to the buffer list the directory of the the buffer under cursor. See also [directory handler](#buffersdirectory_handler).           |
-| `<c-k>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
-| `<c-j>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
+| `<c-x>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
+| `<c-a>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
 
 > [!NOTE]
 > Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
@@ -1295,7 +1295,7 @@ Move the buffer under cursor down in the *pinned list*. The buffer is pinned if 
 See also [Pinned Buffers](#pinned-buffers).
 
 ```lua
-vessel.opt.buffers.mappings.pin_increment = { "<c-j>" }
+vessel.opt.buffers.mappings.pin_increment = { "<c-a>" }
 ```
 
 #### buffers.mappings.pin_decrement
@@ -1308,7 +1308,7 @@ Move the buffer under cursor up in the *pinned list*. The buffer is pinned if no
 See also [Pinned Buffers](#pinned-buffers).
 
 ```lua
-vessel.opt.buffers.mappings.pin_decrement = { "<c-k>" }
+vessel.opt.buffers.mappings.pin_decrement = { "<c-x>" }
 ```
 
 #### buffers.mappings.toggle_unlisted
