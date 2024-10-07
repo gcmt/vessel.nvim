@@ -615,7 +615,7 @@ vessel.opt.preview.options.border = "single"
 Whether to position the preview popup on the right side or on the bottom side of the main popup window. Can be either `right` or `bottom`.
 
 ```lua
-vessel.opt.preview.posision = "right"
+vessel.opt.preview.position = "right"
 ```
 
 #### preview.width
