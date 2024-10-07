@@ -217,6 +217,10 @@ end
 ---@param show_preview boolean Whether to also open the preview window
 ---@return integer, boolean
 function Window:open(height, show_preview)
+	if height == 0 then
+		show_preview = false
+	end
+
 	local main_opts, prev_opts = self:_get_popup_options(height, show_preview)
 
 	self.bufnr = self:_create_buffer()

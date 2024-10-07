@@ -397,7 +397,9 @@ function Jumplist:_render()
 		self.window:_set_buffer_data({})
 		vim.cmd("doau User VesselJumplistChanged")
 		-- clear preview window
-		self.window.preview:make_writer({})()
+		if self.window.preview.bufnr ~= -1 then
+			self.window.preview:make_writer({})()
+		end
 		return {}
 	end
 
@@ -436,7 +438,7 @@ function Jumplist:_render()
 	self.window:_set_buffer_data(map)
 	vim.cmd("doau User VesselJumplistChanged")
 
-	if self.config.jumps.preview then
+	if self.window.preview.bufnr ~= -1 then
 		-- Show the file under cursor content in the preview popup
 		local write_preview = self.window.preview:make_writer(meta.max_lnums)
 		vim.api.nvim_create_autocmd("CursorMoved", {
