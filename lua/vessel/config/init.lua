@@ -46,6 +46,12 @@ local function autoload_filter(bufnr, bufpath)
 	return vim.startswith(bufpath, vim.fn.getcwd() .. "/")
 end
 
+--- Return the width of the popup
+---@return table
+local function popup_width()
+	return vim.o.columns < 120 and { 90, 90 } or { 75, 90 }
+end
+
 --- Default plugin options
 local _opt = {
 
@@ -58,7 +64,7 @@ local _opt = {
 
 	--- floating window options
 	window = {
-		width = { 75, 90 },
+		width = popup_width,
 		gravity = "center",
 		max_height = 75, -- % of the vim ui
 		cursorline = true,

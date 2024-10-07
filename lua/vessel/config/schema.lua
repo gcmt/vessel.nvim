@@ -61,7 +61,7 @@ return {
 	["jump_callback"] = { "function" },
 
 	["window"] = { "table" },
-	["window.width"] = listof("number", 2),
+	["window.width"] = { "table", "function" },
 	["window.gravity"] = oneof("center", "top"),
 	["window.max_height"] = { "number" },
 	["window.cursorline"] = { "boolean" },

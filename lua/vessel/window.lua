@@ -136,7 +136,8 @@ function Window:_get_popup_options(height, show_preview)
 	-- preview popup options
 	local prev = self.preview:default_opts()
 
-	local p1, p2 = unpack(self.config.window.width)
+	local width = self.config.window.width
+	local p1, p2 = unpack(type(width) == "table" and width or width())
 	main.width = floor(ui.width * p1 / 100)
 
 	if show_preview and preview_pos == "right" then

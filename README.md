@@ -593,11 +593,20 @@ vessel.opt.window.options.border = "single"
 
 #### window.width
 
-Width of the popup window as a percentage of the *Neovim* UI. The first value is the popup width with no side preview popup displayed, the second value is the total width of both the main popup and the preview popup when the latter is displayed to the right side of the main popup.
+Width of the popup window as a percentage of the *Neovim* UI. This can be either a function or a table with 2 numbers.
+
+The first value is the popup width with no side preview popup displayed, the second value is the total width of both the main popup and the preview popup when the latter is displayed on the right side of the main popup.
 
 ```lua
-vessel.opt.window.width = { 75, 90 }
+vessel.opt.window.width = <function>
 ```
+
+Below the default implementation:
+
+```lua
+function popup_width()
+  return vim.o.columns < 120 and { 90, 90 } or { 75, 90 }
+end
 
 ### Preview Window Options
 
