@@ -352,6 +352,7 @@ The `Buffer` object is `table` with the following keys:
 - `pinpos` Position in the pinned list. `-1` if buffer is not pinned.
 - `listed` Whether the buffer is listed (visible in the buffer list).
 - `isdirectory` Whether the buffer is a directory.
+- `filetype` Buffer file type.
 - `modified` Whether the buffer is modified/changed.
 - `changedtick` Number total changes made to the buffer.
 - `loaded` Whether the buffer is loaded.

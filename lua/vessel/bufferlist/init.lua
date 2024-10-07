@@ -15,6 +15,7 @@ local Pinned = {}
 ---@field nr integer Buffer number
 ---@field path string Buffer full path
 ---@field isdirectory boolean Whether the buffer is a directory
+---@field filetype string Buffer file type
 ---@field listed boolean Whether the buffer is listed
 ---@field modified boolean Whether the buffer is modified/changed
 ---@field changedtick integer Number total changes made to the buffer
@@ -38,6 +39,7 @@ function Buffer:new(bufnr)
 	buffer.changedtick = 0
 	buffer.loaded = false
 	buffer.isdirectory = false
+	buffer.filetype = ""
 	buffer.hidden = false
 	buffer.lastused = 0
 	buffer.pinpos = -1
@@ -435,6 +437,7 @@ function Bufferlist:_get_buffers()
 		buffer.lastused = b.lastused
 		buffer.isdirectory = vim.fn.isdirectory(b.name) == 1
 		buffer.pinpos = pinpos[b.bufnr] or -1
+		buffer.filetype = vim.api.nvim_get_option_value("filetype", { buf = b.bufnr })
 
 		if self:_filter(buffer, self.context) then
 			table.insert(buffers, buffer)
