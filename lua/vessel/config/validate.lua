@@ -14,7 +14,14 @@ function M.validate_option(schema_key, val, ignore_unknown)
 	if not ignore_unknown and schema[schema_key] == nil then
 		error(string.format("%s: unknown option", schema_key))
 	end
-	local ok, err = pcall(vim.validate, { [schema_key] = { val, unpack(schema[schema_key]) } })
+	local arg
+	local expected = schema[schema_key]
+	if type(expected[1]) == "function" then
+		arg = { val, unpack(expected) }
+	else
+		arg = { val, expected }
+	end
+	local ok, err = pcall(vim.validate, { [schema_key] = arg })
 	if not ok then
 		error(string.format("%s (%s)", err, val))
 	end
