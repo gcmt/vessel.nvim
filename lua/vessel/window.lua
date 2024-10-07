@@ -2,6 +2,7 @@
 
 local Preview = require("vessel.preview")
 local logger = require("vessel.logger")
+local schema = require("vessel.config.schema")
 local util = require("vessel.util")
 
 ---@class Window
@@ -136,8 +137,22 @@ function Window:_get_popup_options(height, show_preview)
 	-- preview popup options
 	local prev = self.preview:default_opts()
 
-	local width = self.config.window.width
-	local p1, p2 = unpack(type(width) == "table" and width or width())
+	local ok, width
+	if type(self.config.window.width) == "function" then
+		ok, width = pcall(self.config.window.width)
+		if not ok then
+			local msg = string.gsub(tostring(width), "^.-:%d+:%s+", "")
+			error("validation error: window.width: " .. msg)
+		end
+	else
+		width = self.config.window.width
+	end
+	local check, msg = unpack(schema.__listof("number", false, 2))
+	if not check(width) then
+		error("validation error: window.width: expected " .. msg)
+	end
+
+	local p1, p2 = unpack(width)
 	main.width = floor(ui.width * p1 / 100)
 
 	if show_preview and preview_pos == "right" then

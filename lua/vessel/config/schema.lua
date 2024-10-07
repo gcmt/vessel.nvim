@@ -54,6 +54,9 @@ end
 
 return {
 
+	__listof = listof,
+	__oneof = oneof,
+
 	["verbosity"] = oneof(0, 1, 2, 3, 4, 5),
 	["lazy_load_buffers"] = { "boolean" },
 	["highlight_on_jump"] = { "boolean" },
