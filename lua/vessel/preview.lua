@@ -83,6 +83,13 @@ function Preview:make_writer(max_lnums)
 	end
 end
 
+---Setup window options
+function Preview:setup_window()
+	util.reset_window(self.winid)
+	vim.api.nvim_set_option_value("cursorline", true, { win = self.winid })
+	vim.api.nvim_set_option_value("number", true, { win = self.winid })
+end
+
 --- Open the preview window
 ---@param opts table Preview window options
 ---@return integer
@@ -90,9 +97,6 @@ function Preview:open(opts)
 	self.bufnr = self:_create_buffer()
 	self.winid = vim.api.nvim_open_win(self.bufnr, false, opts)
 	self.wininfo = vim.fn.getwininfo(self.winid)[1]
-	util.reset_window(self.winid)
-	vim.api.nvim_set_option_value("cursorline", true, { win = self.winid })
-	vim.api.nvim_set_option_value("number", true, { win = self.winid })
 	return self.bufnr
 end
 

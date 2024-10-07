@@ -61,7 +61,7 @@ return {
 	["jump_callback"] = { "function" },
 
 	["window"] = { "table" },
-	["window.width"] = { "number", "function" },
+	["window.width"] = listof("number", 2),
 	["window.gravity"] = oneof("center", "top"),
 	["window.max_height"] = { "number" },
 	["window.cursorline"] = { "boolean" },
@@ -72,7 +72,9 @@ return {
 	["window.options.border"] = { "string" },
 
 	["preview"] = { "table" },
+	["preview.position"] = oneof("right", "bottom"),
 	["preview.width"] = { "number" },
+	["preview.width_threshold"] = { "number" },
 	["preview.min_height"] = { "number" },
 	["preview.options"] = { "table" },
 	["preview.options.style"] = { "string" },

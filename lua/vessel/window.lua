@@ -11,8 +11,6 @@ local util = require("vessel.util")
 ---@field context Context
 ---@field bufnr integer
 ---@field winid integer
----@field preview_bufnr integer
----@field preview_winid integer
 local Window = {}
 Window.__index = Window
 
@@ -30,8 +28,6 @@ function Window:new(config, context)
 	win.preview = Preview:new(config)
 	win.bufnr = -1
 	win.winid = -1
-	win.preview_bufnr = -1
-	win.preview_winid = -1
 	return win
 end
 
@@ -56,16 +52,17 @@ function Window:_close_window()
 end
 
 --- Setup the buffer by setting sensible options
----@param winid integer
-function Window:_setup_window(winid)
-	util.reset_window(winid)
-	local wininfo = vim.fn.getwininfo(winid)
+function Window:_setup_window()
+	util.reset_window(self.winid)
+	local wininfo = vim.fn.getwininfo(self.winid)
 	local bufnr = wininfo[1].bufnr
 	local winnr = wininfo[1].winnr
 	vim.fn.setwinvar(winnr, "&cursorline", self.config.window.cursorline)
 	vim.fn.setwinvar(winnr, "&number", self.config.window.number)
 	vim.fn.setwinvar(winnr, "&relativenumber", self.config.window.relativenumber)
+	local aug = vim.api.nvim_create_augroup("VesselPopup", { clear = true })
 	vim.api.nvim_create_autocmd("BufLeave", {
+		group = aug,
 		desc = "Close the window when switching to another buffer",
 		buffer = bufnr,
 		callback = function()
@@ -109,39 +106,52 @@ end
 
 --- Resize the current window height to fit its content,
 --- up to max_height % of the total lines
----@return integer
 function Window:fit_content()
+	local has_preview = self.preview.winid ~= -1
 	local bufinfo = vim.fn.getbufinfo(self.bufnr)[1]
-	-- make sure window does not overflow at the bottom
-	-- necessary with many unlisted buffers
-	local row = vim.fn.getwininfo(self.winid)[1].winrow
-	local size = math.min(self:_cap_height(bufinfo.linecount), vim.o.lines - row - 3)
-	vim.fn.win_execute(self.winid, "resize " .. size)
-	return size
+	local main_opts, prev_opts = self:_get_popup_options(bufinfo.linecount, has_preview)
+	vim.api.nvim_win_set_config(self.winid, main_opts)
+	self:_setup_window()
+	if has_preview then
+		vim.api.nvim_win_set_config(self.preview.winid, prev_opts)
+		self.preview:setup_window()
+	end
 end
 
 --- Compute options for both main and preview window
----@param est_height integer
+---@param height integer
 ---@param show_preview boolean
 ---@return table, table
-function Window:_get_popup_options(est_height, show_preview)
+function Window:_get_popup_options(height, show_preview)
 	local ui = vim.api.nvim_list_uis()[1]
 	local gravity = self.config.window.gravity
 	local min_preview_height = self.config.preview.min_height
+	local preview_pos = self.config.preview.position
 	local floor = math.floor
+	local min = math.min
+	local max = math.max
 
 	-- main popup options
 	local main = self:_default_opts()
 	-- preview popup options
 	local prev = self.preview:default_opts()
 
-	-- main popup width dependent on screen width
-	local width = self.config.window.width
-	local p = type(width) == "number" and width or width(show_preview)
-	main.width = floor(ui.width * p / 100)
+	local p1, p2 = unpack(self.config.window.width)
+	main.width = floor(ui.width * p1 / 100)
+
+	if show_preview and preview_pos == "right" then
+		main.width = floor(ui.width * p2 / 100)
+		local threshold = self.config.preview.width_threshold
+		-- move preview window at the bottom if main popup width < threshold
+		print("main width would be", (main.width * (100 - self.config.preview.width) / 100))
+		if (main.width * (100 - self.config.preview.width) / 100) < threshold then
+			preview_pos = "bottom"
+			main.width = floor(ui.width * p1 / 100)
+		end
+	end
 
 	-- main popup height
-	main.height = math.max(self:_cap_height(est_height), 1)
+	main.height = max(self:_cap_height(height), 1)
 
 	-- center the main popup horizontally
 	main.col = floor((ui.width / 2) - (main.width / 2))
@@ -158,51 +168,67 @@ function Window:_get_popup_options(est_height, show_preview)
 	end
 
 	if show_preview then
-		-- make preview popup half the total width
-		prev.width = floor(main.width * self.config.preview.width / 100)
-		-- make space for the preview
-		main.width = main.width - prev.width
-		-- move preview popup to the right side of the main popup
-		prev.col = main.width + 1
+		if preview_pos == "right" then
+			-- make preview popup half the total width
+			prev.width = floor(main.width * self.config.preview.width / 100)
+			-- make space for the preview
+			main.width = main.width - prev.width
+			-- move preview popup to the right side of the main popup
+			prev.col = main.width + 1
 
-		-- align both heights unless the main popup height is < preview.min_height
-		prev.height = math.max(min_preview_height, main.height)
+			-- align both heights unless the main popup height is < preview.min_height
+			prev.height = max(min_preview_height, main.height)
 
-		if gravity == "top" then
-			-- preview popup will have the top margin aligned to the main popup
-			prev.row = -1
-			-- consider the tallest window when centering vertically
-			main.row = floor((ui.height / 2) - ((prev.height + 2) / 2)) - 1
-		elseif gravity == "center" then
-			-- center the popups vertically indipendently
-			main.row = floor((ui.height / 2) - ((main.height + 2) / 2)) - 1
-			prev.row = floor((ui.height / 2) - ((prev.height + 2) / 2)) - 1
-			-- set offset (main.row is always >= prev.row)
-			prev.row = prev.row - main.row - 1
+			if gravity == "top" then
+				-- preview popup will have the top margin aligned to the main popup
+				prev.row = -1
+				-- consider the tallest window when centering vertically
+				main.row = floor((ui.height / 2) - ((prev.height + 2) / 2)) - 1
+			elseif gravity == "center" then
+				-- center the popups vertically indipendently
+				main.row = floor((ui.height / 2) - ((main.height + 2) / 2)) - 1
+				prev.row = floor((ui.height / 2) - ((prev.height + 2) / 2)) - 1
+				-- set offset (main.row is always >= prev.row)
+				prev.row = prev.row - main.row - 1
+			end
+		else
+			-- move popup at the bottom
+			prev.width = main.width
+			main.height = main.height
+			prev.height = min_preview_height
+			-- compute max available height for both popups combined
+			local max_height = self:_cap_height(main.height + prev.height)
+			-- center popup vertically in the screen
+			main.row = floor(((ui.height - 2) / 2) - ((max_height + 4) / 2))
+			-- make sure main popop takes at leat 50% of available space
+			main.height = min(main.height, floor(max_height * 50 / 100))
+			prev.height = max_height - main.height
+			prev.row = main.height + 1
+			prev.col = -1
 		end
 	end
 
+	prev.win = self.winid
 	return main, prev
 end
 
 --- Open the floating window
----@param est_height integer For centering the window
+---@param height integer For centering the window
 ---@param show_preview boolean Whether to also open the preview window
 ---@return integer, boolean
-function Window:open(est_height, show_preview)
-	local main_opts, prev_opts = self:_get_popup_options(est_height, show_preview)
+function Window:open(height, show_preview)
+	local main_opts, prev_opts = self:_get_popup_options(height, show_preview)
 
 	self.bufnr = self:_create_buffer()
 	if vim.fn.bufwinid(self.bufnr) == -1 then
 		self.winid = vim.api.nvim_open_win(self.bufnr, true, main_opts)
-		self:_setup_window(self.winid)
+		self:_setup_window()
 	else
 		logger.warn("window already open")
 		return self.bufnr, false
 	end
 
 	if show_preview then
-		prev_opts.win = self.winid
 		self.preview:open(prev_opts)
 	end
 

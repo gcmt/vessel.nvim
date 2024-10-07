@@ -593,23 +593,10 @@ vessel.opt.window.options.border = "single"
 
 #### window.width
 
-Width of the popup window as a percentage of the *Neovim* UI. Can be either be a number or a function. When a function, it must return a number that will be then used as a percentage.
+Width of the popup window as a percentage of the *Neovim* UI. The first value is the popup width with no side preview popup displayed, the second value is the total width of both the main popup and the preview popup when the latter is displayed to the right side of the main popup.
 
 ```lua
-vessel.opt.window.width = <function>
-```
-Below the default implementation:
-
-```lua
----@param preview_enabled boolean Whether the preview window is enabled
----@return integer Width as a percentage
-function popup_width(preview_enabled)
-  if preview_enabled then
-    return 90 -- 90% of the screen width when the preview is enabled
-  end
-    -- adjust width according to the available screen space
-  return vim.o.columns < 120 and 90 or 75
-end
+vessel.opt.window.width = { 75, 90 }
 ```
 
 ### Preview Window Options
@@ -623,6 +610,14 @@ vessel.opt.preview.options.style = "minimal"
 vessel.opt.preview.options.border = "single"
 ```
 
+#### preview.position
+
+Whether to position the preview popup on the right side or on the bottom side of the main popup window. Can be either `right` or `bottom`.
+
+```lua
+vessel.opt.preview.posision = "right"
+```
+
 #### preview.width
 
 Width of the preview window as a percentage of [window.width](#windowwidth).
@@ -631,12 +626,20 @@ Width of the preview window as a percentage of [window.width](#windowwidth).
 vessel.opt.preview.width = 50
 ```
 
+#### preview.width_threshold
+
+If the main popup width is less than *this* amount of columns, the preview popup is pushed to the bottom side of the main popup.
+
+```lua
+vessel.opt.preview.width_threshold = 80
+```
+
 #### preview.min_height
 
 Minimum height of the preview window, expressed in lines.
 
 ```lua
-vessel.opt.preview.min_height = 25
+vessel.opt.preview.min_height = 21
 ```
 
 ### Mark List Options
