@@ -143,7 +143,6 @@ function Window:_get_popup_options(height, show_preview)
 		main.width = floor(ui.width * p2 / 100)
 		local threshold = self.config.preview.width_threshold
 		-- move preview window at the bottom if main popup width < threshold
-		print("main width would be", (main.width * (100 - self.config.preview.width) / 100))
 		if (main.width * (100 - self.config.preview.width) / 100) < threshold then
 			preview_pos = "bottom"
 			main.width = floor(ui.width * p1 / 100)
