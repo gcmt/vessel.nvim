@@ -607,6 +607,7 @@ Below the default implementation:
 function popup_width()
   return vim.o.columns < 120 and { 90, 90 } or { 75, 90 }
 end
+```
 
 ### Preview Window Options
 
