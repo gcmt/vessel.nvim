@@ -103,6 +103,17 @@ function Jumplist:_action_close()
 	self.window:_close_window()
 end
 
+--- Execute post jump actions
+---@param mode integer
+function Jumplist:_post_jump_cb(mode)
+	if self.config.jump_callback then
+		self.config.jump_callback(mode, self.context)
+	end
+	if self.config.highlight_on_jump then
+		util.cursorline(self.config.highlight_timeout)
+	end
+end
+
 --- Jump to the jump entry on the current line
 ---@param mode integer
 ---@param map table
@@ -127,12 +138,7 @@ function Jumplist:_action_jump(mode, map)
 		vim.cmd(string.format('exec "norm! %s%s"', math.abs(selected.relpos), cmd))
 	end
 
-	if self.config.jump_callback then
-		self.config.jump_callback(mode, self.context)
-	end
-	if self.config.highlight_on_jump then
-		util.cursorline(self.config.highlight_timeout)
-	end
+	self:_post_jump_cb(mode)
 end
 
 --- Clear all jumps for the current window
@@ -191,6 +197,7 @@ function Jumplist:_action_passthrough(map, mapping)
 	self:_action_close()
 	local cmd = string.format('execute "normal! %s%s"', count, mapping)
 	vim.fn.win_execute(self.context.wininfo.winid, cmd)
+	self:_post_jump_cb(util.modes.BUFFER)
 end
 
 --- Setup mappings for the jumplist window

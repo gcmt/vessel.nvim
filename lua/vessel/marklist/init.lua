@@ -304,6 +304,17 @@ function Marklist:_set_cursor(map)
 	end
 end
 
+--- Execute post jump actions
+---@param mode integer
+function Marklist:_post_jump_cb(mode)
+	if self.config.jump_callback then
+		self.config.jump_callback(mode, self.context)
+	end
+	if self.config.highlight_on_jump then
+		util.cursorline(self.config.highlight_timeout)
+	end
+end
+
 --- Close the mark list window
 function Marklist:_action_close()
 	self.window:_close_window()
@@ -351,12 +362,7 @@ function Marklist:_action_jump(mode, map, keepjumps)
 			logger.err(string.gsub(err, "^.*Vim%(%a+%):", ""))
 			return
 		end
-		if self.config.jump_callback then
-			self.config.jump_callback(mode, self.context)
-		end
-		if self.config.highlight_on_jump then
-			util.cursorline(self.config.highlight_timeout)
-		end
+		self:_post_jump_cb(mode)
 	end
 end
 
@@ -408,6 +414,7 @@ function Marklist:_action_passthrough(mapping)
 	self:_action_close()
 	local cmd = string.format('execute "normal! %s%s"', vim.v.count1, mapping)
 	vim.fn.win_execute(self.context.wininfo.winid, cmd)
+	self:_post_jump_cb(util.modes.BUFFER)
 end
 
 --- Allow jumping to marks with the classic '
