@@ -29,7 +29,7 @@ Better ergonomics around *Neovim* **mark list**, **buffer list** and **jump list
   - [Autocommand Events](#autocommand-events)
 - [Configuration](#configuration)
   - [Options Validation](#options-validation)
-  - [Common Options](#generic-options)
+  - [Common Options](#common-options)
   - [Commands Options](#commands-options)
   - [Window Options](#window-options)
   - [Preview Window Options](#preview-window-options)
