@@ -1,6 +1,6 @@
 # vessel.nvim
 
-On a quest to bring better ergonomics around *Neovim* native lists. This plugin provides nicely formatted interactive windows to better manage the **mark list**, the **buffer list** and the **jump list**.
+Better ergonomics around *Neovim* **mark list**, **buffer list** and **jump list**.
 
 - Workflow still centered around native functionality.
 - Highly customizable look and feel thanks to custom formatters and an extensive range of options.
@@ -29,7 +29,7 @@ On a quest to bring better ergonomics around *Neovim* native lists. This plugin 
   - [Autocommand Events](#autocommand-events)
 - [Configuration](#configuration)
   - [Options Validation](#options-validation)
-  - [Generic Options](#generic-options)
+  - [Common Options](#generic-options)
   - [Commands Options](#commands-options)
   - [Window Options](#window-options)
   - [Preview Window Options](#preview-window-options)
@@ -193,7 +193,7 @@ Once inside the window, the following mappings are available:
 
 | Mapping      | Action                                                                                                                                  |
 |--------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| `q`, `<ESC>` | Close the floating window,                                                                                                              |
+| `q`, `<ESC>` | Close the floating window.                                                                                                              |
 | `l`, `<CR>`  | Edit the buffer under cursor. Takes a count.                                                                                            |
 | `t`          | Edit the buffer undeer cursor in a new tab.                                                                                             |
 | `s`          | Edit the buffer under cursor in a horizontal split.                                                                                     |
@@ -206,8 +206,8 @@ Once inside the window, the following mappings are available:
 | `a`          | Toggle showing *unlisted* buffers (Buffers on which you executed `:bdelete`).                                                           |
 | `p`          | Pin/unpin the buffer under cursor.                                                                                                      |
 | `P`          | Add to the buffer list the directory of the the buffer under cursor. See also [directory handler](#buffersdirectory_handler).           |
-| `<c-x>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
-| `<c-a>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
+| `<C-X>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
+| `<C-A>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
 
 > [!NOTE]
 > Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
@@ -471,7 +471,7 @@ end)
 
 Whether you use the `setup` function or set options via the `opt` interface, some basic *type* validation is alsways performed before options are actually being set. Specifically, if you decide to go the `opt` interface route, you should know that each option is validated the moment it is assigned. The moment you mistakenly try to assign a wrong value type to an option, you'll get a nice error message about what you need to fix, but everything will keep working and the option will retain its original value.
 
-### Generic Options
+### Common Options
 
 #### verbosity
 
@@ -502,7 +502,7 @@ vessel.opt.highlight_timeout = 250
 
 #### jump_callback
 
-Function executed after each jump. By default it just centers the cursor vertically unless `vim.o.jumpotion`s is set to "view".
+Function executed after each jump. By default it just centers the cursor vertically unless `vim.o.jumpotions` is set to "view".
 
 This function takes two parameters: [mode](#modes) and [context](#context-object).
 
@@ -577,7 +577,7 @@ vessel.opt.window.number = false
 
 #### window.relativenumber
 
-Enable/disable `relativenumber` *neovim* option in the popup window
+Enable/disable `relativenumber` *neovim* option in the popup window.
 
 ```lua
 vessel.opt.window.relativenumber = false
@@ -665,7 +665,7 @@ vessel.opt.marks.preview = true
 
 #### marks.locals and maks.globals
 
-The pool of marks the plugin chooses from when automatically picking the letter for you
+The pool of marks the plugin chooses from when automatically picking the letter for you.
 
 ```lua
 vessel.opt.marks.locals = "abcdefghijklmnopqrstuvwxyz"
