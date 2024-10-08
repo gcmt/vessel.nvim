@@ -37,7 +37,14 @@ local function ConfigProxy(path, node, wrapped)
 			logger.err("validation error: %s", string.gsub(tostring(err), "^.-:%d+:%s+", ""))
 			return
 		end
-		wrapped[key] = val
+		if type(val) == "table" and not vim.islist(val) then
+			-- handle assigning a table directly
+			for _key, _val in pairs(val) do
+				node[key][_key] = _val
+			end
+		else
+			wrapped[key] = val
+		end
 	end
 	setmetatable(proxy, meta)
 	return proxy

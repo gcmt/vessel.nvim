@@ -70,6 +70,7 @@ return {
 	["window.cursorline"] = { "boolean" },
 	["window.number"] = { "boolean" },
 	["window.relativenumber"] = { "boolean" },
+
 	["window.options"] = { "table" },
 	["window.options.style"] = { "string" },
 	["window.options.border"] = { "string" },
@@ -79,11 +80,13 @@ return {
 	["preview.width"] = { "number" },
 	["preview.width_threshold"] = { "number" },
 	["preview.min_height"] = { "number" },
+
 	["preview.options"] = { "table" },
 	["preview.options.style"] = { "string" },
 	["preview.options.border"] = { "string" },
 
 	["create_commands"] = { "boolean" },
+
 	["commands"] = { "table" },
 	["commands.view_marks"] = { "string" },
 	["commands.view_jumps"] = { "string" },
@@ -106,9 +109,11 @@ return {
 	["marks.show_colnr"] = { "boolean" },
 	["marks.strip_lines"] = { "boolean" },
 	["marks.path_style"] = oneof("full", "short", "relhome", "relcwd"),
+
 	["marks.formatters"] = { "table" },
 	["marks.formatters.mark"] = { "function" },
 	["marks.formatters.header"] = { "function" },
+
 	["marks.highlights"] = { "table" },
 	["marks.highlights.path"] = { "string" },
 	["marks.highlights.not_loaded"] = { "string" },
@@ -117,6 +122,7 @@ return {
 	["marks.highlights.lnum"] = { "string" },
 	["marks.highlights.col"] = { "string" },
 	["marks.highlights.line"] = { "string" },
+
 	["marks.mappings"] = { "table" },
 	["marks.mappings.close"] = listof("string"),
 	["marks.mappings.delete"] = listof("string"),
@@ -141,6 +147,7 @@ return {
 	["jumps.indicator"] = listof("string", false, 2),
 	["jumps.show_colnr"] = { "boolean" },
 	["jumps.autoload_filter"] = { "function" },
+
 	["jumps.mappings"] = { "table" },
 	["jumps.mappings.ctrl_o"] = { "string" },
 	["jumps.mappings.ctrl_i"] = { "string" },
@@ -150,8 +157,10 @@ return {
 	["jumps.mappings.load_buffer"] = listof("string"),
 	["jumps.mappings.load_all"] = listof("string"),
 	["jumps.mappings.load_cwd"] = listof("string"),
+
 	["jumps.formatters"] = { "table" },
 	["jumps.formatters.jump"] = { "function" },
+
 	["jumps.highlights"] = { "table" },
 	["jumps.highlights.indicator"] = { "string" },
 	["jumps.highlights.pos"] = { "string" },
@@ -162,6 +171,7 @@ return {
 	["jumps.highlights.line"] = { "string" },
 	["jumps.highlights.not_loaded"] = { "string" },
 
+	["buffers"] = { "table" },
 	["buffers.wrap_around"] = { "boolean" },
 	["buffers.not_found"] = { "string" },
 	["buffers.unnamed_label"] = { "string" },
@@ -174,6 +184,8 @@ return {
 	["buffers.bufname_style"] = oneof("basename", "unique", "hide"),
 	["buffers.bufpath_style"] = oneof("full", "short", "relhome", "relcwd", "hide"),
 	["buffers.directory_handler"] = { "function" },
+
+	["buffers.mappings"] = { "table" },
 	["buffers.mappings.cycle_sort"] = listof("string"),
 	["buffers.mappings.pin_increment"] = listof("string"),
 	["buffers.mappings.pin_decrement"] = listof("string"),
@@ -189,7 +201,11 @@ return {
 	["buffers.mappings.force_delete"] = listof("string"),
 	["buffers.mappings.wipe"] = listof("string"),
 	["buffers.mappings.force_wipe"] = listof("string"),
+
+	["buffers.formatters"] = { "table" },
 	["buffers.formatters.buffer"] = { "function" },
+
+	["buffers.highlights"] = { "table" },
 	["buffers.highlights.bufname"] = { "string" },
 	["buffers.highlights.bufpath"] = { "string" },
 	["buffers.highlights.unlisted"] = { "string" },
