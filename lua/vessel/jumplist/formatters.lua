@@ -44,17 +44,20 @@ function M.jump_formatter(jump, meta, context, config)
 	local path_fmt = "%-" .. meta.max_suffix .. "s"
 	local path = string.format(path_fmt, meta.suffixes[jump.bufpath])
 
-	local line
 	local line_hl
-	if not jump.loaded then
-		line = config.jumps.not_loaded .. util.prettify_path(jump.line)
-		line_hl = config.jumps.highlights.not_loaded
-	else
-		line = jump.line
-		line_hl = config.jumps.highlights.line
+	if jump.line then
 		if config.jumps.strip_lines then
-			line = string.gsub(line, "^%s+", "")
+			jump.line = string.gsub(jump.line, "^%s+", "")
 		end
+		line_hl = { jump.line, config.jumps.highlights.line }
+	else
+		if jump.err then
+			jump.err = "error: " .. string.gsub(jump.err, "^.*:%s+", "")
+		end
+		line_hl = {
+			jump.err or util.prettify_path(jump.bufpath),
+			config.jumps.highlights.not_loaded,
+		}
 	end
 
 	return util.format(
@@ -64,7 +67,7 @@ function M.jump_formatter(jump, meta, context, config)
 		{ path, config.jumps.highlights.path },
 		{ lnum, config.jumps.highlights.lnum },
 		{ col, config.jumps.highlights.col },
-		{ line, line_hl }
+		line_hl
 	)
 end
 

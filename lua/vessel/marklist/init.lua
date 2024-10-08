@@ -1,6 +1,7 @@
 ---@module "marklist"
 
 local Context = require("vessel.context")
+local FileStore = require("vessel.filestore")
 local Window = require("vessel.window")
 local logger = require("vessel.logger")
 local util = require("vessel.util")
@@ -12,10 +13,8 @@ local Sort_func
 ---@field mark string Mark letter
 ---@field lnum integer Mark line number
 ---@field col integer Mark column number
----@field line string Line on which the mark is positioned
+---@field line string? Line on which the mark is positioned
 ---@field file string File the mark belongs to
----@field loaded boolean Whether the file is actually loaded in memory
----@field valid boolean Whether the file is valid (file exists)
 ---@field err string? Why the mark is invalid
 local Mark = {}
 Mark.__index = Mark
@@ -29,10 +28,9 @@ function Mark:new(letter)
 	mark.mark = letter or ""
 	mark.lnum = 0
 	mark.col = 0
-	mark.line = ""
+	mark.line = nil
 	mark.file = ""
-	mark.loaded = false
-	mark.valid = false
+	mark.err = nil
 	return mark
 end
 
@@ -42,6 +40,7 @@ end
 ---@field config table Gloabl config
 ---@field context Context Info about the current buffer/window
 ---@field window Window The main popup window
+---@field filestore FileStore File cache
 ---@field bufnr integer Buffer where marks will be displayed
 ---@field marks table Marks grouped by file
 ---@field filter_func function?
@@ -60,6 +59,7 @@ function Marklist:new(config, filter_func)
 	marks.config = config
 	marks.context = Context:new()
 	marks.window = Window:new(config, marks.context)
+	marks.filestore = FileStore:new()
 	marks.bufnr = -1
 	marks.marks = {}
 	marks.filter_func = filter_func
@@ -184,35 +184,27 @@ end
 ---@param bufnr integer
 ---@return table
 function Marklist:_get_marks(bufnr)
-	local groups = {}
+	local max_lnums = {}
+	local marks = {}
 	for _, item in pairs(getmarklist(bufnr)) do
 		local mark = Mark:new(item.mark)
 		mark.lnum = item.pos[2]
 		mark.col = item.pos[3]
 		mark.file = item.file
-		mark.valid = true
-		mark.loaded = true
-		if vim.fn.filereadable(mark.file) == 0 then
-			mark.valid = false
-			mark.loaded = false
-			mark.err = "file does not exist"
-		elseif vim.fn.bufloaded(mark.file) == 0 then
-			-- If the buffer is in the buffer list, load it anyway
-			if not self.config.lazy_load_buffers or vim.fn.buflisted(mark.file) == 1 then
-				vim.fn.bufload(vim.fn.bufadd(mark.file))
-				mark.loaded = true
-			else
-				mark.loaded = false
-			end
+		table.insert(marks, mark)
+		-- calculate max lnum per file in order to load files for efficiently
+		if not max_lnums[mark.file] or mark.lnum > max_lnums[mark.file] then
+			max_lnums[mark.file] = mark.lnum + vim.o.lines
 		end
-		if mark.loaded then
-			local line = vim.fn.getbufline(mark.file, mark.lnum)
-			if #line == 0 then
-				mark.valid = false
-				mark.err = "line does not exist"
-			else
-				mark.line = line[1]
-			end
+	end
+
+	local groups = {}
+	for _, mark in pairs(marks) do
+		local lines, err = self.filestore:store(mark.file, max_lnums[mark.file])
+		if lines then
+			mark.line, mark.err = self.filestore:getline(mark.file, mark.lnum)
+		else
+			mark.err = err
 		end
 		if self:_filter(mark, self.context) then
 			if not groups[mark.file] then
@@ -327,8 +319,8 @@ function Marklist:_action_jump(mode, map, keepjumps)
 		return
 	end
 
-	if type(selected) == "table" and vim.fn.filereadable(selected.file) == 0 then
-		logger.err("file does not exist: %s", selected.file)
+	if selected.err then
+		logger.err(selected.err)
 		return
 	end
 
@@ -559,8 +551,6 @@ function Marklist:_get_meta(marks)
 		max_col = 0,
 		max_lnum = 0,
 		groups_count = 0,
-		--- Maps each path to max mark lnum inside the file
-		max_lnums = {},
 		-- Maps each path the its shortest unique suffix
 		suffixes = {},
 		max_suffix = 0,
@@ -585,9 +575,6 @@ function Marklist:_get_meta(marks)
 			end
 			if not groups_meta[path].max_lnum or mark.lnum > groups_meta[path].max_lnum then
 				groups_meta[path].max_lnum = mark.lnum
-			end
-			if not meta.max_lnums[mark.file] or mark.lnum > meta.max_lnums[mark.file] then
-				meta.max_lnums[mark.file] = mark.lnum
 			end
 		end
 	end
@@ -614,14 +601,17 @@ function Marklist:_render()
 	if next(self.marks) == nil then
 		vim.fn.setbufline(self.bufnr, 1, self.config.marks.not_found)
 		vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
+
 		self:_setup_mappings({})
 		self.window:fit_content()
 		self.window:_set_buffer_data({})
+
 		vim.cmd("doau User VesselMarklistChanged")
-		-- clear preview window
+
 		if self.window.preview.bufnr ~= -1 then
-			self.window.preview:make_writer({})()
+			self.window.preview:clear()
 		end
+
 		return {}
 	end
 
@@ -707,7 +697,6 @@ function Marklist:_render()
 
 	if self.window.preview.bufnr ~= -1 then
 		-- Show the file under cursor content in the preview popup
-		local write_preview = self.window.preview:make_writer(meta.max_lnums)
 		vim.api.nvim_create_autocmd("CursorMoved", {
 			desc = "Write to the preview window on every movement",
 			group = preview_aug,
@@ -715,11 +704,9 @@ function Marklist:_render()
 			callback = function()
 				local mark = map[vim.fn.line(".")]
 				if mark then
-					if type(mark) == "table" then
-						write_preview(mark.file, mark.lnum)
-					else
-						write_preview(mark, 1)
-					end
+					local file = type(mark) == "table" and mark.file or mark
+					local lnum = type(mark) == "table" and mark.lnum or 1
+					self.window.preview:show(self.filestore, file, lnum)
 				end
 			end,
 		})

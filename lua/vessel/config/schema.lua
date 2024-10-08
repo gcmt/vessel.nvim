@@ -1,5 +1,6 @@
 ---@module "schema"
 
+local logger = require("vessel.logger")
 local util = require("vessel.util")
 
 --- Check if a list contains only values of the given type
@@ -52,13 +53,23 @@ local function oneof(...)
 	return { fn, msg }
 end
 
+--- Pass validation but give message about deprecation
+local function deprecated(option)
+	return {
+		function(_)
+			logger.warn("option is deprecated: " .. option)
+			return true
+		end,
+	}
+end
+
 return {
 
 	__listof = listof,
 	__oneof = oneof,
 
 	["verbosity"] = oneof(0, 1, 2, 3, 4, 5),
-	["lazy_load_buffers"] = { "boolean" },
+	["lazy_load_buffers"] = deprecated("lazy_load_buffers"),
 	["highlight_on_jump"] = { "boolean" },
 	["highlight_timeout"] = { "number" },
 	["jump_callback"] = { "function" },
@@ -143,10 +154,10 @@ return {
 	["jumps.strip_lines"] = { "boolean" },
 	["jumps.filter_empty_lines"] = { "boolean" },
 	["jumps.not_found"] = { "string" },
-	["jumps.not_loaded"] = { "string" },
+	["jumps.not_loaded"] = deprecated("jumps.not_loaded"),
 	["jumps.indicator"] = listof("string", false, 2),
 	["jumps.show_colnr"] = { "boolean" },
-	["jumps.autoload_filter"] = { "function" },
+	["jumps.autoload_filter"] = deprecated("jumps.autoload_filter"),
 
 	["jumps.mappings"] = { "table" },
 	["jumps.mappings.ctrl_o"] = { "string" },
@@ -154,9 +165,9 @@ return {
 	["jumps.mappings.jump"] = listof("string"),
 	["jumps.mappings.close"] = listof("string"),
 	["jumps.mappings.clear"] = listof("string"),
-	["jumps.mappings.load_buffer"] = listof("string"),
-	["jumps.mappings.load_all"] = listof("string"),
-	["jumps.mappings.load_cwd"] = listof("string"),
+	["jumps.mappings.load_buffer"] = deprecated("jumps.mappings.load_buffer"),
+	["jumps.mappings.load_all"] = deprecated("jumps.mappings.load_all"),
+	["jumps.mappings.load_cwd"] = deprecated("jumps.mappings.load_cwd"),
 
 	["jumps.formatters"] = { "table" },
 	["jumps.formatters.jump"] = { "function" },

@@ -33,14 +33,6 @@ local function directory_handler(path, context)
 	vim.cmd("edit " .. vim.fn.fnameescape(path))
 end
 
---- Filter jump files from being autoloaded
----@param bufnr integer
----@param bufpath string
----@return boolean
-local function autoload_filter(bufnr, bufpath)
-	return vim.startswith(bufpath, vim.fn.getcwd() .. "/")
-end
-
 --- Return the width of the popup
 ---@return table
 local function popup_width()
@@ -150,7 +142,7 @@ return {
 		indicator = { " ", " " },
 		show_colnr = false,
 		not_loaded = "",
-		autoload_filter = autoload_filter,
+		autoload_filter = function() end,
 		mappings = {
 			ctrl_o = "<c-o>",
 			ctrl_i = "<c-i>",

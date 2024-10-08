@@ -143,9 +143,6 @@ Once inside the window, the following mappings are available:
 | `m{a-zA-Z}`  | Change the mark under cursor.                                                             |
 | `'{a-z-A-Z}` | Jump directly to a mark.
 
-> [!NOTE]
-> By default, lines cannot be displayed for files that are not loaded in memory and are not in the vim buffer list. You'll see the mark file path greyed out instead. To automatically load in memory all files for which marks exist, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false` (files will be automatically added to the buffer list).
-
 ### Jump List Window
 
 ![Jumplist](assets/jumps_dark.png "Jump list preview.")
@@ -161,19 +158,12 @@ Once inside the window, the following mappings are available:
 | `C`          | Clear the entire jump list.                                                                    |
 | `<C-O>`      | Move backwards in the jump list (towards the bottom).                                          |
 | `<C-I>`      | Move forward in the jump list (towards the top).                                               |
-| `r`          | Load the file under cursor in memory and add it to the buffer list.                            |
-| `R`          | Load all files in memory and add them to the buffer list.                                      |
-| `W`          | Load in memory all files inside the current working directory and add them to the buffer list. |
 
 > [!TIP]
 >  As a count to `<C-O>` and `<C-I>`, you can use the relative number displayed on the left column.
 
 > [!NOTE]
 > The relative positions you see by default on the left column are not the **real relative positions** you would use as a count outside the jump list window. This is because the list can be filtered and you could potentially see big gaps between these positions otherwise.
-
-#### Autoloading buffers
-
-By default, lines cannot be displayed for files that are not loaded in memory, that is, that are not in the buffer list. You'll see the jump file path greyed out insted. To automatically load in memory all files for which jumps exist and add them to the buffer list, you can set the [lazy_load_buffers](#lazy_load_buffers) option to `false`, or use the provided mappings `r`, `R` and `W` to load the files as necessary. If you decide to disable lazy loading, have also a look at the [jumps.autoload_filter](#jumpsautoload_filter) option as it might help limiting the files that get automatically loaded.
 
 ### Preview Window
 
@@ -325,9 +315,9 @@ The `Mark` object is `table` with the following keys:
 - `mark` Mark letter.
 - `lnum` Mark line number.
 - `col` Mark column number.
-- `line` Line on which the mark is positioned.
+- `line` Line on which the mark is positioned. Can be `nil` when the mark is invalid (`err` is not `nil`).
 - `file` File the mark belongs to.
-- `loaded` Whether the file is actually loaded in memory.
+- `err` The mark has an error. Usually when file cannot be read or line does not exist anymore.
 
 ### Jump Object
 
@@ -340,8 +330,8 @@ The `Jump` object is `table` with the following keys:
 - `bufpath` Buffer full path.
 - `lnum` Jump line number.
 - `col` Jump column number.
-- `line` Line on which the jump is positioned.
-- `loaded` Whether the file the jump refers to is loaded in memory.
+- `line` Line on which the jump is positioned. Can be `nil` when the mark is invalid (`err` is not `nil`).
+- `err` The jump has an error. Usually when file cannot be read or line does not exist anymore.
 
 ### Buffer Object
 
@@ -479,16 +469,6 @@ Control how much noisy the plugin is. One of `vim.log.levels`.
 
 ```lua
 vessel.opt.verbosity = vim.log.levels.INFO
-```
-
-#### lazy_load_buffers
-
- Some global marks or jumps might belong to files currently not loaded in memory. In this case the plugin can't retrieve the line content.
-
- Set this option to `false` to load in memory any such file as soon as you open the mark or jump list window.
-
-```lua
-vessel.opt.lazy_load_buffers = true
 ```
 
 #### highlight_on_jump, highlight_timeout
@@ -981,24 +961,6 @@ Message used when the jump list is empty.
 vessel.opt.jumps.not_found = "Jump list empty"
 ```
 
-#### jumps.not_loaded
-
-Label used as prefix for unloaded file paths.
-
-```lua
-vessel.opt.jumps.not_loaded = ""
-```
-
-#### jumps.autoload_filter
-
-This function comes into play when [lazy_load_buffers](#lazy_load_buffers) is set to `false`, that is, when the plugin is instructed to load all files automatically in memory. This functions limits the buffers that are actually going to be loaded. By default, anything that does not reside in the *current working directory* won't be loaded automatically (but will still be visible in the list with the path greyed out).
-
-```lua
-vessel.opt.jumps.not_loaded = function(bufnr, bufpath)
-  return vim.startswith(bufpath, vim.fn.getcwd() .. "/")
-end
-```
-
 #### jumps.indicator
 
 Prefix used for each formatted jump entry. First item is the line of the current position in the jump list.
@@ -1069,36 +1031,6 @@ Clear the jump list. Executes `:clearjumps`.
 vessel.opt.jumps.mappings.clear = { "C" }
 ```
 
-#### jumps.mappings.load_buffer
-
-Load the file under cursor in memory.
-
-Useful when [lazy_load_buffers](#lazy_load_buffers) is set to `true` and buffers are not automatically loaded in memory when there are jumps that refer to them.
-
-```lua
-vessel.opt.jumps.mappings.load_buffer = { "r" }
-```
-
-#### jumps.mappings.load_all
-
-Load all files in memory.
-
-Useful when [lazy_load_buffers](#lazy_load_buffers) is set to `true` and buffers are not automatically loaded in memory when there are jumps that refer to them.
-
-```lua
-vessel.opt.jumps.mappings.load_all = { "R" }
-```
-
-#### jumps.mappings.load_cwd
-
-Load in memory all files inside the current working directory.
-
-Useful when [lazy_load_buffers](#lazy_load_buffers) is set to `true` and buffers are not automatically loaded in memory when there are jumps that refer to them.
-
-```lua
-vessel.opt.jumps.mappings.load_cwd = { "W" }
-```
-
 #### jumps.highlights.*
 
 Highlight groups used by the default formatter.
@@ -1111,6 +1043,7 @@ vessel.opt.jumps.highlights.path = "Directory"
 vessel.opt.jumps.highlights.lnum = "LineNr"
 vessel.opt.jumps.highlights.col = "LineNr"
 vessel.opt.jumps.highlights.line = "Normal"
+vessel.opt.jumps.highlights.not_loaded = "Comment"
 ```
 
 ### Buffer List Options
@@ -1500,14 +1433,13 @@ vessel.opt.marks.formatters.mark = function(mark, meta, context, config)
   local lnum = string.format(lnum_fmt, mark.lnum)
 
   local line, line_hl
-  if mark.loaded then
+  if mark.line then
     -- strips leading white spaces from each line
     line = string.gsub(mark.line, "^%s+", "")
     line_hl = "Normal"
   else
-    -- If the file the mark belongs to is not loaded in memory,
-    -- display its path instead
-    line = util.prettify_path(mark.file)
+    -- if line is nil, it could mean the mark is invalid
+    line = mark.err or ""
     line_hl = "Comment"
   end
 

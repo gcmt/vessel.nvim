@@ -44,18 +44,20 @@ function M.mark_formatter(mark, meta, context, config)
 		col = " " .. string.format(col_fmt, mark.col)
 	end
 
-	local line = mark.line
-	if config.marks.strip_lines then
-		line = string.gsub(line, "^%s+", "")
-	end
-	local line_hl = { line, config.marks.highlights.line }
-	if not mark.valid or not mark.loaded then
-		if not mark.valid then
-			line = mark.err and "invalid: " .. mark.err or "invalid"
-		else
-			line = util.prettify_path(mark.file)
+	local line_hl
+	if mark.line then
+		if config.marks.strip_lines then
+			mark.line = string.gsub(mark.line, "^%s+", "")
 		end
-		line_hl = { line, config.marks.highlights.not_loaded }
+		line_hl = { mark.line, config.marks.highlights.line }
+	else
+		if mark.err then
+			mark.err = "error: " .. string.gsub(mark.err, "^.*:%s+", "")
+		end
+		line_hl = {
+			mark.err or util.prettify_path(mark.file),
+			config.marks.highlights.not_loaded,
+		}
 	end
 
 	return util.format(

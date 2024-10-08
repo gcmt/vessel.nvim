@@ -8,7 +8,6 @@ local util = require("vessel.util")
 ---@field wininfo table
 ---@field bufnr integer
 ---@field winid integer
----@field _cache table
 local Preview = {}
 Preview.__index = Preview
 
@@ -23,7 +22,6 @@ function Preview:new(config)
 	preview.wininfo = {}
 	preview.bufnr = -1
 	preview.winid = -1
-	preview._cache = {}
 	return preview
 end
 
@@ -48,39 +46,28 @@ function Preview:default_opts()
 	})
 end
 
---- Return a function that can be used to read files into the preview buffer.
----
---- `max_lnums' maps each path to the max jump line inside that file.
---- This is useful for optimizing the amount of lines read for each file.
----
----@param max_lnums table
----@return function
-function Preview:make_writer(max_lnums)
-	return function(path, lnum)
-		if not path then
-			vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
-			return
-		end
-		local lines
-		if self._cache[path] then
-			lines = self._cache[path]
-		else
-			if vim.fn.bufloaded(path) == 1 then
-				lines = vim.fn.getbufline(path, 1, "$")
-			else
-				local max_lnum = (max_lnums[path] or 1) + (self.wininfo.height * 2)
-				if vim.fn.filereadable(path) == 1 then
-					lines = vim.fn.readfile(path, max_lnum)
-				else
-					lines = { "File does not exist: " .. path }
-				end
-				self._cache[path] = lines
-			end
-		end
-		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines)
+--- Show file content in the preview window
+---@param filestore FileStore
+---@param path string
+---@param lnum integer
+function Preview:show(filestore, path, lnum)
+	if not path then
+		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
+		return
+	end
+	local lines, err = filestore:getfile(path, true)
+	if err then
+		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, { err })
+	else
+		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines or {})
 		vim.fn.win_execute(self.winid, lnum)
 		vim.fn.win_execute(self.winid, "norm! zz")
 	end
+end
+
+--- Clear preview window buffer
+function Preview:clear()
+	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
 end
 
 ---Setup window options
