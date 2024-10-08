@@ -7,28 +7,55 @@ CONTENTS                                                      *vessel-contents*
 
     1. Overview .................................... |vessel-overview|
     2. API ......................................... |vessel-api|
-    3. Default Popup Mappings ...................... |vessel-default-mappings|
-    3. Configuration ............................... |vessel-configuration|
-    6. Credits ..................................... |vessel-credits|
-    7. License ..................................... |vessel-license|
+       2.1 Marks API ............................... |vessel-marks-api|
+       2.2 Jumps API ............................... |vessel-jumps-api|
+       2.3 Buffers API ............................. |vessel-buffers-api|
+    3. Default Mappings ............................ |vessel-default-mappings|
+       3.1 Mark List Mappings ...................... |vessel-marks-mappings|
+       3.2 Jump List Mappings ...................... |vessel-jumps-mappings|
+       3.3 Buffer List Mappings .................... |vessel-buffers-mappings|
+    4. Configuration ............................... |vessel-configuration|
+       4.1 Common Options........................... |vessel-common-options|
+       4.2 Command Options.......................... |vessel-command-options|
+       4.3 Window Options........................... |vessel-window-options|
+       4.4 Preview Window Options................... |vessel-preview-options|
+       4.5 Mark List Options........................ |vessel-marks-options|
+       4.6 Jump List Options........................ |vessel-jumps-options|
+       4.7 Buffer List Options...................... |vessel-buffers-options|
+    5. Credits ..................................... |vessel-credits|
+    6. License ..................................... |vessel-license|
 
 
 ==============================================================================
 1. Overview                                                    *vessel-overview*
 
-Interactive mark and jump lists floating window.
+Better ergonomics around Neovim mark list, buffer list and jump list.
 
-Simple interactive wrapper around :marks and :jumps commands that does not try
-to re-imagine native Vim functionality.
+- Workflow still centered around native functionality.
 
-Also provides useful shortcuts for setting marks automatically without having
-to pick a letter by yourself.
+- Highly customizable look and feel thanks to custom formatters and an
+  extensive range of options.
+
+- Provides useful shortcuts for setting marks automatically without having to
+  pick a letter by yourself.
+
+- Change and delete marks more effectively directly from the interactive mark
+  list window.
+
+- Delete and "resurrect" buffers directly from the buffer list window.
+
+- Pin important buffers and quickly access them even from outside the buffer
+  list window.
+
+This document only offers a brief overview on how the plugin can be used and
+configured. Head over https://github.com/gcmt/vessel.nvim for a more
+comprehensive documentation.
 
 ==============================================================================
 2. API                                       *vessel-plug-mappings*   *vessel-api*
 
------------------------------------------------------------------------------
-Mark list api
+------------------------------------------------------------------------------
+2.1 Mark List API                                             *vessel-marks-api*
 
 Show all global (uppercase) and local marks (lowercase) grouped by file.
 >
@@ -59,6 +86,7 @@ Show only global marks belonging to other files.
     <plug>(VesselViewExternalMarks)
     require("vessel").view_external_marks(opts)
 <
+
 Automatically set/unset a local mark on the current line.
 >
     <plug>(VesselSetLocalMark)
@@ -71,8 +99,8 @@ Automatically set/unset a global mark on the current line.
     require("vessel").set_global_mark(opts)
 <
 
------------------------------------------------------------------------------
-Jump list api
+------------------------------------------------------------------------------
+2.2 Jump List API                                             *vessel-jumps-api*
 
 Show the whole jump list
 >
@@ -92,11 +120,37 @@ Show only jumps outside the current file
     require("vessel").view_external_jumps(opts)
 <
 
+------------------------------------------------------------------------------
+2.3 Buffer List API                                         *vessel-buffers-api*
+
+Show the buffer list. Only *normal listed buffers* will be displayed.
+>
+    `<plug>(VesselViewBuffers)
+    vessel.view_buffers(opts?, filter_func?)
+<
+
+Switch to the next buffer in the pinned list (relative to buffer `%`)
+>
+    <plug>(VesselPinnedNext)
+    vessel.get_pinned_next(bufnr?)
+<
+
+Switch to the previous buffer in the pinned list (relative to buffer `%`)
+>
+    <plug>(VesselPinnedPrev)
+    vessel.get_pinned_prev(bufnr?)
+<
+
+Get list of all buffer numbers in the pinned list.
+>
+    vessel.get_pinned_list()
+<
+
 ==============================================================================
 3. Default Popup Mappings                                *vessel-popup-mappings*
 
 ------------------------------------------------------------------------------
-Mark list mapppings
+3.1 Mark List Mapppings                                  *vessel-marks-mappings*
 
 Defaul mappings for the mark list window.
 They can be changed with the "marks.mappings" option.
@@ -108,6 +162,7 @@ q, <ESC>        Close the floating window
 <C-K>           Move to the previous mark group (path header)
 
 d               Delete the mark on the current line
+		Pressing 'd' on the file path will delete all of its marks.
 
 l, <CR>         Jump to the mark (or path) under cursor
 
@@ -136,8 +191,9 @@ m{a-zA-Z}       Change the mark under cursor
 
 '{a-z-A-Z}      Jump directly to a mark
 
+
 ------------------------------------------------------------------------------
-Jump list mappings
+Jump List Mappings                                       *vessel-jumps-mappings*
 
 Defaul mappings for the jump list window.
 They be changed with the "jumps.mappings" option.
@@ -154,16 +210,1010 @@ C               Clear the entire jump list.
 <C-I>           Move forward in the jump list (towards the top). As a count, you
                 can use the relative number displayed on the left column.
 
+r               Load the file under cursor in memory and add it to the buffer
+                list.
+
+R                Load all files in memory and add them to the buffer list.
+
+W                Load in memory all files inside the current working directory
+                 and add them to the buffer list.
+
+------------------------------------------------------------------------------
+3.3 Buffer List Mappings                               *vessel-buffers-mappings*
+
+q, <ESC>         Close the floating window.
+
+l, <CR>          Edit the buffer under cursor. Takes a count.
+
+t                Edit the buffer undeer cursor in a new tab.
+
+s                Edit the buffer under cursor in a horizontal split.
+
+v                Edit the buffer under cursor in a vertical split.
+
+d                Delete the buffer under cursor. Fails if there is any unsaved
+                 change. Executes :bdelete on the buffer.
+
+D                Force delete the buffer under cursor. All unsaved changes
+                 will be lost! Executes :bdelete! on the buffer.
+
+w                Wipe buffer under cursor. Fails if there is any unsaved
+                 change. Executes :bwipeout on the buffer.
+
+W                Force wipe the buffer under cursor. All unsaved changes will
+                 be lost! Executes :bwipeout! on the buffer.
+
+<SPACE>          Cycle sorting type. It will be remembered once you close and
+                 reopen the window.
+
+a                Toggle showing unlisted buffers (Buffers on which you
+                 executed :bdelete).
+
+p                Pin/unpin the buffer under cursor.
+
+P                Add to the buffer list the directory of the the buffer under
+                 cursor. See also [directory handler](#buffersdirectory_handler).
+
+<C-X>            Decrease the buffer position in the pinned list (moves the
+                 buffer up).
+
+<C-A>            Increase the buffer position in the pinned list (moves the
+                 buffer down).
+
+
 ==============================================================================
 4. Configuration                                          *vessel-configuration*
 
-Vessel has extensive configuration options. Head over to
+You can configure the plugin in different ways. The most obvious one is by
+calling the classic `setup` function. Calling this function is *required* if
+you want to create all predefined commands.
+>
+    require("vessel").setup({
+      create_commands = true,
+      commands = {
+	view_marks = "Marks",
+	view_jumps = "Jumps"
+	view_buffers = "Buffers"
+      },
+      ...
+      window = {
+	relativenumber = true
+      }
+      ...
+    })
+<
+The plugin also offers a more succinct way of setting options by providing an
+`opt` interface object
+>
+    local vessel = require("vessel")
+    vessel.opt.highlight_on_jump = true
+    vessel.opt.window.max_height = 50
+    vessel.opt.marks.mappings.close = { "Q" }
+    vessel.opt.buffers = {
+	name_align = "right"
+    }
+<
+The third way of setting options is by directly passing a `table` argument to
+*API* functions. These options will override anything you passed previously to
+the `setup` function or set via the `opt` interface object.
+>
+    vim.keymap.set("n", "g", function()
+      require('vessel').view_jumps({ window = { max_height = 90 } })
+    end)
+<
 
-https://github.com/gcmt/vessel.nvim#Configuration
+------------------------------------------------------------------------------
+4.1 Common Options                                       *vessel-common-options*
 
+------------------------------------------------------------------------------
+verbosity
+
+Control how much noisy the plugin is. One of vim.log.levels.
+>
+    vessel.opt.verbosity = vim.log.levels.INFO
+<
+------------------------------------------------------------------------------
+lazy_load_buffers
+
+ Some global marks or jumps might belong to files currently not loaded in
+ memory. In this case the plugin can't retrieve the line content.
+
+ Set this option to false to load in memory any such file as soon as you
+ open the mark or jump list window.
+>
+    vessel.opt.lazy_load_buffers = true
+<
+------------------------------------------------------------------------------
+highlight_on_jump, highlight_timeout
+
+Set cursorline vim option for a brief period of time after a jump for
+`highlight_timeout` milliseconds.
+>
+    vessel.opt.highlight_on_jump = false
+    vessel.opt.highlight_timeout = 250
+<
+------------------------------------------------------------------------------
+jump_callback
+
+Function executed after each jump. By default it just centers the cursor
+vertically unless vim.o.jumpotions is set to "view".
+
+This function takes two parameters: mode and context.
+>
+    vessel.opt.jump_callback = <function>
+<
+
+------------------------------------------------------------------------------
+4.2 Command Options                                     *vessel-command-options*
+
+------------------------------------------------------------------------------
+create_commands
+
+Whether to create commands or not.
+
+NOTE: You need to call the setup function to actually create commands
+>
+    vessel.opt.create_commands = false
+<
+------------------------------------------------------------------------------
+commands.view_marks, view_jumps, view_buffers
+
+Customize each command name.
+>
+    vessel.opt.commands.view_marks = "Marks"
+    vessel.opt.commands.view_jumps = "Jumps"
+    vessel.opt.commands.view_buffers = "Buffers"
+<
+
+------------------------------------------------------------------------------
+4.3 Window Options                                       *vessel-window-options*
+
+------------------------------------------------------------------------------
+window.gravity
+
+Controls the positioning of the main popup window. This option have different
+effects whether the preview window is enabled or not.
+
+Without the preview window enabled:
+- 'center' The window is centered vertically in the screen.
+- 'top' The window is positioned towards the top of the screen. The max top
+  position is determined by the window.max_height option. The more this option
+  is closer to 100 (100%), the highest the window will be positioned.
+
+With the preview window enabled:
+- 'center': When the preview window height is higher than the main popup
+  window height, the latter will be vertically centered relative to the
+  preview window.
+- 'top': When the preview window height is higher than the main popup window
+  height, the top margin of both windows will be aligned.
+
+>
+    vessel.opt.window.gravity = "center"
+<
+------------------------------------------------------------------------------
+window.max_height
+
+Control the maximum height of the popup window as a percentage of the nvim UI.
+>
+    vessel.opt.window.max_height = 80
+<
+------------------------------------------------------------------------------
+window.cursorline
+
+Enable/disable cursorline Neovim option in the window.
+>
+    vessel.opt.window.cursorline = true
+<
+------------------------------------------------------------------------------
+window.number
+
+Enable/disable number Neovim option in the window.
+>
+    vessel.opt.window.number = false
+<
+------------------------------------------------------------------------------
+window.relativenumber
+
+Enable/disable 'relativenumber' Neovim option in the popup window.
+>
+    vessel.opt.window.relativenumber = false
+<
+------------------------------------------------------------------------------
+window.options
+
+Control how the popup looks. These options are passed directly to the
+'vim.api.nvim_open_win()' function. See ':help api-floatwin'.
+>
+    vessel.opt.window.options.style = "minimal"
+    vessel.opt.window.options.border = "single"
+<
+------------------------------------------------------------------------------
+window.width
+
+Width of the popup window as a percentage of the *Neovim* UI. This can be
+either a function or a table with 2 numbers.
+
+The first value is the popup width with no side preview popup displayed, the
+second value is the total width of both the main popup and the preview popup
+when the latter is displayed on the right side of the main popup.
+>
+    vessel.opt.window.width = <function>
+<
+Below the default implementation:
+>
+    function popup_width()
+      return vim.o.columns < 120 and { 90, 90 } or { 75, 90 }
+    end
+<
+------------------------------------------------------------------------------
+4.4 Preview Window Options                              *vessel-preview-options*
+
+------------------------------------------------------------------------------
+preview.options
+
+Control how the preview popup looks. These options are passed directly to the
+'vim.api.nvim_open_win()' function. See ':help api-floatwin'.
+>
+    vessel.opt.preview.options.style = "minimal"
+    vessel.opt.preview.options.border = "single"
+<
+------------------------------------------------------------------------------
+preview.position
+
+Whether to position the preview popup on the right side or on the bottom side
+of the main popup window. Can be either `right' or 'bottom'.
+>
+    vessel.opt.preview.position = "right"
+<
+------------------------------------------------------------------------------
+preview.width
+
+Width of the preview window as a percentage of window.width.
+>
+    vessel.opt.preview.width = 50
+<
+------------------------------------------------------------------------------
+preview.width_threshold
+
+If the main popup width is less than *this* amount of columns, the preview
+popup is pushed to the bottom side of the main popup.
+>
+    vessel.opt.preview.width_threshold = 80
+<
+------------------------------------------------------------------------------
+preview.min_height
+
+Minimum height of the preview window, expressed in lines.
+>
+    vessel.opt.preview.min_height = 21
+<
+------------------------------------------------------------------------------
+4.5 Mark List Options                                     *vessel-marks-options*
+
+------------------------------------------------------------------------------
+marks.preview
+
+Enable or disable preview window. See the Preview Window Options section for
+how to customize it.
+<
+    vessel.opt.marks.preview = true
+>
+------------------------------------------------------------------------------
+marks.locals, maks.globals
+
+The pool of marks the plugin chooses from when automatically picking the
+letter for you.
+<
+    vessel.opt.marks.locals = "abcdefghijklmnopqrstuvwxyz"
+    vessel.opt.marks.globals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+>
+------------------------------------------------------------------------------
+marks.sort_groups
+
+Function used to sort groups. A group is a set of marks belonging to the same
+file.
+<
+    vessel.opt.marks.sort_groups = function(a, b)
+	return a > b
+    end
+>
+------------------------------------------------------------------------------
+marks.sort_marks
+
+List of functions used to sort marks in the each groups. First item is the
+function used by default the first time you open the window. See also
+marks.mappings.cycle_sort
+<
+    local sorters = require("vessel.config.sorters")
+    vessel.opt.marks.sort_marks = { sorters.marks.by_lnum, sorters.marks.by_mark }
+>
+
+Available sorters are:
+
+- 'sorters.marks.by_lnum' Sort by mark line number.
+- 'sorters.marks.by_mark' Sort by mark letter (capitals first).
+
+You can also define your own *sorter function*. The function must return two
+values:
+
+- A function with the signature: 'function(MarkA, MarkB) return boolean end'
+- A description string that will be used to give feedback to the user when
+  cycling between these function, or empty string for no feedback
+
+Example function:
+<
+    function sort_by_lnum()
+      local fn = function(a, b)
+	return a.lnum < b.lnum
+      end
+      return fn, "sorting by line number"
+    end
+>
+------------------------------------------------------------------------------
+marks.path_style
+
+Controls the style of the file path header. Can be one of:
+- 'full' Full file path
+- 'short' Shortest unique suffix among all paths
+- 'relhome' Relative to the home directory
+- 'relcwd' Relative to the current working directory
+
+NOTE: Has effect only when using default formatters.
+<
+    vessel.opt.marks.path_style = "relcwd"
+>
+------------------------------------------------------------------------------
+marks.toggle_mark
+
+Enable/disable unsetting a mark when trying to mark an alredy marked line.
+<
+    vessel.opt.marks.toggle_mark = true
+>
+------------------------------------------------------------------------------
+marks.use_backtick
+
+Use backtick instead of apostrophe for jumping to marks. See ':help mark-motions'.
+<
+    vessel.opt.marks.use_backtick = false
+>
+------------------------------------------------------------------------------
+marks.not_found
+
+Message used when the mark list is empty.
+<
+    vessel.opt.marks.not_found = "No marks found"
+>
+------------------------------------------------------------------------------
+marks.move_to_first_mark
+
+Position the cursor on the first line of a mark group.
+<
+    vessel.opt.marks.move_to_first_mark = true
+>
+------------------------------------------------------------------------------
+marks.move_to_closest_mark, marks.proximity_threshold
+
+Position the cursor on the closest mark relative to the current position in
+the buffer. If a mark is farther from the cursor than `proximity_threshold`
+lines, it won't be considered.
+<
+    vessel.opt.marks.move_to_closest_mark = true
+    vessel.opt.marks.proximity_threshold = 50
+>
+------------------------------------------------------------------------------
+marks.force_header
+
+Force displaying the group header (file path) even when there is just one
+group.
+
+NOTE: Has effect only when using default formatters.
+<
+    vessel.opt.marks.force_header = false
+>
+------------------------------------------------------------------------------
+marks.decorations
+
+Decorations used as prefix to each formatted mark. Last item is for last
+entries in each group.
+
+NOTE: Has effect only when using default formatters.
+<
+    vessel.opt.marks.decorations = { "├ ", "└ " }
+>
+------------------------------------------------------------------------------
+marks.show_colnr
+
+Show/hide mark column number.
+
+NOTE: Has effect only when using default formatters.
+<
+    vessel.opt.marks.show_colnr = false
+>
+------------------------------------------------------------------------------
+marks.strip_lines
+
+Strip leading white spaces from lines.
+
+NOTE: Has effect only when using default formatters.
+<
+    vessel.opt.marks.strip_lines = true
+>
+------------------------------------------------------------------------------
+marks.formatters.mark, marks.formatters.header
+
+Functions used to format each mark / group header line.
+<
+    vessel.opt.marks.formatters.mark = <function>
+    vessel.opt.marks.formatters.header = <function>
+>
+------------------------------------------------------------------------------
+marks.highlights.*
+
+Highlight groups used by default formatters.
+
+NOTE: Have effect only when using the default formatters.
+<
+    vessel.opt.marks.highlights.path = "Directory"
+    vessel.opt.marks.highlights.not_loaded = "Comment"
+    vessel.opt.marks.highlights.decorations = "NonText"
+    vessel.opt.marks.highlights.mark = "Keyword"
+    vessel.opt.marks.highlights.lnum = "LineNr"
+    vessel.opt.marks.highlights.col = "LineNr"
+    vessel.opt.marks.highlights.line = "Normal"
+>
+------------------------------------------------------------------------------
+marks.mappings.close
+
+Close the mark list window.
+<
+    vessel.opt.marks.mappings.close = { "q", "<esc>" }
+>
+------------------------------------------------------------------------------
+marks.mappings.delete
+
+Delete the mark under cursor.
+<
+    vessel.opt.marks.mappings.delete = { "d" }
+>
+------------------------------------------------------------------------------
+marks.mappings.next_group
+
+Move to the next group header.
+<
+    vessel.opt.marks.mappings.next_group = { "<c-j>" }
+>
+------------------------------------------------------------------------------
+marks.mappings.prev_group
+
+Move to the previous group header.
+<
+    vessel.opt.marks.mappings.prev_group = { "<c-k>" }
+>
+------------------------------------------------------------------------------
+marks.mappings.jump
+
+Jump to the mark (or path) under cursor.
+<
+    vessel.opt.marks.mappings.jump = { "l", "<cr>" }
+>
+------------------------------------------------------------------------------
+marks.mappings.keepj_jump
+
+Jump to the mark under cursor (does not change the jump list).
+<
+    vessel.opt.marks.mappings.keepj_jump = { "o" }
+>
+------------------------------------------------------------------------------
+marks.mappings.tab
+
+Open the mark under cursor in a new tab.
+<
+    vessel.opt.marks.mappings.tab = { "t" }
+>
+------------------------------------------------------------------------------
+marks.mappings.keepj_tab
+
+Open the mark under cursor in a new tab (does not change the jump list).
+<
+    vessel.opt.marks.mappings.keepj_tab = { "T" }
+>
+------------------------------------------------------------------------------
+marks.mappings.split
+
+Open the mark under cursor in a horizontal.
+<
+    vessel.opt.marks.mappings.split = { "s" }
+>
+------------------------------------------------------------------------------
+marks.mappings.keepj_split
+
+Open the mark under cursor in a horizontal split (does not change the jump
+list).
+<
+    vessel.opt.marks.mappings.keepj_split = { "S" }
+>
+------------------------------------------------------------------------------
+marks.mappings.vsplit
+
+Open the mark under cursor in a vertical split.
+<
+    vessel.opt.marks.mappings.vsplit = { "v" }
+>
+------------------------------------------------------------------------------
+marks.mappings.keepj_vsplit
+
+Open the mark under cursor in a vertical split with (does not change the jump
+list).
+<
+    vessel.opt.marks.mappings.keepj_vsplit = { "V" }
+>
+------------------------------------------------------------------------------
+marks.mappings.cycle_sort
+
+Cycle sorting functions. See also marks.sort_marks
+<
+    vessel.opt.marks.mappings.cycle_sort = { "<SPACE>" }
+>
+------------------------------------------------------------------------------
+4.6 Jump List Options                                     *vessel-jumps-options*
+
+------------------------------------------------------------------------------
+jumps.preview
+
+Enable or disable preview window. See the Preview Window Options section for
+how to customize it.
+<
+    vessel.opt.jumps.preview = true
+>
+------------------------------------------------------------------------------
+jumps.real_positions
+
+Display real jump entries positions. There might be gaps when filters are applied to the list.
+<
+    vessel.opt.jumps.real_positions = false
+>
+------------------------------------------------------------------------------
+jumps.strip_lines
+
+Strip leading white spaces from lines.
+<
+    vessel.opt.jumps.strip_lines = false
+>
+------------------------------------------------------------------------------
+jumps.filter_empty_lines
+
+Filter jump entries that point to empty lines.
+<
+    vessel.opt.jumps.filter_empty_lines = true
+>
+------------------------------------------------------------------------------
+jumps.not_found
+
+Message used when the jump list is empty.
+<
+    vessel.opt.jumps.not_found = "Jump list empty"
+>
+------------------------------------------------------------------------------
+jumps.not_loaded
+
+Label used as prefix for unloaded file paths.
+<
+    vessel.opt.jumps.not_loaded = ""
+>
+------------------------------------------------------------------------------
+jumps.autoload_filter
+
+This function comes into play when lazy_load_buffers is set to 'false', that
+is, when the plugin is instructed to load all files automatically in memory.
+This functions limits the buffers that are actually going to be loaded. By
+default, anything that does not reside in the *current working directory*
+won't be loaded automatically (but will still be visible in the list with the
+path greyed out).
+<
+    vessel.opt.jumps.not_loaded = function(bufnr, bufpath)
+      return vim.startswith(bufpath, vim.fn.getcwd() .. "/")
+    end
+>
+------------------------------------------------------------------------------
+jumps.indicator
+
+Prefix used for each formatted jump entry. First item is the line of the
+current position in the jump list.
+
+NOTE: Has effect only when using the default formatter.
+<
+    vessel.opt.jumps.indicator = { " ", " " }
+>
+------------------------------------------------------------------------------
+jumps.show_colnr
+
+Show/hide jump entries column numbers.
+
+NOTE: Has effect only when using the default formatter.
+<
+    vessel.opt.jumps.show_colnr = false
+>
+------------------------------------------------------------------------------
+jumps.formatters.jump
+
+Functions used to format each jump entry line.
+<
+    vessel.opt.jumps.formatters.jump = <function>
+>
+------------------------------------------------------------------------------
+jumps.mappings.ctrl_o
+
+Mapping used to move backwards in the jump list (to the bottom of the window).
+Takes a count.
+<
+    vessel.opt.jumps.mappings.ctrl_o = "<c-o>"
+>
+------------------------------------------------------------------------------
+jumps.mappings.ctrl_i
+
+Mapping used to move forwards in the jump list (to the top of the window).
+Takes a count.
+<
+    vessel.opt.jumps.mappings.ctrl_i = "<c-i>"
+>
+------------------------------------------------------------------------------
+jumps.mappings.jump
+
+Jump to the entry under cursor.
+<
+    vessel.opt.jumps.mappings.jump = { "l", "<cr>" }
+>
+------------------------------------------------------------------------------
+jumps.mappings.close
+
+Close the jump list window.
+<
+    vessel.opt.jumps.mappings.close = { "q", "<esc>" }
+>
+------------------------------------------------------------------------------
+jumps.mappings.clear
+
+Clear the jump list. Executes `:clearjumps`.
+<
+    vessel.opt.jumps.mappings.clear = { "C" }
+>
+------------------------------------------------------------------------------
+jumps.mappings.load_buffer
+
+Load the file under cursor in memory.
+
+Useful when lazy_load_buffers is set to `true` and buffers are not
+automatically loaded in memory when there are jumps that refer to them.
+<
+    vessel.opt.jumps.mappings.load_buffer = { "r" }
+>
+------------------------------------------------------------------------------
+jumps.mappings.load_all
+
+Load all files in memory.
+
+Useful when lazy_load_buffers is set to `true` and buffers are not
+automatically loaded in memory when there are jumps that refer to them.
+<
+    vessel.opt.jumps.mappings.load_all = { "R" }
+>
+------------------------------------------------------------------------------
+jumps.mappings.load_cwd
+
+Load in memory all files inside the current working directory.
+
+Useful when lazy_load_buffers is set to `true` and buffers are not
+automatically loaded in memory when there are jumps that refer to them.
+<
+    vessel.opt.jumps.mappings.load_cwd = { "W" }
+>
+------------------------------------------------------------------------------
+jumps.highlights.*
+
+Highlight groups used by the default formatter.
+<
+    vessel.opt.jumps.highlights.indicator = "Comment"
+    vessel.opt.jumps.highlights.pos = "LineNr"
+    vessel.opt.jumps.highlights.current_pos = "CursorLineNr"
+    vessel.opt.jumps.highlights.path = "Directory"
+    vessel.opt.jumps.highlights.lnum = "LineNr"
+    vessel.opt.jumps.highlights.col = "LineNr"
+    vessel.opt.jumps.highlights.line = "Normal"
+>
+
+------------------------------------------------------------------------------
+4.7 Buffer List Options                                 *vessel-buffers-options*
+
+------------------------------------------------------------------------------
+buffers.wrap_around
+
+When navigating to next/previous buffers in the pinned list with the API or
+<plug> mappings, wrap around the list when reaching its start or end.
+<
+    vessel.opt.buffers.wrap_around = true
+>
+------------------------------------------------------------------------------
+buffers.not_found
+
+Message used when the buffer list is empty
+<
+    vessel.opt.buffers.not_found = "Buffer list empty"
+>
+------------------------------------------------------------------------------
+buffers.unnamed_label
+
+Label used for unnamed buffers.
+<
+    vessel.opt.buffers.unnamed_label = "[no name]"
+>
+------------------------------------------------------------------------------
+buffers.quickjump
+
+Remap numbers `[1-9]` in normal mode to quickly edit the 9 buffers at the top
+of the window.
+<
+    vessel.opt.buffers.quickjump = true
+>
+------------------------------------------------------------------------------
+buffers.directory_handler
+
+Function called for buffers that are directories. By default assumes Netrw is
+enabled (vim.g.loaded_netrwPlugin == 1) and simply executes `:edit` command on
+the buffer. Can be useful to open up your favorite file explorer or fuzzy
+finder.
+
+This function takes two parameters: `path` and context
+<
+    vessel.opt.buffers.directory_handler = <function>
+>
+------------------------------------------------------------------------------
+buffers.sort_buffers
+
+List of functions used to sort buffers. First item is the function used by
+default the first time you open the window.
+
+See also buffers.mappings.cycle_sort
+<
+    local sorters = require("vessel.config.sorters")
+    vessel.opt.buffers.sort_buffers = {
+	sorters.buffers.by_path,
+	sorters.buffers.by_basename,
+	sorters.buffers.by_lastused,
+	sorters.buffers.by_changes,
+    }
+>
+Available sorters are:
+- 'sorters.buffers.by_path' Sort by buffer directory.
+- 'sorters.buffers.by_basename' Sort by buffer basename.
+- 'sorters.buffers.by_lastused' Sort by last time the buffer was used/visited.
+- 'sorters.buffers.by_changes' Sort by the total number of changes made in the
+  buffer.
+
+You can also define your own *sorter function*. The function must return two
+values:
+- A function with the signature: 'function(BufferA, BufferB) return boolean
+  end'
+- A description string that will be used to give feedback to the user when
+  cycling between these function, or empty string for no feedback
+
+Example sorter function:
+<
+    function sort_by_basename()
+	local fn = function(a, b)
+	    return vim.fs.basename(a.path) < vim.fs.basename(b.path)
+	end
+	return fn, "sorting by basename"
+    end
+>
+------------------------------------------------------------------------------
+buffers.show_pin_positions
+
+Whether line numbers are diplayed next to pinned buffers.
+
+Useful when line numbers are not enabled for the window or the
+buffers.quickjump option is enabled.
+
+NOTE: Has effect only when using the default formatter.
+<
+    vessel.opt.buffers.show_pin_positions = true
+>
+------------------------------------------------------------------------------
+buffers.pin_separator
+
+Character used as separator between the *pinned list* and the rest of the
+buffers. Use an empty string to hide the separator. Its color is controlled by
+the option buffers.highlights.pin_separator
+<
+    vessel.opt.buffers.pin_separator = "─"
+>
+------------------------------------------------------------------------------
+buffers.bufname_align
+
+How to align the buffer name. Can be one of:
+- 'left' Left alignment
+- 'right' Right alignment
+- 'none' No alignment
+
+NOTE: Has effect only when using the default formatter.
+<
+    vessel.opt.buffers.bufname_align = "left"
+>
+------------------------------------------------------------------------------
+buffers.bufname_style
+
+Buffer name style. Can be one of:
+- 'basename' Buffer base name
+- 'unique' Shortest unique suffix among all paths
+- 'hide' Hide bufname completely
+
+NOTE: Has effect only when using the default formatter.
+<
+    vessel.opt.buffers.bufname_style = "unique"
+>
+------------------------------------------------------------------------------
+buffers.bufpath_style
+
+Buffer path style. Can be one of:
+- 'full' Full file path
+- 'short' Shortest unique suffix among all paths
+- 'relhome' Relative to the home directory
+- 'relcwd' Relative to the current working directory
+- 'hide' Hide buffer path completely
+
+NOTE: Has effect only when using the default formatter.
+<
+    vessel.opt.buffers.bufpath_style = "relcwd"
+>
+------------------------------------------------------------------------------
+buffers.formatter_spacing
+
+Spacing between formatted items (line numbers, bufname and bufpath).
+
+NOTE: Has effect only when using the default formatter.
+<
+    vessel.opt.buffers.formatter_spacing =  " "
+>
+------------------------------------------------------------------------------
+buffers.mappings.cycle_sort
+
+Cycle sorting functions. See also buffers.sort_buffers,
+<
+    vessel.opt.buffers.mappings.cycle_sort = { "<space>" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.toggle_pin
+
+Toggle pinned status on the buffer under cursor.
+<
+    vessel.opt.buffers.mappings.toggle_pin = { "p" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.add_directory
+
+Add to the buffer list the directory of the buffer under cursor.
+<
+    vessel.opt.buffers.mappings.add_directory = { "P" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.pin_increment
+
+Move the buffer under cursor down in the pinned list. The buffer is pinned
+if not already in the pinned list.
+
+NOTE: Incrementing the position essentially moves the buffer down.
+<
+    vessel.opt.buffers.mappings.pin_increment = { "<c-a>" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.pin_decrement
+
+Move the buffer under cursor up in the pinned list. The buffer is pinned if
+not already in the pinned list.
+
+NOTE: Decrementing the position essentially moves the buffer up.
+<
+    vessel.opt.buffers.mappings.pin_decrement = { "<c-x>" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.toggle_unlisted
+
+Toggle unlisted buffers.
+<
+    vessel.opt.buffers.mappings.toggle_unlisted = { "a" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.edit
+
+Edit the buffer under cursor.
+<
+    vessel.opt.buffers.mappings.edit = { "l", "<cr>" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.tab
+
+Edit the buffer under cursor in a new tab.
+<
+    vessel.opt.buffers.mappings.tab = { "t" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.split
+
+Edit the buffer under cursor in a horizontal split.
+<
+    vessel.opt.buffers.mappings.split = { "s" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.vsplit
+
+Edit buffer under cursor in a vertical split.
+<
+    vessel.opt.buffers.mappings.vsplit = { "v" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.delete
+
+Executes ':bdelete' on the buffer under cursor (fails with unsaved changes).
+
+Basically sets the buffer unlisted. The buffer can then be re-openend by
+toggling unlisted buffers with buffers.mappings.toggle_unlisted.
+<
+    vessel.opt.buffers.mappings.delete = { "d" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.force_delete
+
+Executes ':bdelete!' on the buffer under cursor.
+
+CAUTION: All unsaved changes will be lost!
+<
+    vessel.opt.buffers.mappings.force_delete = { "D" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.wipe
+
+Executes ':bwipeout' buffer under cursor (fails with unsaved changes).
+<
+    vessel.opt.buffers.mappings.wipe = { "w" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.force_wipe
+
+Executes ':bwipeout!' on the buffer under cursor.
+
+CAUTION: All unsaved changes will be lost!
+<
+    vessel.opt.buffers.mappings.force_wipe = { "W" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.close
+
+Close the buffer list window.
+<
+    vessel.opt.buffers.mappings.close = { "q", "<esc>" }
+>
+------------------------------------------------------------------------------
+buffers.formatters.buffer
+
+Functions used to format each buffer entry line.
+<
+    vessel.opt.buffers.formatters.buffer = <function>,
+>
+------------------------------------------------------------------------------
+buffers.highlights.*
+
+Highlight groups used by the default formatter.
+<
+    vessel.opt.buffers.highlights.bufname = "Normal"
+    vessel.opt.buffers.highlights.bufpath = "Comment"
+    vessel.opt.buffers.highlights.unlisted = "Comment"
+    vessel.opt.buffers.highlights.directory = "Directory"
+    vessel.opt.buffers.highlights.modified = "Keyword"
+    vessel.opt.buffers.highlights.pin_position = "LineNr"
+    vessel.opt.buffers.highlights.pin_separator = "NonText"
+>
 
 ==============================================================================
-6. Credits                                                      *vessel-credits*
+5. Credits                                                      *vessel-credits*
 
 Author: Giacomo Comitti
 Contributors: https://github.com/gcmt/vessel.nvim/contributors
@@ -171,7 +1221,7 @@ Git repository: https://github.com/gcmt/vessel.nvim
 
 
 ==============================================================================
-7. License                                                      *vessel-license*
+6. License                                                      *vessel-license*
 
 MIT License
 
