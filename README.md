@@ -1617,3 +1617,7 @@ Controls how each line of the buffer list is formatted. Takes the following four
 | `suffixes`     | Table mapping each full path to its shortest unique suffix among all paths. |
 | `max_suffix`   | Max string length among all suffixes above.                                 |
 | `pinned_count` | Number of pinned buffers.                                                   |
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE.txt](LICENSE.txt) file for details.
