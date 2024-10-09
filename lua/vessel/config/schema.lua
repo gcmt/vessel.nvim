@@ -183,6 +183,7 @@ return {
 	["jumps.highlights.not_loaded"] = { "string" },
 
 	["buffers"] = { "table" },
+	["buffers.view"] = oneof("flat", "tree"),
 	["buffers.wrap_around"] = { "boolean" },
 	["buffers.not_found"] = { "string" },
 	["buffers.unnamed_label"] = { "string" },
@@ -215,6 +216,9 @@ return {
 
 	["buffers.formatters"] = { "table" },
 	["buffers.formatters.buffer"] = { "function" },
+	["buffers.formatters.tree_root"] = { "function" },
+	["buffers.formatters.tree_buffer"] = { "function" },
+	["buffers.formatters.tree_directory"] = { "function" },
 
 	["buffers.highlights"] = { "table" },
 	["buffers.highlights.bufname"] = { "string" },
@@ -224,4 +228,6 @@ return {
 	["buffers.highlights.modified"] = { "string" },
 	["buffers.highlights.pin_position"] = { "string" },
 	["buffers.highlights.pin_separator"] = { "string" },
+	["buffers.highlights.tree_root"] = { "string" },
+	["buffers.highlights.tree_lines"] = { "string" },
 }

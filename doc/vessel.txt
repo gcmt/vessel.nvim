@@ -804,7 +804,7 @@ NOTE: Has effect only when using the default formatter.
 ------------------------------------------------------------------------------
 jumps.formatters.jump
 
-Functions used to format each jump entry line.
+Function used to format each jump entry line.
 <
     vessel.opt.jumps.formatters.jump = <function>
 >
@@ -862,6 +862,15 @@ Highlight groups used by the default formatter.
 ------------------------------------------------------------------------------
 4.7 Buffer List Options                                 *vessel-buffers-options*
 
+------------------------------------------------------------------------------
+buffers.view
+
+Buffer list view mode. Can be one of
+- 'flat' Buffers displayed as a simple list
+- 'tree' Buffers displayed as a tree
+<
+    vessel.opt.buffers.view = "flat"
+>
 ------------------------------------------------------------------------------
 buffers.wrap_around
 
@@ -1132,9 +1141,38 @@ Close the buffer list window.
 ------------------------------------------------------------------------------
 buffers.formatters.buffer
 
-Functions used to format each buffer entry line.
+Function used to format each buffer entry line.
+
+NOTE: Used when buffers.view == "flat"
 <
-    vessel.opt.buffers.formatters.buffer = <function>,
+    vessel.opt.buffers.formatters.buffer = <function>
+>
+------------------------------------------------------------------------------
+buffers.formatters.tree_root
+
+Function used to format each tree root directory.
+
+NOTE: Used when buffers.view == "tree"
+<
+    vessel.opt.buffers.formatters.tree_root = <function>
+>
+------------------------------------------------------------------------------
+buffers.formatters.tree_directory
+
+Function used to format each tree directory node.
+
+NOTE: Used when buffers.view == "tree"
+<
+    vessel.opt.buffers.formatters.tree_directory = <function>
+>
+------------------------------------------------------------------------------
+buffers.formatters.tree_buffer
+
+Function used to format each tree buffer leave.
+
+NOTE: Used when buffers.view == "tree"
+<
+    vessel.opt.buffers.formatters.tree_buffer = <function>
 >
 ------------------------------------------------------------------------------
 buffers.highlights.*
@@ -1148,6 +1186,8 @@ Highlight groups used by the default formatter.
     vessel.opt.buffers.highlights.modified = "Keyword"
     vessel.opt.buffers.highlights.pin_position = "LineNr"
     vessel.opt.buffers.highlights.pin_separator = "NonText"
+    vessel.opt.buffers.highlights.tree_root = "Keyword"
+    vessel.opt.buffers.highlights.tree_lines = "Comment"
 >
 
 ==============================================================================

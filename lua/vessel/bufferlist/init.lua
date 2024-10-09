@@ -3,6 +3,7 @@
 local Context = require("vessel.context")
 local Window = require("vessel.window")
 local logger = require("vessel.logger")
+local tree = require("vessel.bufferlist.tree")
 local util = require("vessel.util")
 
 -- For stateful sorting
@@ -148,11 +149,20 @@ function Bufferlist:get_pinned_prev(bufnr)
 end
 
 --- Keep cursor on selected buffer
----@param selected Buffer Selected buffer
+---@param selected Buffer|string Selected buffer or path
 ---@param map table New map table
 function Bufferlist:_follow_selected(selected, map)
-	for i, buffer in pairs(map) do
-		if buffer.nr == selected.nr then
+	local is_str = function(v)
+		return type(v) == "string"
+	end
+	local is_tbl = function(v)
+		return type(v) == "table"
+	end
+	for i, _ in pairs(map) do
+		if
+			is_tbl(map[i]) and is_tbl(selected) and map[i].nr == selected.nr
+			or is_str(map[i]) and is_str(selected) and map[i] == selected
+		then
 			util.vcursor(i)
 			break
 		end
@@ -193,7 +203,11 @@ function Bufferlist:_action_edit(map, mode, line)
 		vim.cmd("tab split")
 	end
 
-	if vim.fn.isdirectory(selected.path) == 1 then
+	if type(selected) == "string" and vim.fn.isdirectory(selected) == 1 then
+		-- handle tree view directory nodes
+		self.config.buffers.directory_handler(selected, self.context)
+		return
+	elseif vim.fn.isdirectory(selected.path) == 1 then
 		self.config.buffers.directory_handler(selected.path, self.context)
 		return
 	elseif vim.fn.buflisted(selected.nr) == 1 then
@@ -242,24 +256,60 @@ function Bufferlist:_action_toggle_pin(map)
 	if not selected then
 		return
 	end
-	if selected.pinpos > 0 then
-		table.remove(Pinned, selected.pinpos)
-	else
-		table.insert(Pinned, selected.nr)
+
+	local bufnr = selected.nr
+
+	-- handle tree view directory nodes
+	if type(selected) == "string" then
+		bufnr = vim.fn.bufadd(selected)
+		vim.fn.setbufvar(bufnr, "&buflisted", 1)
+		logger.info('"%s" added to the buffer list', util.prettify_path(selected))
 	end
-	self:_refresh()
+
+	local index
+	for i, nr in ipairs(Pinned) do
+		if nr == bufnr then
+			index = i
+		end
+	end
+
+	if index then
+		table.remove(Pinned, index)
+	else
+		table.insert(Pinned, bufnr)
+	end
+
+	local newmap = self:_refresh()
+	if type(selected) == "string" then
+		-- intermediate directory nodes don't disappear from the tree
+		self:_follow_selected(selected, newmap)
+	end
 end
 
 --- Add to the buffer list the directory of the buffer under cursor
 ---@param map table
+---@return table
 function Bufferlist:_action_add_directory(map)
 	local selected = map[vim.fn.line(".")]
-	if selected then
-		local bufnr = vim.fn.bufadd(vim.fs.dirname(selected.path))
-		vim.fn.setbufvar(bufnr, "&buflisted", 1)
-		local newmap = self:_refresh()
-		self:_follow_selected(Buffer:new(bufnr), newmap)
+	if not selected then
+		return map
 	end
+
+	local path
+	if type(selected) == "string" then
+		-- handle tree view directory nodes
+		path = selected
+	else
+		path = vim.fs.dirname(selected.path)
+	end
+
+	local bufnr = vim.fn.bufadd(path)
+	vim.fn.setbufvar(bufnr, "&buflisted", 1)
+
+	local newmap = self:_refresh()
+	self:_follow_selected(Buffer:new(bufnr), newmap)
+	logger.info('"%s" added to the buffer list', util.prettify_path(path))
+	return newmap
 end
 
 --- Toggle unlisted buffes
@@ -287,6 +337,11 @@ function Bufferlist:_action_delete(map, cmd, force)
 		return
 	end
 
+	if type(selected) == "string" then
+		-- TODO: delete all buffers for the directory
+		return
+	end
+
 	-- windows containing the buffer we want to delete
 	local windows = {}
 	for _, win in pairs(vim.fn.getwininfo()) do
@@ -295,24 +350,32 @@ function Bufferlist:_action_delete(map, cmd, force)
 		end
 	end
 
-	-- Replacement buffer in case the target is being shown in a window
-	local next = function(offset)
-		return map[(curline % vim.fn.line("$")) + offset]
+	-- Find replacement buffer
+	local function _find_repl()
+		for _, b in pairs(vim.fn.getbufinfo()) do
+			if
+				b.bufnr ~= selected.nr
+				and b.listed == 1
+				and vim.fn.getbufvar(b.bufnr, "&buftype") == ""
+			then
+				return b.bufnr
+			end
+		end
 	end
-	-- Handle the possibility of the pinned separator being shown
-	local repl = next(1) or next(2)
-	if repl.nr == selected.nr then
+
+	local repl = _find_repl()
+	if not repl then
 		if selected.path == "" then
-			logger.info("Can't delete last unnamed buffer")
+			logger.info("can't delete last buffer")
 			return
 		end
-		repl = Buffer:new(vim.api.nvim_create_buf(true, false))
+		repl = vim.api.nvim_create_buf(true, false)
 	end
 
 	local modified = vim.fn.getbufvar(selected.nr, "&modified", 0) == 1
 	if not modified or force then
 		for _, win in pairs(windows) do
-			vim.api.nvim_win_set_buf(win, repl.nr)
+			vim.api.nvim_win_set_buf(win, repl)
 		end
 	end
 
@@ -484,7 +547,7 @@ function Bufferlist:_refresh()
 end
 
 --- Get metadata table
----@param buffers Bufferlist
+---@param buffers Buffer[]
 ---@return table
 local function _get_meta(buffers)
 	local meta = {
@@ -515,6 +578,160 @@ local function _get_meta(buffers)
 	return meta
 end
 
+--- Format Buffer with the given formatter
+---@param formatter function Formatter function
+---@param buffer Buffer Buffer to format
+---@param meta table Contextual info
+function Bufferlist:_format(formatter, buffer, meta)
+	local ok, line, matches = pcall(formatter, buffer, meta, self.context, self.config)
+	if not ok or not line then
+		local msg
+		if not line then
+			msg = string.format("string expected, got nil")
+		else
+			msg = string.gsub(tostring(line), "^.*:%s+", "")
+		end
+		error(string.format("formatter error: %s", msg))
+	end
+	return line, matches
+end
+
+--- Set buffer line and setup highlighting
+---@param map table
+---@param lnum integer
+---@param line string
+---@param matches table
+---@param data any
+function Bufferlist:_set_buf_line(map, lnum, line, matches, data)
+	map[lnum] = data
+	vim.fn.setbufline(self.bufnr, lnum, line)
+	util.set_matches(matches or {}, lnum, self.bufnr, self.nsid)
+end
+
+--- Render buffer list as a tree
+---@param map table
+---@param start integer Line after which start rendering
+---@param buffers Buffer[] Buffer list
+---@return integer Last rendered line
+function Bufferlist:_render_tree(map, start, buffers)
+	local root_formatter = self.config.buffers.formatters.tree_root
+	local buf_formatter = self.config.buffers.formatters.tree_buffer
+	local dir_formatter = self.config.buffers.formatters.tree_directory
+
+	local i = start
+	local function _render_tree(tree, prefix, padding, is_last)
+		i = i + 1
+		local curr_padding = ""
+		local next_padding = padding
+
+		local path, children
+		if not tree.children then
+			path = vim.fs.basename(tree.path)
+			children = {}
+		else
+			path = tree.path
+			children = tree.children
+		end
+
+		if tree.is_root then
+			local line, matches = self:_format(root_formatter, path, { prefix = curr_padding })
+			self:_set_buf_line(map, i, line, matches, tree.path)
+		else
+			curr_padding = padding .. (is_last and "└─ " or "├─ ")
+			next_padding = padding .. (is_last and "   " or "│  ")
+			if #children > 0 then
+				local line, matches = self:_format(dir_formatter, path, { prefix = curr_padding })
+				self:_set_buf_line(map, i, line, matches, vim.fs.joinpath(prefix, path))
+			else
+				local line, matches = self:_format(buf_formatter, tree, { prefix = curr_padding })
+				self:_set_buf_line(map, i, line, matches, tree)
+			end
+		end
+
+		for k, child in ipairs(tree.children or {}) do
+			if
+				not child.children -- It's a leaf node (a buffer)
+				and vim.fn.isdirectory(child.path) == 1 -- Redundant bu avoids next check
+				and #( -- There's any intemediate node with the same name
+						vim.tbl_filter(function(c)
+							return c.children
+								and vim.fs.basename(c.path) == vim.fs.basename(child.path)
+						end, tree.children)
+					)
+					> 0
+			then
+				-- Buffers can be directories. Don't show then unless
+				-- they are the only child
+				goto continue
+			end
+			_render_tree(child, prefix, next_padding, k == #children)
+			::continue::
+		end
+	end
+
+	local _buffers = {}
+	for _, buffer in pairs(buffers) do
+		if self._show_unlisted or buffer.listed then
+			table.insert(_buffers, buffer)
+		end
+	end
+
+	for _, t in ipairs(tree.make_trees(_buffers)) do
+		if #t.children > 0 then
+			local ok, err = pcall(_render_tree, t, t.path, "", false)
+			if not ok then
+				logger.err(string.gsub(tostring(err), "^.-:%d+:%s+", ""))
+				return i
+			end
+		end
+	end
+
+	return i
+end
+
+--- Render a flat buffer list
+---@param map table
+---@param start integer Line after which start rendering
+---@param buffers Buffer[] Buffer list
+---@param meta table Contextual info to pass to formatters
+---@return integer Last rendered line
+function Bufferlist:_render_flat(map, start, buffers, meta)
+	local formatter = self.config.buffers.formatters.buffer
+	local i = start
+	for _, buffer in pairs(buffers) do
+		if self._show_unlisted or buffer.listed then
+			i = i + 1
+			meta.current_line = i
+			local line, matches, err = self:_format(formatter, buffer, meta)
+			if err then
+				logger.err(err)
+				return i
+			end
+			self:_set_buf_line(map, i, line, matches, buffer)
+		end
+	end
+	return i
+end
+
+--- Render a separator line between pinned and unpinned buffers
+---@param start integer Line after which start rendering
+---@return integer Last rendered line
+function Bufferlist:_render_separator(start)
+	local separator = self.config.buffers.pin_separator
+	if separator == "" then
+		return start
+	end
+	local i = start + 1
+	vim.fn.setbufline(self.bufnr, i, string.rep(separator, vim.fn.winwidth(0)))
+	local match = {
+		hlgroup = self.config.buffers.highlights.pin_separator,
+		startpos = 1,
+		endpos = -1,
+	}
+	util.set_matches({ match }, i, self.bufnr, self.nsid)
+	return i
+end
+
 --- Render the buffer list in the given buffer
 ---@return table Table Maps each line to the buffer displayed on it
 function Bufferlist:_render()
@@ -532,39 +749,7 @@ function Bufferlist:_render()
 		return {}
 	end
 
-	local map = {}
-	local formatter = self.config.buffers.formatters.buffer
-	local meta = _get_meta(self.buffers)
-
-	local _render = function(start, buffers)
-		local i = start
-		for _, buffer in pairs(buffers) do
-			if not self._show_unlisted and not buffer.listed then
-				goto continue
-			end
-			i = i + 1
-			meta.current_line = i
-			local ok, line, matches = pcall(formatter, buffer, meta, self.context, self.config)
-			if not ok or not line then
-				local msg
-				if not line then
-					msg = string.format("line %s: string expected, got nil", i)
-				else
-					msg = string.gsub(tostring(line), "^.*:%s+", "")
-				end
-				self.window:_close_window()
-				logger.err("formatter error: %s", msg)
-				return {}
-			end
-			map[i] = buffer
-			vim.fn.setbufline(self.bufnr, i, line)
-			if matches then
-				util.set_matches(matches, i, self.bufnr, self.nsid)
-			end
-			::continue::
-		end
-		return i
-	end
+	local view = self.config.buffers.view
 
 	local pinned = vim.tbl_filter(function(buffer)
 		return buffer.pinpos > 0
@@ -574,41 +759,52 @@ function Bufferlist:_render()
 		return a.pinpos < b.pinpos
 	end)
 
-	local unpinned = vim.tbl_filter(function(buffer)
-		return buffer.pinpos < 0
-	end, self.buffers)
-
-	local unpinned_listed = vim.tbl_filter(function(buffer)
-		return buffer.listed
-	end, unpinned)
-
-	local sort_func = Sort_func or self.config.buffers.sort_buffers[1]
-	local func, _ = sort_func()
-	local ok, err = pcall(table.sort, unpinned, func)
-	if not ok then
-		local msg = string.gsub(tostring(err), "^.*:%s+", "")
-		logger.err("buffer sorting error: %s", msg)
-		return {}
+	local unpinned = {}
+	local unpinned_listed_count = 0
+	for _, buffer in pairs(self.buffers) do
+		if buffer.pinpos < 0 then
+			if buffer.listed then
+				unpinned_listed_count = unpinned_listed_count + 1
+			end
+			table.insert(unpinned, buffer)
+		end
 	end
+
+	if view == "flat" then
+		local sort_func = Sort_func or self.config.buffers.sort_buffers[1]
+		local func, _ = sort_func()
+		local ok, err = pcall(table.sort, unpinned, func)
+		if not ok then
+			local msg = string.gsub(tostring(err), "^.*:%s+", "")
+			logger.err("buffer sorting error: %s", msg)
+			return {}
+		end
+	end
+
+	local meta
+	if view == "tree" then
+		-- when in tree view mode, meta info makes sense only for pinned buffers
+		meta = _get_meta(pinned)
+	else
+		meta = _get_meta(self.buffers)
+	end
+
+	local map = {}
 
 	-- render pinned buffers first
-	local i = _render(0, pinned)
+	local i = self:_render_flat(map, 0, pinned, meta)
 
-	-- render the separator
-	local separator = self.config.buffers.pin_separator
-	if i > 0 and separator ~= "" and #unpinned_listed > 0 then
-		i = i + 1
-		vim.fn.setbufline(self.bufnr, i, string.rep(separator, vim.fn.winwidth(0)))
-		local match = {
-			hlgroup = self.config.buffers.highlights.pin_separator,
-			startpos = 1,
-			endpos = -1,
-		}
-		util.set_matches({ match }, i, self.bufnr, self.nsid)
+	-- render the separator only if there are unpinned visible buffers
+	if i > 0 and unpinned_listed_count > 0 then
+		i = self:_render_separator(i)
 	end
 
-	-- render the rest of the buffers
-	_render(i, unpinned)
+	-- render unpinned buffers
+	if view == "tree" then
+		self:_render_tree(map, i, unpinned)
+	else
+		self:_render_flat(map, i, unpinned, meta)
+	end
 
 	vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
 	self:_setup_mappings(map)

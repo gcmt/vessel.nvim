@@ -170,6 +170,7 @@ return {
 
 	--- bufferlist-related options
 	buffers = {
+		view = "flat",
 		wrap_around = true,
 		not_found = "Buffer list empty",
 		unnamed_label = "[no name]",
@@ -206,6 +207,9 @@ return {
 		},
 		formatters = {
 			buffer = buf_formatters.buffer_formatter,
+			tree_root = buf_formatters.tree_root_formatter,
+			tree_directory = buf_formatters.tree_directory_formatter,
+			tree_buffer = buf_formatters.tree_buffer_formatter,
 		},
 		highlights = {
 			bufname = "Normal",
@@ -215,6 +219,8 @@ return {
 			modified = "Keyword",
 			pin_position = "LineNr",
 			pin_separator = "NonText",
+			tree_lines = "Comment",
+			tree_root = "Keyword",
 		},
 	},
 }

@@ -1048,6 +1048,19 @@ vessel.opt.jumps.highlights.not_loaded = "Comment"
 
 ### Buffer List Options
 
+#### buffers.view
+
+Buffer list view mode. Can be one of:
+
+- `flat` Buffers displayed as a simple list.
+- `tree` Buffers displayed as directory a tree. Buffers will be grouped in different directory trees depending on the most specific path prefix match: one group for the current working directory, one for the home directory and one for the root directory.
+
+[!NOTE] in *tree view* mode, pinned buffers will still be displayed as a list.
+
+```lua
+vessel.opt.buffers.view = "flat"
+```
+
 #### buffers.wrap_around
 
 When navigating to next/previous buffers in the pinned list with the [*API*](#buffer-list-api) or [`<plug>`](#buffer-list-mappings) mappings, wrap around the list when reaching its start or end.
@@ -1354,6 +1367,36 @@ Functions used to format each buffer entry line. See [Formatters](#formatters) s
 vessel.opt.buffers.formatters.buffer = <function>,
 ```
 
+#### buffers.formatters.tree_root
+
+Function used to format each tree root directory.
+
+> [!NOTE] Used in *tree view* mode ([buffers.view](#buffersview)).
+
+```lua
+vessel.opt.buffers.formatters.tree_root = <function>
+```
+
+#### buffers.formatters.tree_directory
+
+Function used to format each tree directory node.
+
+> [!NOTE] Used in *tree view* mode ([buffers.view](#buffersview)).
+
+```lua
+vessel.opt.buffers.formatters.tree_directory = <function>
+```
+
+##### buffers.formatters.tree_buffer
+
+Function used to format each tree buffer leave.
+
+> [!NOTE] Used in *tree view* mode ([buffers.view](#buffersview)).
+
+```lua
+vessel.opt.buffers.formatters.tree_buffer = <function>
+```
+
 #### buffers.highlights.*
 
 Highlight groups used by the default formatter.
@@ -1366,6 +1409,8 @@ vessel.opt.buffers.highlights.directory = "Directory"
 vessel.opt.buffers.highlights.modified = "Keyword"
 vessel.opt.buffers.highlights.pin_position = "LineNr"
 vessel.opt.buffers.highlights.pin_separator = "NonText"
+vessel.opt.buffers.highlights.tree_root = "Keyword"
+vessel.opt.buffers.highlights.tree_lines = "Comment"
 ```
 
 ## Formatters

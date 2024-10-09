@@ -59,7 +59,7 @@ end
 ---@param meta table Meta nformation about the buffer or other buffer entries
 ---@param context table Information the current buffer/window
 ---@param config table Configuration
----@return string?, table?
+---@return string, table?
 function M.buffer_formatter(buffer, meta, context, config)
 	local bufname, bufpath
 	if buffer.path == "" then
@@ -98,6 +98,48 @@ function M.buffer_formatter(buffer, meta, context, config)
 		{ bufname, hl_bufname },
 		{ bufpath, config.buffers.highlights.bufpath }
 	)
+end
+
+---@param buffer Buffer The buffer entry being formatted
+---@param meta table Meta nformation about the buffer or other buffer entries
+---@param context table Information the current buffer/window
+---@param config table Configuration
+---@return string, table?
+function M.tree_buffer_formatter(buffer, meta, context, config)
+	local prefix = { meta.prefix, config.buffers.highlights.tree_lines }
+	local hl_bufname = config.buffers.highlights.bufname
+	if not buffer.listed then
+		hl_bufname = config.buffers.highlights.unlisted
+	elseif buffer.modified then
+		hl_bufname = config.buffers.highlights.modified
+	end
+	local line = { vim.fs.basename(buffer.path), hl_bufname }
+	return util.format("%s%s", prefix, line)
+end
+
+---@param path string Intermediate directory absolute path
+---@param meta table Meta nformation about the buffer or other buffer entries
+---@param context table Information the current buffer/window
+---@param config table Configuration
+---@return string, table?
+function M.tree_directory_formatter(path, meta, context, config)
+	local prefix = { meta.prefix, config.buffers.highlights.tree_lines }
+	local line = { vim.fs.basename(path), config.buffers.highlights.directory }
+	return util.format("%s%s", prefix, line)
+end
+
+---@param path string Root directory absolute path
+---@param meta table Meta nformation about the buffer or other buffer entries
+---@param context table Information the current buffer/window
+---@param config table Configuration
+---@return string, table?
+function M.tree_root_formatter(path, meta, context, config)
+	local prefix = { meta.prefix, config.buffers.highlights.tree_lines }
+	path = util.prettify_path(path)
+	if path == "~" then
+		path = os.getenv("HOME") or path
+	end
+	return util.format("%s%s", prefix, { path, config.buffers.highlights.tree_root })
 end
 
 return M
