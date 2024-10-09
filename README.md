@@ -1,16 +1,14 @@
-# vessel.nvim
-
-Better ergonomics around *Neovim* **mark list**, **buffer list** and **jump list**.
-
-- Workflow still centered around native functionality.
-- Highly customizable look and feel thanks to custom formatters and an extensive range of options.
-- Provides useful shortcuts for setting marks automatically without having to pick a letter by yourself.
-- Change and delete marks more effectively directly from the interactive mark list window.
-- Delete and "resurrect" buffers directly from the buffer list window.
-- *Pin* important buffers and quickly access them even from outside the buffer list window.
+<div align="center">
+    <h1>vessel.nvim</h1>
+    <img src="https://img.shields.io/badge/status-active-green.svg">
+    <img src="https://img.shields.io/badge/release-2.0.0-green.svg">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg">
+    <p>Better ergonomics around *Neovim* **mark list**, **buffer list** and **jump list**.</p>
+</div>
 
 ## Table of Contents
 
+- [Features](#features)
 - [Setup](#setup)
 - [Windows](#windows)
   - [Mark List Window](#mark-list-window)
@@ -39,6 +37,16 @@ Better ergonomics around *Neovim* **mark list**, **buffer list** and **jump list
 - [Formatters](#formatters)
   - [Example Formatters](#example-formatters)
   - [Formatter Functions Signatures](#formatter-functions-signatures)
+- [LICENSE](#LICENSE)
+
+## Features
+
+- Workflow still centered around native functionality.
+- Highly customizable look and feel thanks to custom formatters and an extensive range of options.
+- Provides useful shortcuts for setting marks automatically without having to pick a letter by yourself.
+- Change and delete marks more effectively directly from the interactive mark list window.
+- Delete and "resurrect" buffers directly from the buffer list window.
+- *Pin* important buffers and quickly access them even from outside the buffer list window.
 
 ## Setup
 
