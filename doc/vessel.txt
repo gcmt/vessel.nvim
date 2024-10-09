@@ -22,8 +22,9 @@ CONTENTS                                                      *vessel-contents*
        4.5 Mark List Options........................ |vessel-marks-options|
        4.6 Jump List Options........................ |vessel-jumps-options|
        4.7 Buffer List Options...................... |vessel-buffers-options|
-    5. Credits ..................................... |vessel-credits|
-    6. License ..................................... |vessel-license|
+    5. Changelog ................................... |vessel-changelog|
+    6. Credits ..................................... |vessel-credits|
+    7. License ..................................... |vessel-license|
 
 
 ==============================================================================
@@ -1191,7 +1192,48 @@ Highlight groups used by the default formatter.
 >
 
 ==============================================================================
-5. Credits                                                      *vessel-credits*
+5. Changelog                                                  *vessel-changelog*
+
+------------------------------------------------------------------------------
+v2.0.0
+
+NEW
+
+- Lines of buffers not in the neovim buffer list are read automatically
+  without having the need to turn on any option.
+- Added tree viewing mode for the buffer list.
+- New option 'buffers.view'
+- New option 'buffers.formatters.tree_root'
+- New option 'buffers.formatters.tree_directory'
+- New option 'buffers.formatters.tree_buffer'
+- New option 'buffers.highlights.tree_root'
+- New option 'buffers.highlights.tree_lines'
+
+BREAKING CHANGES
+
+- Files are not automatically added to the neovim buffer list anymore. The
+  options below are now deprecated and don't have any effect.
+
+DEPRECATED:
+- Option 'lazy_load_buffers'
+- Option 'jumps.mappings.load_buffer'
+- Option 'jumps.mappings.load_all'
+- Option 'jumps.mappings.load_cwd'
+- Option 'jumps.not_loaded'
+- Option 'jumps.autoload_filter'
+
+FIXES
+
+- Various fixes.
+
+------------------------------------------------------------------------------
+v1.0.0
+
+Initial release
+
+
+==============================================================================
+6. Credits                                                      *vessel-credits*
 
 Author: Giacomo Comitti
 Contributors: https://github.com/gcmt/vessel.nvim/contributors
@@ -1199,7 +1241,7 @@ Git repository: https://github.com/gcmt/vessel.nvim
 
 
 ==============================================================================
-6. License                                                      *vessel-license*
+7. License                                                      *vessel-license*
 
 MIT License
 
