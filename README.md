@@ -3,7 +3,7 @@
     <img src="https://img.shields.io/badge/status-active-green.svg">
     <img src="https://img.shields.io/badge/release-2.0.0-green.svg">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg">
-    <p>Better ergonomics around *Neovim* **mark list**, **buffer list** and **jump list**.</p>
+    <p>Better ergonomics around Neovim mark list, buffer list and jump list.</p>
 </div>
 
 ## Table of Contents
