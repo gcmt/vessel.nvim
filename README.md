@@ -234,11 +234,11 @@ You can switch to *pinned buffers* even from outside the buffer list window. Use
 
 ![TreeView](assets/treeview_dark.png "Buffer list tree view.")
 
-With *tree view* enabled, all buffers will be grouped and displayed as multiple directory trees, one for *current working directory*, one for the *home directory*, and one for the *root directory*.
+With *tree view* enabled, all buffers will be grouped and displayed as multiple directory trees, one for the *current working directory*, one for the *home directory*, and one for the *root directory*.
 
-You can create additional tree groups by pressing `g` on a directory or buffer. A new tree root will be created for that directory, or, in case a file is selected, its parent directory, and all matching buffers will be grouped under that tree. Buffers will always be grouped by the most specific group that matches their path.
+You can create additional tree groups by pressing `g` on a directory or buffer. A new tree root will be created for that directory, or, in case a file is selected, its parent directory. All matching buffers will be grouped under that tree. Buffers will always be grouped by the most specific group that matches their path.
 
-You can delete a group by pressing `g` again on the group and buffers will be regrouped automatically. You can customize the default `g` mapping with the option [buffers.mappings.toggle_group](buffersmappingstoggle_group).
+You can delete a group by pressing `g` again on the group and buffers will be regrouped automatically. You can customize the default `g` mapping with the option [buffers.mappings.toggle_group](#buffersmappingstoggle_group).
 
 *Pinned* buffers will still be displayed as a list at the top.
 
