@@ -6,6 +6,15 @@
     <p>Better ergonomics around Neovim mark list, buffer list and jump list.</p>
 </div>
 
+## Features
+
+- Workflow still centered around native functionality.
+- Highly customizable look and feel thanks to custom formatters and an extensive range of options.
+- Provides useful shortcuts for setting marks automatically without having to pick a letter by yourself.
+- Change and delete marks more effectively directly from the interactive mark list window.
+- Delete and "resurrect" buffers directly from the buffer list window.
+- *Pin* important buffers and quickly access them even from outside the buffer list window.
+
 ## Table of Contents
 
 - [Features](#features)
@@ -39,15 +48,6 @@
   - [Example Formatters](#example-formatters)
   - [Formatter Functions Signatures](#formatter-functions-signatures)
 - [LICENSE](#LICENSE)
-
-## Features
-
-- Workflow still centered around native functionality.
-- Highly customizable look and feel thanks to custom formatters and an extensive range of options.
-- Provides useful shortcuts for setting marks automatically without having to pick a letter by yourself.
-- Change and delete marks more effectively directly from the interactive mark list window.
-- Delete and "resurrect" buffers directly from the buffer list window.
-- *Pin* important buffers and quickly access them even from outside the buffer list window.
 
 ## Setup
 
