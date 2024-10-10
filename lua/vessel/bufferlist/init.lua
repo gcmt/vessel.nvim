@@ -623,6 +623,7 @@ function Bufferlist:_render_tree(map, start, buffers)
 		i = i + 1
 		local curr_padding = ""
 		local next_padding = padding
+		local lines = self.config.buffers.tree_lines
 
 		local path, children
 		if not tree.children then
@@ -637,8 +638,8 @@ function Bufferlist:_render_tree(map, start, buffers)
 			local line, matches = self:_format(root_formatter, path, { prefix = curr_padding })
 			self:_set_buf_line(map, i, line, matches, tree.path)
 		else
-			curr_padding = padding .. (is_last and "└─ " or "├─ ")
-			next_padding = padding .. (is_last and "   " or "│  ")
+			curr_padding = padding .. (is_last and lines[3] or lines[2])
+			next_padding = padding .. (is_last and lines[4] or lines[1])
 			if #children > 0 then
 				local line, matches = self:_format(dir_formatter, path, { prefix = curr_padding })
 				self:_set_buf_line(map, i, line, matches, vim.fs.joinpath(prefix, path))

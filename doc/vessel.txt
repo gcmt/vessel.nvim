@@ -966,6 +966,15 @@ NOTE: Has effect only when using the default formatter.
     vessel.opt.buffers.show_pin_positions = true
 >
 ------------------------------------------------------------------------------
+buffers.tree_lines
+
+Building blocks of the tree in tree view mode. All must have equal length.
+
+NOTE: Has effect only in tree view mode.
+<
+    vessel.opt.buffers.tree_lines = { "│  ", "├─ ", "└─ ", "   " }
+>
+------------------------------------------------------------------------------
 buffers.pin_separator
 
 Character used as separator between the *pinned list* and the rest of the

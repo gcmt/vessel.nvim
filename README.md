@@ -1162,6 +1162,16 @@ Useful when line numbers are not enabled for the window or the [buffers.quickjum
 vessel.opt.buffers.show_pin_positions = true
 ```
 
+#### buffers.tree_lines
+
+Building blocks of the tree in [tree view](#buffersview) mode. All must have equal length.
+
+> [!NOTE] Has effect only in [tree view](#buffersview) mode.
+
+```lua
+vessel.opt.buffers.tree_lines = { "│  ", "├─ ", "└─ ", "   " }
+```
+
 #### buffers.pin_separator
 
 Character used as separator between the *pinned list* and the rest of the buffers. Use an empty string to hide the separator. Its color is controlled by the option [buffers.highlights.pin_separator](#buffershighlights).

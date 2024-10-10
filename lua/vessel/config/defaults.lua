@@ -188,6 +188,7 @@ return {
 		bufpath_style = "relcwd",
 		formatter_spacing = " ",
 		directory_handler = directory_handler,
+		tree_lines = { "│  ", "├─ ", "└─ ", "   " },
 		mappings = {
 			cycle_sort = { "<space>" },
 			pin_increment = { "<c-a>", "<c-j>" },
