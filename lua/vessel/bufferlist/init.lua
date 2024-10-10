@@ -612,6 +612,59 @@ function Bufferlist:_set_buf_line(map, lnum, line, matches, data)
 	util.set_matches(matches or {}, lnum, self.bufnr, self.nsid)
 end
 
+--- Sort buffers and directories
+---@param list any[]
+---@param dir_fn function Function for filtering directories
+---@param sort_dirs_fn function Function for sorting directories
+---@param sort_buf_fn function Function for sorting regular buffers
+---@return any[]
+function Bufferlist:_sort(list, dir_fn, sort_dirs_fn, sort_buf_fn)
+	local directories, rest = {}, {}
+	for _, item in ipairs(list) do
+		if dir_fn(item) then
+			table.insert(directories, item)
+		else
+			table.insert(rest, item)
+		end
+	end
+
+	local ok, err = pcall(table.sort, directories, sort_dirs_fn)
+	if not ok then
+		local msg = string.gsub(tostring(err), "^.*:%s+", "")
+		logger.err("directories sorting error: %s", msg)
+	end
+
+	ok, err = pcall(table.sort, rest, sort_buf_fn)
+	if not ok then
+		local msg = string.gsub(tostring(err), "^.*:%s+", "")
+		logger.err("buffers sorting error: %s", msg)
+	end
+
+	local order
+	if self.config.buffers.directories_first then
+		order = { a = directories, b = rest }
+	else
+		order = { b = directories, a = rest }
+	end
+
+	local ret = {}
+	for _, item in ipairs(order.a) do
+		table.insert(ret, item)
+	end
+	for _, item in ipairs(order.b) do
+		table.insert(ret, item)
+	end
+
+	return ret
+end
+
+--- Retrun current buffer sorting function
+---@return function, string
+function Bufferlist:_sort_buf_function()
+	local sort_func = Sort_func or self.config.buffers.sort_buffers[1]
+	return sort_func()
+end
+
 --- Render buffer list as a tree
 ---@param map table
 ---@param start integer Line after which start rendering
@@ -621,6 +674,17 @@ function Bufferlist:_render_tree(map, start, buffers)
 	local root_formatter = self.config.buffers.formatters.tree_root
 	local buf_formatter = self.config.buffers.formatters.tree_buffer
 	local dir_formatter = self.config.buffers.formatters.tree_directory
+
+	local dirs_fn = function(node)
+		return not node.buffer or node.buffer.isdirectory
+	end
+	local sort_dirs_fn = function(a, b)
+		return self.config.buffers.sort_directories(a.path, b.path)
+	end
+	local sort_fn = self:_sort_buf_function()
+	local sort_buf_fn = function(a, b)
+		return sort_fn(a.buffer, b.buffer)
+	end
 
 	local i = start
 	local function _render_tree(tree, prefix, padding, is_last)
@@ -637,7 +701,7 @@ function Bufferlist:_render_tree(map, start, buffers)
 			curr_padding = padding .. (is_last and lines[3] or lines[2])
 			next_padding = padding .. (is_last and lines[4] or lines[1])
 			local meta = { prefix = curr_padding }
-			if not tree.buffer or tree.buffer and vim.fn.isdirectory(tree.buffer.path) == 1 then
+			if not tree.buffer or tree.buffer.isdirectory then
 				-- NOTE: directory nodes, when buffers, can be childless
 				local line, matches = self:_format(dir_formatter, tree.path, meta)
 				self:_set_buf_line(map, i, line, matches, vim.fs.joinpath(prefix, tree.path))
@@ -647,7 +711,9 @@ function Bufferlist:_render_tree(map, start, buffers)
 			end
 		end
 
-		for k, child in ipairs(tree.children) do
+		local children = self:_sort(tree.children, dirs_fn, sort_dirs_fn, sort_buf_fn)
+
+		for k, child in ipairs(children) do
 			_render_tree(child, prefix, next_padding, k == #tree.children)
 		end
 	end
@@ -753,17 +819,6 @@ function Bufferlist:_render()
 		end
 	end
 
-	if view == "flat" then
-		local sort_func = Sort_func or self.config.buffers.sort_buffers[1]
-		local func, _ = sort_func()
-		local ok, err = pcall(table.sort, unpinned, func)
-		if not ok then
-			local msg = string.gsub(tostring(err), "^.*:%s+", "")
-			logger.err("buffer sorting error: %s", msg)
-			return {}
-		end
-	end
-
 	local meta
 	if view == "tree" then
 		-- when in tree view mode, meta info makes sense only for pinned buffers
@@ -786,6 +841,20 @@ function Bufferlist:_render()
 	if view == "tree" then
 		self:_render_tree(map, i, unpinned)
 	else
+		local ok, err = pcall(table.sort, unpinned, self:_sort_buf_function())
+		if not ok then
+			local msg = string.gsub(tostring(err), "^.*:%s+", "")
+			logger.err("sorting error: %s", msg)
+			return {}
+		end
+		local dirs_fn = function(buffer)
+			return buffer.isdirectory
+		end
+		local sort_dirs_fn = function(a, b)
+			return self.config.buffers.sort_directories(a.path, b.path)
+		end
+		local sort_buf_fn = self:_sort_buf_function()
+		unpinned = self:_sort(unpinned, dirs_fn, sort_dirs_fn, sort_buf_fn)
 		self:_render_flat(map, i, unpinned, meta)
 	end
 

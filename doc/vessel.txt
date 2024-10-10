@@ -954,6 +954,22 @@ Example sorter function:
     end
 >
 ------------------------------------------------------------------------------
+buffers.sort_directories
+
+Function used to sort directories.
+<
+    buffers.sort_directories = function(path_a, path_b)
+        return path_a < path_b
+    end
+>
+------------------------------------------------------------------------------
+buffers.directories_first
+
+Whether directories should be put first or last in the buffer list or tree.
+<
+    buffers.directories_first = false
+>
+------------------------------------------------------------------------------
 buffers.show_pin_positions
 
 Whether line numbers are diplayed next to pinned buffers.
@@ -1211,14 +1227,17 @@ NEW
 - Lines of buffers not in the neovim buffer list are read automatically
   without having the need to turn on any option.
 - Added tree viewing mode for the buffer list.
-- New option 'buffers.view'
-- New option 'buffers.formatters.tree_root'
-- New option 'buffers.formatters.tree_directory'
-- New option 'buffers.formatters.tree_buffer'
-- New option 'buffers.highlights.tree_root'
-- New option 'buffers.highlights.tree_lines'
+- New option 'buffers.view'. Tree or flat list view.
+- New option 'buffers.formatters.tree_root'. New formatter for tree view.
+- New option 'buffers.formatters.tree_directory'. New formatter for tree view.
+- New option 'buffers.formatters.tree_buffer'. New formatter for tree view.
+- New option 'buffers.highlights.tree_root'. New highlight for tree view.
+- New option 'buffers.highlights.tree_lines'. New highlight for tree view.
+- New option 'buffers.sort_directories'. How directories are sorted.
+- New option 'buffers.directories_first'. How to position directories in the
+  list, first or last.
 
-BREAKING CHANGES
+BREAKING
 
 - Files are not automatically added to the neovim buffer list anymore. The
   options below are now deprecated and don't have any effect.

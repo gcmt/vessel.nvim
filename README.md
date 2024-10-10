@@ -1149,6 +1149,23 @@ function sort_by_basename()
 end
 ```
 
+#### buffers.sort_directories
+
+Function used to sort directories.
+
+```lua
+buffers.sort_directories = function(path_a, path_b)
+    return path_a < path_b
+end
+```
+#### buffers.directories_first
+
+Whether directories should be put first or last in the buffer list or tree.
+
+```lua
+    buffers.directories_first = false
+```
+
 #### buffers.show_pin_positions
 
 Whether line numbers are diplayed next to pinned buffers.

@@ -192,6 +192,8 @@ return {
 	["buffers.pin_separator"] = { "string" },
 	["buffers.formatter_spacing"] = { "string" },
 	["buffers.sort_buffers"] = listof("function", false),
+	["buffers.sort_directories"] = { "function" },
+	["buffers.directories_first"] = { "boolean" },
 	["buffers.bufname_align"] = oneof("none", "left", "right"),
 	["buffers.bufname_style"] = oneof("basename", "unique", "hide"),
 	["buffers.bufpath_style"] = oneof("full", "short", "relhome", "relcwd", "hide"),
