@@ -7,13 +7,11 @@ local tree = require("vessel.bufferlist.tree")
 local util = require("vessel.util")
 
 -- For stateful sorting
-local Sort_func
-
+local SORT_FUNC
 -- Custom tree roots
 local TREE_GROUPS = {}
-
 -- List of pinned buffers (only numbers)
-local Pinned = {}
+local PINNED = {}
 
 ---@class Buffer
 ---@field nr integer Buffer number
@@ -110,24 +108,24 @@ end
 --- Return pinned buffer list
 ---@return table
 function Bufferlist:get_pinned_list()
-	return Pinned
+	return PINNED
 end
 
 --- Return the next pinned buffer number
 ---@param bufnr integer
 ---@return integer?
 function Bufferlist:get_pinned_next(bufnr)
-	for i, nr in ipairs(Pinned) do
+	for i, nr in ipairs(PINNED) do
 		if nr == bufnr then
 			local index = i + 1
-			if index > #Pinned then
+			if index > #PINNED then
 				if not self.config.buffers.wrap_around then
 					return
 				else
 					index = 1
 				end
 			end
-			return Pinned[index]
+			return PINNED[index]
 		end
 	end
 end
@@ -136,17 +134,17 @@ end
 ---@param bufnr integer
 ---@return integer?
 function Bufferlist:get_pinned_prev(bufnr)
-	for i, nr in ipairs(Pinned) do
+	for i, nr in ipairs(PINNED) do
 		if nr == bufnr then
 			local index = i - 1
 			if index < 1 then
 				if not self.config.buffers.wrap_around then
 					return
 				else
-					index = #Pinned
+					index = #PINNED
 				end
 			end
-			return Pinned[index]
+			return PINNED[index]
 		end
 	end
 end
@@ -272,12 +270,12 @@ function Bufferlist:_action_increment_pin_pos(map, increment)
 		return
 	end
 	if selected.pinpos < 0 then
-		table.insert(Pinned, selected.nr)
+		table.insert(PINNED, selected.nr)
 	else
 		local newpos = selected.pinpos + increment
-		if newpos >= 1 and newpos <= #Pinned then
-			table.remove(Pinned, selected.pinpos)
-			table.insert(Pinned, selected.pinpos + increment, selected.nr)
+		if newpos >= 1 and newpos <= #PINNED then
+			table.remove(PINNED, selected.pinpos)
+			table.insert(PINNED, selected.pinpos + increment, selected.nr)
 		end
 	end
 	local newmap = self:_refresh()
@@ -306,16 +304,16 @@ function Bufferlist:_action_toggle_pin(map)
 	end
 
 	local index
-	for i, nr in ipairs(Pinned) do
+	for i, nr in ipairs(PINNED) do
 		if nr == bufnr then
 			index = i
 		end
 	end
 
 	if index then
-		table.remove(Pinned, index)
+		table.remove(PINNED, index)
 	else
-		table.insert(Pinned, bufnr)
+		table.insert(PINNED, bufnr)
 	end
 
 	local newmap = self:_refresh()
@@ -378,6 +376,7 @@ function Bufferlist:_action_delete(map, cmd, force)
 
 	if type(selected) == "string" then
 		-- TODO: delete all buffers for the directory
+		-- FIXME: delete if a directory buffer exists
 		return
 	end
 
@@ -428,7 +427,7 @@ function Bufferlist:_action_delete(map, cmd, force)
 		return
 	end
 
-	table.remove(Pinned, selected.pinpos)
+	table.remove(PINNED, selected.pinpos)
 	self:_refresh()
 end
 
@@ -441,14 +440,14 @@ function Bufferlist:_action_cycle_sort(map)
 	local funcs = self.config.buffers.sort_buffers
 	local index = 1
 	for i = 1, #funcs do
-		-- Sort_func is module-local
-		if Sort_func == funcs[i] then
+		-- SORT_FUNC is module-local
+		if SORT_FUNC == funcs[i] then
 			index = i
 			break
 		end
 	end
-	Sort_func = funcs[(index % #funcs) + 1]
-	local _, description = Sort_func()
+	SORT_FUNC = funcs[(index % #funcs) + 1]
+	local _, description = SORT_FUNC()
 	logger.info("vessel: %s", description)
 	local newmap = self:_refresh()
 	self:_follow_selected(selected, newmap)
@@ -519,7 +518,7 @@ end
 ---@return table
 function Bufferlist:_get_buffers()
 	local pinpos = {}
-	for i, nr in pairs(Pinned) do
+	for i, nr in pairs(PINNED) do
 		pinpos[nr] = i
 	end
 
@@ -527,7 +526,7 @@ function Bufferlist:_get_buffers()
 	for _, b in pairs(vim.fn.getbufinfo()) do
 		if vim.fn.getbufvar(b.bufnr, "&buftype") ~= "" then
 			if pinpos[b.bufnr] then
-				table.remove(Pinned, pinpos[b.bufnr])
+				table.remove(PINNED, pinpos[b.bufnr])
 			end
 			goto continue
 		end
@@ -594,7 +593,7 @@ end
 local function _get_meta(buffers)
 	local meta = {
 		max_basename = 0,
-		pinned_count = #Pinned,
+		pinned_count = #PINNED,
 		-- Maps each path to its shortest unique suffix
 		suffixes = {},
 		max_suffix = 0,
@@ -699,7 +698,7 @@ end
 --- Retrun current buffer sorting function
 ---@return function, string
 function Bufferlist:_sort_buf_function()
-	local sort_func = Sort_func or self.config.buffers.sort_buffers[1]
+	local sort_func = SORT_FUNC or self.config.buffers.sort_buffers[1]
 	return sort_func()
 end
 

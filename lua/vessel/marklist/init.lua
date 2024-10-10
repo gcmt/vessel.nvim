@@ -7,7 +7,7 @@ local logger = require("vessel.logger")
 local util = require("vessel.util")
 
 -- Stateful sort type
-local Sort_func
+local SORT_FUNC
 
 ---@class Mark
 ---@field mark string Mark letter
@@ -214,15 +214,15 @@ function Marklist:_get_marks(bufnr)
 		end
 	end
 
-	local sort_func = Sort_func or self.config.marks.sort_marks[1]
+	local sort_func = SORT_FUNC or self.config.marks.sort_marks[1]
 	local func, description = sort_func()
 	local ok, err = pcall(sort_marks, groups, func)
 	if not ok then
 		local msg = string.gsub(tostring(err), "^.*:%s+", "")
 		logger.err("marks sorting error: %s", msg)
 		return {}
-	elseif Sort_func and description ~= "" then
-		-- give feedback only if Sort_func gets changed
+	elseif SORT_FUNC and description ~= "" then
+		-- give feedback only if SORT_FUNC gets changed
 		logger.info("vessel: %s", description)
 	end
 
@@ -472,13 +472,13 @@ function Marklist:_action_cycle_sort(map)
 	local funcs = self.config.marks.sort_marks
 	local index = 1
 	for i = 1, #funcs do
-		if Sort_func == funcs[i] then
+		if SORT_FUNC == funcs[i] then
 			index = i
 			break
 		end
 	end
 
-	Sort_func = funcs[(index % #funcs) + 1]
+	SORT_FUNC = funcs[(index % #funcs) + 1]
 	local newmap = self:_refresh()
 	self:_follow_selected(selected, newmap)
 end
