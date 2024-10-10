@@ -1677,6 +1677,70 @@ Controls how each line of the buffer list is formatted. Takes the following four
 | `max_suffix`   | Max string length among all suffixes above.                                 |
 | `pinned_count` | Number of pinned buffers.                                                   |
 
+#### buffers.formatters.tree_buffer
+
+```lua
+vessel.opt.buffers.formatters.tree_buffer = <function>
+```
+
+Controls how each buffer is formatted in *tree view*. Takes the following four arguments:
+
+| Parameter | Description                                                                                                      |
+|-----------|------------------------------------------------------------------------------------------------------------------|
+| `buffer`  | The buffer being formatted. See the [buffer object](#buffer-object) section.                                     |
+| `context` | Table containing information about the current window/buffer. See the [context object](#context-object) section. |
+| `config`  | Table containing the complete configuration.                                                                     |
+| `meta`    | Table containing additional contextual information.                                                              |
+
+The `meta` table has the following keys:
+
+| Key            | Description                                                                 |
+|----------------|-----------------------------------------------------------------------------|
+| `prefix`       | Decoration lines of the tree line being rendered.                           |
+
+#### buffers.formatters.tree_directory
+
+```lua
+vessel.opt.buffers.formatters.tree_directory = <function>
+```
+
+Controls how each directory is formatted in *tree view*. Takes the following four arguments:
+
+| Parameter | Description                                                                                                      |
+|-----------|------------------------------------------------------------------------------------------------------------------|
+| `path`    | The path of the directory being formatted.                                                                       |
+| `context` | Table containing information about the current window/buffer. See the [context object](#context-object) section. |
+| `config`  | Table containing the complete configuration.                                                                     |
+| `meta`    | Table containing additional contextual information.                                                              |
+
+The `meta` table has the following keys:
+
+| Key            | Description                                                                 |
+|----------------|-----------------------------------------------------------------------------|
+| `prefix`       | Decoration lines of the tree line being rendered.                           |
+
+#### buffers.formatters.root_directory
+
+```lua
+vessel.opt.buffers.formatters.tree_root = <function>
+```
+
+Controls how each root directory is formatted in *tree view*. Takes the following four arguments:
+
+| Parameter | Description                                                                                                      |
+|-----------|------------------------------------------------------------------------------------------------------------------|
+| `path`    | The tree root path of the directory being formatted.                                                             |
+| `context` | Table containing information about the current window/buffer. See the [context object](#context-object) section. |
+| `config`  | Table containing the complete configuration.                                                                     |
+| `meta`    | Table containing additional contextual information.                                                              |
+
+The `meta` table has the following keys:
+
+| Key            | Description                                                                 |
+|----------------|-----------------------------------------------------------------------------|
+| `prefix`       | Decoration lines of the tree line being rendered.                           |
+
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE.txt](LICENSE.txt) file for details.
