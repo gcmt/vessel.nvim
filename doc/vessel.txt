@@ -1259,25 +1259,46 @@ Highlight groups used by the default formatter.
 5. Changelog                                                  *vessel-changelog*
 
 ------------------------------------------------------------------------------
+v2.1.0
+
+NEW FEATURES
+
+- Added ability to collapse directories in tree mode (bufferlist).
+- Added separators between tree groups (bufferlist).
+
+NEW OPTIONS
+
+- 'buffers.group_separator': Add separator between different tree groups.
+- 'buffers.highlights.group_separator': Group separator highlight.
+- 'buffers.mappings.collapse_directory': Collapse directory under cursor.
+- 'buffers.highlights.hidden_count': Hidden count on collapsed directories.
+
+FIXES
+
+- Fixed inability to delete directory buffers (bufferlist).
+
+------------------------------------------------------------------------------
 v2.0.0
 
-NEW
+NEW FEATURES
 
 - Lines of buffers not in the neovim buffer list are read automatically
   without having the need to turn on any option.
-- Added tree viewing mode for the buffer list.
-- New option 'buffers.view'. Tree or flat list view.
-- New option 'buffers.formatters.tree_root'. New formatter for tree view.
-- New option 'buffers.formatters.tree_directory'. New formatter for tree view.
-- New option 'buffers.formatters.tree_buffer'. New formatter for tree view.
-- New option 'buffers.highlights.tree_root'. New highlight for tree view.
-- New option 'buffers.highlights.tree_lines'. New highlight for tree view.
-- New option 'buffers.sort_directories'. How directories are sorted.
-- New option 'buffers.directories_first'. How to position directories in the
-  list, first or last.
-- New option 'buffers.mappings.toggle_group'. Create custom tree groups.
+- Added tree mode for the buffer list.
 
-BREAKING
+NEW OPTIONS
+
+- 'buffers.view': Tree or flat list view.
+- 'buffers.formatters.tree_root': New formatter for tree view.
+- 'buffers.formatters.tree_directory': New formatter for tree view.
+- 'buffers.formatters.tree_buffer': New formatter for tree view.
+- 'buffers.highlights.tree_root': New highlight for tree view.
+- 'buffers.highlights.tree_lines': New highlight for tree view.
+- 'buffers.sort_directories': How directories are sorted.
+- 'buffers.directories_first': Directories position, first or last in the list.
+- 'buffers.mappings.toggle_group': Create custom tree groups.
+
+BREAKING CHANGES
 
 - Files are not automatically added to the neovim buffer list anymore. The
   options below are now deprecated and don't have any effect.
