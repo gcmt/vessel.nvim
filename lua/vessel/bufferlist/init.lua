@@ -749,13 +749,22 @@ function Bufferlist:_render_tree(map, start, buffers)
 		end
 	end
 
-	for _, t in ipairs(tree.make_trees(_buffers, TREE_GROUPS)) do
-		if not t:is_leaf() then
-			local ok, err = pcall(_render_tree, t, t.path, "", false)
-			if not ok then
-				logger.err(string.gsub(tostring(err), "^.-:%d+:%s+", ""))
-				return i
-			end
+	local trees = tree.make_trees(_buffers, TREE_GROUPS)
+	trees = vim.tbl_filter(function(t)
+		return not t:is_leaf()
+	end, trees)
+	for k, t in ipairs(trees) do
+		local ok, err = pcall(_render_tree, t, t.path, "", false)
+		if not ok then
+			logger.err(string.gsub(tostring(err), "^.-:%d+:%s+", ""))
+			return i
+		end
+		if k ~= #trees then
+			i = self:_render_separator(
+				i,
+				self.config.buffers.group_separator,
+				self.config.buffers.highlights.group_separator
+			)
 		end
 	end
 
@@ -788,19 +797,15 @@ end
 
 --- Render a separator line between pinned and unpinned buffers
 ---@param start integer Line after which start rendering
+---@param sep integer Separator character
 ---@return integer Last rendered line
-function Bufferlist:_render_separator(start)
-	local separator = self.config.buffers.pin_separator
-	if separator == "" then
+function Bufferlist:_render_separator(start, sep, hlgroup)
+	if sep == "" then
 		return start
 	end
 	local i = start + 1
-	vim.fn.setbufline(self.bufnr, i, string.rep(separator, vim.fn.winwidth(0)))
-	local match = {
-		hlgroup = self.config.buffers.highlights.pin_separator,
-		startpos = 1,
-		endpos = -1,
-	}
+	vim.fn.setbufline(self.bufnr, i, string.rep(sep, vim.fn.winwidth(0)))
+	local match = { hlgroup = hlgroup, startpos = 1, endpos = -1 }
 	util.set_matches({ match }, i, self.bufnr, self.nsid)
 	return i
 end
@@ -858,7 +863,11 @@ function Bufferlist:_render()
 
 	-- render the separator only if there are unpinned visible buffers
 	if i > 0 and unpinned_listed_count > 0 then
-		i = self:_render_separator(i)
+		i = self:_render_separator(
+			i,
+			self.config.buffers.pin_separator,
+			self.config.buffers.highlights.pin_separator
+		)
 	end
 
 	-- render unpinned buffers

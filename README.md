@@ -1217,6 +1217,16 @@ See also [Pinned Buffers](#pinned-buffers).
 vessel.opt.buffers.pin_separator = "─"
 ```
 
+#### buffers.group_separator
+
+Character used as separator between different [tree groups](#buffer-list-tree-view). Use an empty string to hide the separator.
+
+The color can be set with the option [buffers.highlights.group_separator](#buffershighlights).
+
+```lua
+vessel.opt.buffers.group_separator = ""
+```
+
 #### buffers.bufname_align
 
 How to align the buffer name. Can be one of:
@@ -1476,6 +1486,7 @@ vessel.opt.buffers.highlights.directory = "Directory"
 vessel.opt.buffers.highlights.modified = "Keyword"
 vessel.opt.buffers.highlights.pin_position = "LineNr"
 vessel.opt.buffers.highlights.pin_separator = "NonText"
+vessel.opt.buffers.highlights.group_separator = "NonText"
 vessel.opt.buffers.highlights.tree_root = "Keyword"
 vessel.opt.buffers.highlights.tree_lines = "Comment"
 ```

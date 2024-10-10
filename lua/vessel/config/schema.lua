@@ -190,6 +190,7 @@ return {
 	["buffers.quickjump"] = { "boolean" },
 	["buffers.show_pin_positions"] = { "boolean" },
 	["buffers.pin_separator"] = { "string" },
+	["buffers.group_separator"] = { "string" },
 	["buffers.formatter_spacing"] = { "string" },
 	["buffers.sort_buffers"] = listof("function", false),
 	["buffers.sort_directories"] = { "function" },
@@ -232,6 +233,7 @@ return {
 	["buffers.highlights.modified"] = { "string" },
 	["buffers.highlights.pin_position"] = { "string" },
 	["buffers.highlights.pin_separator"] = { "string" },
+	["buffers.highlights.group_separator"] = { "string" },
 	["buffers.highlights.tree_root"] = { "string" },
 	["buffers.highlights.tree_lines"] = { "string" },
 }

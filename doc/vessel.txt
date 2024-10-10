@@ -1001,6 +1001,16 @@ the option buffers.highlights.pin_separator
     vessel.opt.buffers.pin_separator = "─"
 >
 ------------------------------------------------------------------------------
+buffers.group_separator
+
+Character used as separator between different tree groups. Use an empty string
+to hide the separator.
+
+The color can be set with the option 'buffers.highlights.group_separator'.
+<
+    vessel.opt.buffers.group_separator = ""
+>
+------------------------------------------------------------------------------
 buffers.bufname_align
 
 How to align the buffer name. Can be one of:
@@ -1223,6 +1233,7 @@ Highlight groups used by the default formatter.
     vessel.opt.buffers.highlights.modified = "Keyword"
     vessel.opt.buffers.highlights.pin_position = "LineNr"
     vessel.opt.buffers.highlights.pin_separator = "NonText"
+    vessel.opt.buffers.highlights.group_separator = "NonText"
     vessel.opt.buffers.highlights.tree_root = "Keyword"
     vessel.opt.buffers.highlights.tree_lines = "Comment"
 >

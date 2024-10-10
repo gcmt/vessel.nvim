@@ -184,6 +184,7 @@ return {
 		quickjump = true,
 		show_pin_positions = true,
 		pin_separator = "─",
+		group_separator = "",
 		sort_buffers = {
 			sorters.buffers.by_path,
 			sorters.buffers.by_basename,
@@ -230,6 +231,7 @@ return {
 			modified = "Keyword",
 			pin_position = "LineNr",
 			pin_separator = "NonText",
+			group_separator = "NonText",
 			tree_lines = "Comment",
 			tree_root = "Keyword",
 		},
