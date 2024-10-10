@@ -55,6 +55,9 @@ function Tree:insert(buffer, path)
 		::continue::
 		return tree
 	end
+	if path == "" then
+		path = "[no name]"
+	end
 	return _insert(self, {}, vim.split(path, "/", { trimempty = true }))
 end
 
@@ -91,7 +94,7 @@ function M.make_trees(buffers)
 	local home = os.getenv("HOME") or "/home"
 	local groups = { Tree:new(cwd), Tree:new(home), Tree:new("/") }
 	for _, buffer in ipairs(buffers) do
-		if vim.startswith(buffer.path, cwd .. "/") then
+		if vim.startswith(buffer.path, cwd .. "/") or buffer.path == "" then
 			groups[1]:insert(buffer, string.gsub(buffer.path, cwd, "", 1))
 		elseif vim.startswith(buffer.path, home .. "/") then
 			groups[2]:insert(buffer, string.gsub(buffer.path, home, "", 1))

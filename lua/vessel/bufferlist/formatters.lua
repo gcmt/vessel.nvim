@@ -113,8 +113,13 @@ function M.tree_buffer_formatter(buffer, meta, context, config)
 	elseif buffer.modified then
 		hl_bufname = config.buffers.highlights.modified
 	end
-	local line = { vim.fs.basename(buffer.path), hl_bufname }
-	return util.format("%s%s", prefix, line)
+	local bufname
+	if buffer.path == "" then
+		bufname = config.buffers.unnamed_label
+	else
+		bufname = vim.fs.basename(buffer.path)
+	end
+	return util.format("%s%s", prefix, { bufname, hl_bufname })
 end
 
 ---@param path string Intermediate directory absolute path
