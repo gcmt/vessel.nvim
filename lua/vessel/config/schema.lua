@@ -57,7 +57,7 @@ end
 local function deprecated(option)
 	return {
 		function(_)
-			logger.warn("option is deprecated: " .. option)
+			logger.warn("option is deprecated: '%s' (see :help vessel-changelog)", option)
 			return true
 		end,
 	}
