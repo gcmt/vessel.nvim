@@ -41,7 +41,8 @@ function Tree:insert(buffer, path)
 	---@return Tree
 	local function _insert(tree, head, tail)
 		if #tail == 0 then
-			return Tree:new(vim.fs.joinpath(unpack(head)), tree, buffer)
+			tree.buffer = buffer
+			return tree
 		end
 		table.insert(head, table.remove(tail, 1))
 		local head_path = vim.fs.joinpath(unpack(head))
