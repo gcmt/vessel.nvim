@@ -1171,7 +1171,7 @@ end
 Function used to sort directories.
 
 ```lua
-buffers.sort_directories = function(path_a, path_b)
+vessel.opt.buffers.sort_directories = function(path_a, path_b)
     return path_a < path_b
 end
 ```
@@ -1180,7 +1180,7 @@ end
 Whether directories should be put first or last in the buffer list or tree.
 
 ```lua
-    buffers.directories_first = false
+vessel.opt.buffers.directories_first = false
 ```
 
 #### buffers.show_pin_positions
