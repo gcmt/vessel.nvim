@@ -1,5 +1,7 @@
 ---@module "tree"
 
+local util = require("vessel.util")
+
 local M = {}
 
 ---@class Tree
@@ -134,16 +136,13 @@ function M.make_trees(buffers, custom_groups)
 		for _, prefix in ipairs(prefixes) do
 			if buffer.path == "" then
 				groups[cwd]:insert(buffer, string.gsub(buffer.path, cwd, "", 1))
-				break
-			elseif vim.startswith(buffer.path, prefix .. "/") then
+				goto continue
+			elseif vim.startswith(buffer.path, util.trim_path(prefix) .. "/") then
 				groups[prefix]:insert(buffer, string.gsub(buffer.path, prefix, "", 1))
-				break
-			elseif vim.startswith(buffer.path, prefix) then
-				-- handle root
-				groups[prefix]:insert(buffer, buffer.path)
-				break
+				goto continue
 			end
 		end
+		::continue::
 	end
 
 	local ret = {}
