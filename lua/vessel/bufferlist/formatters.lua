@@ -119,7 +119,7 @@ function M.tree_buffer_formatter(buffer, meta, context, config)
 	else
 		bufname = vim.fs.basename(buffer.path)
 	end
-	return util.format("%s%s", prefix, { bufname, hl_bufname })
+	return util.format(" %s%s", prefix, { bufname, hl_bufname })
 end
 
 ---@param path string Intermediate directory absolute path
@@ -135,7 +135,7 @@ function M.tree_directory_formatter(path, meta, context, config)
 		local hidden_count = string.format(" [%d]", meta.hidden_buffers)
 		hidden = { hidden_count, config.buffers.highlights.hidden_count }
 	end
-	return util.format("%s%s%s", prefix, dir, hidden or "")
+	return util.format(" %s%s%s", prefix, dir, hidden or "")
 end
 
 ---@param path string Root directory absolute path
@@ -149,7 +149,7 @@ function M.tree_root_formatter(path, meta, context, config)
 	if path == "~" then
 		path = os.getenv("HOME") or path
 	end
-	return util.format("%s%s", prefix, { path, config.buffers.highlights.tree_root })
+	return util.format(" %s%s", prefix, { path, config.buffers.highlights.tree_root })
 end
 
 return M
