@@ -242,9 +242,11 @@ You can create additional tree groups by pressing `g` on a directory or buffer. 
 
 You can delete a group by pressing `g` again on the group and buffers will be regrouped automatically. You can customize the default `g` mapping with the option [buffers.mappings.toggle_group](#buffersmappingstoggle_group).
 
-*Pinned* buffers will still be displayed as a list at the top.
+To keep things organized, you can momentarily hide buffers by collapsing directories with `h`. You can expand them again with `l` or `<CR>`.
 
 You can enable tree view with the option [buffers.view](#buffersview).
+
+> [!NOTE] *Pinned* buffers will always be displayed on top as a flat list.
 
 ## API
 
