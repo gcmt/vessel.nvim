@@ -16,6 +16,7 @@
   - [Preview Window](#preview-window)
   - [Buffer List Window](#buffer-list-window)
   - [Pinned Buffers](#pinned-buffers)
+  - [Buffer List Tree View](#buffer-list-tree-view)
 - [API](#api)
   - [Mark List API](#mark-list-api)
   - [Jump List API](#jump-list-api)
@@ -206,6 +207,7 @@ Once inside the window, the following mappings are available:
 | `P`          | Add to the buffer list the directory of the the buffer under cursor. See also [directory handler](#buffersdirectory_handler).           |
 | `<C-X>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
 | `<C-A>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
+| `g`          | Create or destroy group under cursor. See [Buffer List Tree View](#buffer-list-tree-view).                                              |
 
 > [!NOTE]
 > Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
@@ -227,6 +229,20 @@ The order of buffers in the *pinned list* can be manually adjusted. See mappings
 #### Pinned buffers navigation
 
 You can switch to *pinned buffers* even from outside the buffer list window. Use the provided [mappings](#buffer-list-mappings) `<plug>(VesselPinnedNext)` and `<plug>(VesselPinnedPrev)` or directly use the [Buffers API](#buffer-list-api). See also option [buffers.wrap_around](#bufferswrap_around).
+
+### Buffer List Tree View
+
+![TreeView](assets/treeview_dark.png "Buffer list tree view.")
+
+With *tree view* enabled, all buffers will be grouped and displayed as multiple directory trees, one for *current working directory*, one for the *home directory*, and one for the *root directory*.
+
+You can create additional tree groups by pressing `g` on a directory or buffer. A new tree root will be created for that directory, or, in case a file is selected, its parent directory, and all matching buffers will be grouped under that tree. Buffers will always be grouped by the most specific group that matches their path.
+
+You can delete a group by pressing `g` again on the group and buffers will be regrouped automatically. You can customize the default `g` mapping with the option [buffers.mappings.toggle_group](buffersmappingstoggle_group).
+
+*Pinned* buffers will still be displayed as a list at the top.
+
+You can enable tree view with the option [buffers.view](#buffersview).
 
 ## API
 

@@ -261,6 +261,7 @@ P                Add to the buffer list the directory of the the buffer under
 <C-A>            Increase the buffer position in the pinned list (moves the
                  buffer down).
 
+g                Toggle group under cursor.
 
 ==============================================================================
 4. Configuration                                          *vessel-configuration*
