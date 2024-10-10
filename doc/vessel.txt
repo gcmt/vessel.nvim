@@ -1088,6 +1088,16 @@ NOTE: Decrementing the position essentially moves the buffer up.
     vessel.opt.buffers.mappings.pin_decrement = { "<c-x>" }
 >
 ------------------------------------------------------------------------------
+buffers.mappings.toggle_group
+
+Create new tree group for the parent directory of the selected buffer or
+directly for the selected directory.
+
+NOTE: Has effect only in tree view mode.
+<
+    vessel.opt.buffers.mappings.toggle_group = { "g" }
+>
+------------------------------------------------------------------------------
 buffers.mappings.toggle_unlisted
 
 Toggle unlisted buffers.
@@ -1236,6 +1246,7 @@ NEW
 - New option 'buffers.sort_directories'. How directories are sorted.
 - New option 'buffers.directories_first'. How to position directories in the
   list, first or last.
+- New option 'buffers.mappings.toggle_group'. Create custom tree groups.
 
 BREAKING
 

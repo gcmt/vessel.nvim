@@ -1272,6 +1272,16 @@ See also [Pinned Buffers](#pinned-buffers).
 vessel.opt.buffers.mappings.toggle_pin = { "p" }
 ```
 
+#### buffers.mappings.toggle_group
+
+Create new tree group for the parent directory of the selected buffer or directly for the selected directory.
+
+> [!NOTE] Has effect only in tree view mode.
+
+```lua
+vessel.opt.buffers.mappings.toggle_group = { "g" }
+```
+
 #### buffers.mappings.add_directory
 
 Add to the buffer list the directory of the buffer under cursor.

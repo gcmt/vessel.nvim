@@ -9,6 +9,9 @@ local util = require("vessel.util")
 -- For stateful sorting
 local Sort_func
 
+-- Custom tree roots
+local TREE_GROUPS = {}
+
 -- List of pinned buffers (only numbers)
 local Pinned = {}
 
@@ -172,6 +175,38 @@ end
 --- Close the buffer list window
 function Bufferlist:_action_close()
 	self.window:_close_window()
+end
+
+--- Toggle custom group
+---@param map table
+function Bufferlist:_action_toggle_group(map)
+	local selected = map[vim.fn.line(".")]
+	if not selected then
+		return
+	end
+
+	local path
+	if type(selected) == "string" then
+		path = selected
+	else
+		path = vim.fs.dirname(selected.path)
+	end
+
+	local index
+	for i, _path in ipairs(TREE_GROUPS) do
+		if _path == path then
+			index = i
+		end
+	end
+
+	if index then
+		table.remove(TREE_GROUPS, index)
+	else
+		table.insert(TREE_GROUPS, 1, path)
+	end
+
+	local newmap = self:_refresh()
+	self:_follow_selected(selected, newmap)
 end
 
 --- Edit the buffer under cursor
@@ -427,6 +462,9 @@ function Bufferlist:_setup_mappings(map)
 	end)
 	util.keymap("n", self.config.buffers.mappings.cycle_sort, function()
 		self:_action_cycle_sort(map)
+	end)
+	util.keymap("n", self.config.buffers.mappings.toggle_group, function()
+		self:_action_toggle_group(map)
 	end)
 	util.keymap("n", self.config.buffers.mappings.toggle_unlisted, function()
 		self:_action_toggle_unlisted(map)
@@ -725,7 +763,7 @@ function Bufferlist:_render_tree(map, start, buffers)
 		end
 	end
 
-	for _, t in ipairs(tree.make_trees(_buffers)) do
+	for _, t in ipairs(tree.make_trees(_buffers, TREE_GROUPS)) do
 		if not t:is_leaf() then
 			local ok, err = pcall(_render_tree, t, t.path, "", false)
 			if not ok then

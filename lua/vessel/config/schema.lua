@@ -204,6 +204,7 @@ return {
 	["buffers.mappings.cycle_sort"] = listof("string"),
 	["buffers.mappings.pin_increment"] = listof("string"),
 	["buffers.mappings.pin_decrement"] = listof("string"),
+	["buffers.mappings.toggle_group"] = listof("string"),
 	["buffers.mappings.toggle_pin"] = listof("string"),
 	["buffers.mappings.add_directory"] = listof("string"),
 	["buffers.mappings.toggle_unlisted"] = listof("string"),
