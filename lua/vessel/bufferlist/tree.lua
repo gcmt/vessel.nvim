@@ -90,10 +90,6 @@ function M.make_trees(buffers)
 	local cwd = vim.fn.getcwd()
 	local home = os.getenv("HOME") or "/home"
 	local groups = { Tree:new(cwd), Tree:new(home), Tree:new("/") }
-	table.sort(buffers, function(a, b)
-		-- files first
-		return vim.fs.dirname(a.path) < vim.fs.dirname(b.path)
-	end)
 	for _, buffer in ipairs(buffers) do
 		if vim.startswith(buffer.path, cwd .. "/") then
 			groups[1]:insert(buffer, string.gsub(buffer.path, cwd, "", 1))
