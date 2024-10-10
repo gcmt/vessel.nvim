@@ -1063,7 +1063,8 @@ Buffer list view mode. Can be one of:
 - `flat` Buffers displayed as a simple list.
 - `tree` Buffers displayed as directory a tree. Buffers will be grouped in different directory trees depending on the most specific path prefix match: one group for the current working directory, one for the home directory and one for the root directory.
 
-[!NOTE] in *tree view* mode, pinned buffers will still be displayed as a list.
+> [!NOTE]
+> In *tree view* mode, pinned buffers will still be displayed as a list.
 
 ```lua
 vessel.opt.buffers.view = "flat"
@@ -1183,7 +1184,8 @@ vessel.opt.buffers.show_pin_positions = true
 
 Building blocks of the tree in [tree view](#buffersview) mode. All must have equal length.
 
-> [!NOTE] Has effect only in [tree view](#buffersview) mode.
+> [!NOTE]
+> Has effect only in [tree view](#buffersview) mode.
 
 ```lua
 vessel.opt.buffers.tree_lines = { "│  ", "├─ ", "└─ ", "   " }
@@ -1276,7 +1278,8 @@ vessel.opt.buffers.mappings.toggle_pin = { "p" }
 
 Create new tree group for the parent directory of the selected buffer or directly for the selected directory.
 
-> [!NOTE] Has effect only in tree view mode.
+> [!NOTE]
+> Has effect only in tree view mode.
 
 ```lua
 vessel.opt.buffers.mappings.toggle_group = { "g" }
@@ -1295,7 +1298,7 @@ vessel.opt.buffers.mappings.add_directory = { "P" }
 Move the buffer under cursor down in the *pinned list*. The buffer is pinned if not already in the *pinned list*.
 
 > [!NOTE]
->  Incrementing the position essentially moves the buffer down.
+> Incrementing the position essentially moves the buffer down.
 
 See also [Pinned Buffers](#pinned-buffers).
 
@@ -1416,7 +1419,8 @@ vessel.opt.buffers.formatters.buffer = <function>,
 
 Function used to format each tree root directory.
 
-> [!NOTE] Used in *tree view* mode ([buffers.view](#buffersview)).
+> [!NOTE]
+> Used in *tree view* mode ([buffers.view](#buffersview)).
 
 ```lua
 vessel.opt.buffers.formatters.tree_root = <function>
@@ -1426,7 +1430,8 @@ vessel.opt.buffers.formatters.tree_root = <function>
 
 Function used to format each tree directory node.
 
-> [!NOTE] Used in *tree view* mode ([buffers.view](#buffersview)).
+> [!NOTE]
+> Used in *tree view* mode ([buffers.view](#buffersview)).
 
 ```lua
 vessel.opt.buffers.formatters.tree_directory = <function>
@@ -1436,7 +1441,8 @@ vessel.opt.buffers.formatters.tree_directory = <function>
 
 Function used to format each tree buffer leave.
 
-> [!NOTE] Used in *tree view* mode ([buffers.view](#buffersview)).
+> [!NOTE]
+> Used in *tree view* mode ([buffers.view](#buffersview)).
 
 ```lua
 vessel.opt.buffers.formatters.tree_buffer = <function>
