@@ -10,6 +10,17 @@ M.modes = {
 	TAB = 4,
 }
 
+--- Find next available buffer
+---@param bufnr integer Buffer to replace
+---@return integer
+function M.find_repl_buf(bufnr)
+	for _, b in pairs(vim.fn.getbufinfo()) do
+		if b.bufnr ~= bufnr and b.listed == 1 and vim.fn.getbufvar(b.bufnr, "&buftype") == "" then
+			return b.bufnr
+		end
+	end
+end
+
 --- Join arguments with the given separator
 ---@param sep string
 ---@param ... any

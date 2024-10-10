@@ -376,7 +376,6 @@ function Bufferlist:_action_delete(map, cmd, force)
 
 	if type(selected) == "string" then
 		-- TODO: delete all buffers for the directory
-		-- FIXME: delete if a directory buffer exists
 		return
 	end
 
@@ -388,20 +387,7 @@ function Bufferlist:_action_delete(map, cmd, force)
 		end
 	end
 
-	-- Find replacement buffer
-	local function _find_repl()
-		for _, b in pairs(vim.fn.getbufinfo()) do
-			if
-				b.bufnr ~= selected.nr
-				and b.listed == 1
-				and vim.fn.getbufvar(b.bufnr, "&buftype") == ""
-			then
-				return b.bufnr
-			end
-		end
-	end
-
-	local repl = _find_repl()
+	local repl = util.find_repl_buf(selected.nr)
 	if not repl then
 		if selected.path == "" then
 			logger.info("can't delete last buffer")
@@ -741,7 +727,8 @@ function Bufferlist:_render_tree(map, start, buffers)
 			if not tree.buffer or tree.buffer.isdirectory then
 				-- NOTE: directory nodes, when buffers, can be childless
 				local line, matches = self:_format(dir_formatter, tree.path, meta)
-				self:_set_buf_line(map, i, line, matches, vim.fs.joinpath(prefix, tree.path))
+				local data = tree.buffer or vim.fs.joinpath(prefix, tree.path)
+				self:_set_buf_line(map, i, line, matches, data)
 			else
 				local line, matches = self:_format(buf_formatter, tree.buffer, meta)
 				self:_set_buf_line(map, i, line, matches, tree.buffer)
