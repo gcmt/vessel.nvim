@@ -51,7 +51,7 @@ return {
 
 	--- generic options
 	verbosity = vim.log.levels.INFO,
-	lazy_load_buffers = true,
+	lazy_load_buffers = true, -- DEPRECATED
 	highlight_on_jump = false,
 	highlight_timeout = 250,
 	jump_callback = jump_callback,
@@ -148,17 +148,17 @@ return {
 		not_found = "Jump list empty",
 		indicator = { " ", " " },
 		show_colnr = false,
-		not_loaded = "",
-		autoload_filter = function() end,
+		not_loaded = "", -- DEPRECATED
+		autoload_filter = function() end, -- DEPRECATED
 		mappings = {
 			ctrl_o = "<c-o>",
 			ctrl_i = "<c-i>",
 			jump = { "l", "<cr>" },
 			close = { "q", "<esc>" },
 			clear = { "C" },
-			load_buffer = { "r" },
-			load_all = { "R" },
-			load_cwd = { "W" },
+			load_buffer = { "r" }, -- DEPRECATED
+			load_all = { "R" }, -- DEPRECATED
+			load_cwd = { "W" }, -- DEPRECATED
 		},
 		formatters = {
 			jump = jumps_formatters.jump_formatter,
