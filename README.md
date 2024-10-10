@@ -246,7 +246,8 @@ To keep things organized, you can momentarily hide buffers by collapsing directo
 
 You can enable tree view with the option [buffers.view](#buffersview).
 
-> [!NOTE] *Pinned* buffers will always be displayed on top as a flat list.
+> [!NOTE]
+> *Pinned* buffers will always be displayed on top as a flat list.
 
 ## API
 
