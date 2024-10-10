@@ -257,13 +257,17 @@ function Bufferlist:_action_toggle_pin(map)
 		return
 	end
 
-	local bufnr = selected.nr
-
-	-- handle tree view directory nodes
+	local bufnr
 	if type(selected) == "string" then
-		bufnr = vim.fn.bufadd(selected)
-		vim.fn.setbufvar(bufnr, "&buflisted", 1)
-		logger.info('"%s" added to the buffer list', util.prettify_path(selected))
+		-- handle tree view directory nodes
+		bufnr = vim.fn.bufnr(selected)
+		if bufnr == -1 then
+			bufnr = vim.fn.bufadd(selected)
+			vim.fn.setbufvar(bufnr, "&buflisted", 1)
+			logger.info('"%s" added to the buffer list', util.prettify_path(selected))
+		end
+	else
+		bufnr = selected.nr
 	end
 
 	local index
@@ -625,48 +629,26 @@ function Bufferlist:_render_tree(map, start, buffers)
 		local next_padding = padding
 		local lines = self.config.buffers.tree_lines
 
-		local path, children
-		if not tree.children then
-			path = vim.fs.basename(tree.path)
-			children = {}
-		else
-			path = tree.path
-			children = tree.children
-		end
-
-		if tree.is_root then
-			local line, matches = self:_format(root_formatter, path, { prefix = curr_padding })
+		if not tree.parent then
+			-- print root directory
+			local line, matches = self:_format(root_formatter, tree.path, { prefix = curr_padding })
 			self:_set_buf_line(map, i, line, matches, tree.path)
 		else
 			curr_padding = padding .. (is_last and lines[3] or lines[2])
 			next_padding = padding .. (is_last and lines[4] or lines[1])
-			if #children > 0 then
-				local line, matches = self:_format(dir_formatter, path, { prefix = curr_padding })
-				self:_set_buf_line(map, i, line, matches, vim.fs.joinpath(prefix, path))
+			local meta = { prefix = curr_padding }
+			if not tree.buffer or tree.buffer and vim.fn.isdirectory(tree.buffer.path) == 1 then
+				-- NOTE: directory nodes, when buffers, can be childless
+				local line, matches = self:_format(dir_formatter, tree.path, meta)
+				self:_set_buf_line(map, i, line, matches, vim.fs.joinpath(prefix, tree.path))
 			else
-				local line, matches = self:_format(buf_formatter, tree, { prefix = curr_padding })
-				self:_set_buf_line(map, i, line, matches, tree)
+				local line, matches = self:_format(buf_formatter, tree.buffer, meta)
+				self:_set_buf_line(map, i, line, matches, tree.buffer)
 			end
 		end
 
-		for k, child in ipairs(tree.children or {}) do
-			if
-				not child.children -- It's a leaf node (a buffer)
-				and vim.fn.isdirectory(child.path) == 1 -- Redundant bu avoids next check
-				and #( -- There's any intemediate node with the same name
-						vim.tbl_filter(function(c)
-							return c.children
-								and vim.fs.basename(c.path) == vim.fs.basename(child.path)
-						end, tree.children)
-					)
-					> 0
-			then
-				-- Buffers can be directories. Don't show then unless
-				-- they are the only child
-				goto continue
-			end
-			_render_tree(child, prefix, next_padding, k == #children)
-			::continue::
+		for k, child in ipairs(tree.children) do
+			_render_tree(child, prefix, next_padding, k == #tree.children)
 		end
 	end
 
@@ -678,7 +660,7 @@ function Bufferlist:_render_tree(map, start, buffers)
 	end
 
 	for _, t in ipairs(tree.make_trees(_buffers)) do
-		if #t.children > 0 then
+		if not t:is_leaf() then
 			local ok, err = pcall(_render_tree, t, t.path, "", false)
 			if not ok then
 				logger.err(string.gsub(tostring(err), "^.-:%d+:%s+", ""))
