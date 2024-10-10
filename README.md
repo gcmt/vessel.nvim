@@ -1,8 +1,9 @@
 <div align="center">
     <h1>vessel.nvim</h1>
     <img src="https://img.shields.io/badge/status-active-green.svg">
-    <img src="https://img.shields.io/badge/release-2.0.0-green.svg">
+    <img src="https://img.shields.io/badge/release-2.1.0-green.svg">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg">
+    <p></p>
     <p>Better ergonomics around Neovim mark list, buffer list and jump list.</p>
 </div>
 
