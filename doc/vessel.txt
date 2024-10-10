@@ -225,6 +225,7 @@ W                Load in memory all files inside the current working directory
 q, <ESC>         Close the floating window.
 
 l, <CR>          Edit the buffer under cursor. Takes a count.
+                 Also expand a collpased directory in tree mode.
 
 t                Edit the buffer undeer cursor in a new tab.
 
@@ -262,6 +263,9 @@ P                Add to the buffer list the directory of the the buffer under
                  buffer down).
 
 g                Toggle group under cursor.
+
+h                Collapse the directory under cursor. If a buffer is selected,
+                 its parent directory will be collapsed.
 
 ==============================================================================
 4. Configuration                                          *vessel-configuration*
@@ -1109,6 +1113,18 @@ NOTE: Has effect only in tree view mode.
     vessel.opt.buffers.mappings.toggle_group = { "g" }
 >
 ------------------------------------------------------------------------------
+buffers.mappings.collapse_directory
+
+Collapse directory under cursor and hide all of its content. If a buffer is
+selected instead, its parent directory will be collapsed. To expand
+a collapsed directory, use the the normal mapping 'buffer.mappings.edit'.
+.
+
+NOTE: Works only in tree view mode.
+<
+    vessel.opt.buffers.collapse_directory = { "h" }
+>
+------------------------------------------------------------------------------
 buffers.mappings.toggle_unlisted
 
 Toggle unlisted buffers.
@@ -1236,6 +1252,7 @@ Highlight groups used by the default formatter.
     vessel.opt.buffers.highlights.group_separator = "NonText"
     vessel.opt.buffers.highlights.tree_root = "Keyword"
     vessel.opt.buffers.highlights.tree_lines = "Comment"
+    vessel.opt.buffers.highlights.hidden_count = "Comment"
 >
 
 ==============================================================================

@@ -62,6 +62,23 @@ function Tree:insert(buffer, path)
 	return _insert(self, {}, vim.split(path, "/", { trimempty = true }))
 end
 
+--- Count buffer in the tree
+---@return integer
+function Tree:count()
+	---@param tree Tree
+	---@param acc integer Accumulator
+	local function _count(tree, acc)
+		if tree.buffer then
+			acc = acc + 1
+		end
+		for _, child in pairs(tree.children) do
+			acc = _count(child, acc)
+		end
+		return acc
+	end
+	return _count(self, 0)
+end
+
 --- Pretty print the tree
 function Tree:_pprint()
 	---@param tree Tree

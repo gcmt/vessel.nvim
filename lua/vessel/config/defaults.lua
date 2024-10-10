@@ -203,6 +203,7 @@ return {
 			cycle_sort = { "<space>" },
 			pin_increment = { "<c-a>", "<c-j>" },
 			pin_decrement = { "<c-x>", "<c-k>" },
+			collapse_directory = { "h" },
 			toggle_group = { "g" },
 			toggle_pin = { "p" },
 			add_directory = { "P" },
@@ -234,6 +235,7 @@ return {
 			group_separator = "NonText",
 			tree_lines = "Comment",
 			tree_root = "Keyword",
+			hidden_count = "Comment",
 		},
 	},
 }

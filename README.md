@@ -193,7 +193,7 @@ Once inside the window, the following mappings are available:
 | Mapping      | Action                                                                                                                                  |
 |--------------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | `q`, `<ESC>` | Close the floating window.                                                                                                              |
-| `l`, `<CR>`  | Edit the buffer under cursor. Takes a count.                                                                                            |
+| `l`, `<CR>`  | Edit the buffer under cursor. Takes a count. Also expand a collapsed directory in [tree mode](#buffer-list-tree-view).                  |
 | `t`          | Edit the buffer undeer cursor in a new tab.                                                                                             |
 | `s`          | Edit the buffer under cursor in a horizontal split.                                                                                     |
 | `v`          | Edit the buffer under cursor in a vertical split.                                                                                       |
@@ -208,6 +208,7 @@ Once inside the window, the following mappings are available:
 | `<C-X>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
 | `<C-A>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
 | `g`          | Create or destroy group under cursor. See [Buffer List Tree View](#buffer-list-tree-view).                                              |
+| `h`          | Collapse the directory under cursor. If a buffer is selected, its parent directory will be collapsed.                                   |
 
 > [!NOTE]
 > Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
@@ -1311,6 +1312,17 @@ Create new tree group for the parent directory of the selected buffer or directl
 vessel.opt.buffers.mappings.toggle_group = { "g" }
 ```
 
+#### buffers.mappings.collapse_directory
+
+Collapse directory under cursor and hide all of its content. If a buffer is selected instead, its parent directory will be collapsed. To expand a collapsed directory, use [buffer.mappings.edit](#buffersmappingsedit)
+
+> [!NOTE]
+> Works only in tree view mode.
+
+```lua
+vessel.opt.buffers.collapse_directory = { "h" }
+```
+
 #### buffers.mappings.add_directory
 
 Add to the buffer list the directory of the buffer under cursor.
@@ -1489,6 +1501,7 @@ vessel.opt.buffers.highlights.pin_separator = "NonText"
 vessel.opt.buffers.highlights.group_separator = "NonText"
 vessel.opt.buffers.highlights.tree_root = "Keyword"
 vessel.opt.buffers.highlights.tree_lines = "Comment"
+vessel.opt.buffers.highlights.hidden_count = "Comment"
 ```
 
 ## Formatters

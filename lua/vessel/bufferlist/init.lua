@@ -10,6 +10,8 @@ local util = require("vessel.util")
 local SORT_FUNC
 -- Custom tree roots
 local TREE_GROUPS = {}
+-- Collapsed directory nodes
+local COLLAPSED = {}
 -- List of pinned buffers (only numbers)
 local PINNED = {}
 
@@ -226,6 +228,21 @@ function Bufferlist:_action_edit(map, mode, line)
 		return
 	end
 
+	local path
+	if type(selected) == "string" then
+		path = selected
+	else
+		path = selected.path
+	end
+
+	if COLLAPSED[path] then
+		-- open collapsed directory
+		COLLAPSED[path] = nil
+		self:_refresh()
+		vim.cmd("norm! j")
+		return
+	end
+
 	self:_action_close()
 
 	if mode == util.modes.SPLIT then
@@ -321,6 +338,30 @@ function Bufferlist:_action_toggle_pin(map)
 		-- intermediate directory nodes don't disappear from the tree
 		self:_follow_selected(selected, newmap)
 	end
+end
+
+--- Collapse directory node in tree view
+---@param map table
+function Bufferlist:_action_collapse_directory(map)
+	local selected = map[vim.fn.line(".")]
+	if not selected then
+		return
+	end
+
+	local path
+	if type(selected) == "string" then
+		path = selected
+	else
+		if selected.isdirectory then
+			path = selected.path
+		else
+			path = vim.fs.dirname(selected.path)
+		end
+	end
+
+	COLLAPSED[path] = true
+	local newmap = self:_refresh()
+	self:_follow_selected(path, newmap)
 end
 
 --- Add to the buffer list the directory of the buffer under cursor
@@ -448,9 +489,6 @@ function Bufferlist:_setup_mappings(map)
 	util.keymap("n", self.config.buffers.mappings.cycle_sort, function()
 		self:_action_cycle_sort(map)
 	end)
-	util.keymap("n", self.config.buffers.mappings.toggle_group, function()
-		self:_action_toggle_group(map)
-	end)
 	util.keymap("n", self.config.buffers.mappings.toggle_unlisted, function()
 		self:_action_toggle_unlisted(map)
 	end)
@@ -497,6 +535,15 @@ function Bufferlist:_setup_mappings(map)
 				self:_action_edit(map, util.modes.BUFFER, i)
 			end)
 		end
+	end
+	-- tree view-only mappings
+	if self.config.buffers.view == "tree" then
+		util.keymap("n", self.config.buffers.mappings.toggle_group, function()
+			self:_action_toggle_group(map)
+		end)
+		util.keymap("n", self.config.buffers.mappings.collapse_directory, function()
+			self:_action_collapse_directory(map)
+		end)
 	end
 end
 
@@ -715,6 +762,7 @@ function Bufferlist:_render_tree(map, start, buffers)
 		local curr_padding = ""
 		local next_padding = padding
 		local lines = self.config.buffers.tree_lines
+		local path = vim.fs.joinpath(prefix, tree.path)
 
 		if not tree.parent then
 			-- print root directory
@@ -725,6 +773,10 @@ function Bufferlist:_render_tree(map, start, buffers)
 			next_padding = padding .. (is_last and lines[4] or lines[1])
 			local meta = { prefix = curr_padding }
 			if not tree.buffer or tree.buffer.isdirectory then
+				if COLLAPSED[path] then
+					meta.collapsed = true
+					meta.hidden_buffers = tree:count()
+				end
 				-- NOTE: directory nodes, when buffers, can be childless
 				local line, matches = self:_format(dir_formatter, tree.path, meta)
 				local data = tree.buffer or vim.fs.joinpath(prefix, tree.path)
@@ -733,6 +785,10 @@ function Bufferlist:_render_tree(map, start, buffers)
 				local line, matches = self:_format(buf_formatter, tree.buffer, meta)
 				self:_set_buf_line(map, i, line, matches, tree.buffer)
 			end
+		end
+
+		if COLLAPSED[path] then
+			return
 		end
 
 		local children = self:_sort(tree.children, dirs_fn, sort_dirs_fn, sort_buf_fn)

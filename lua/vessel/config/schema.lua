@@ -208,6 +208,7 @@ return {
 	["buffers.mappings.toggle_group"] = listof("string"),
 	["buffers.mappings.toggle_pin"] = listof("string"),
 	["buffers.mappings.add_directory"] = listof("string"),
+	["buffers.mappings.collapse_directory"] = listof("string"),
 	["buffers.mappings.toggle_unlisted"] = listof("string"),
 	["buffers.mappings.edit"] = listof("string"),
 	["buffers.mappings.close"] = listof("string"),
@@ -236,4 +237,5 @@ return {
 	["buffers.highlights.group_separator"] = { "string" },
 	["buffers.highlights.tree_root"] = { "string" },
 	["buffers.highlights.tree_lines"] = { "string" },
+	["buffers.highlights.hidden_count"] = { "string" },
 }
