@@ -244,7 +244,10 @@ You can delete a group by pressing `g` again on the group and buffers will be re
 
 To keep things organized you also have the possibility to hide buffers by collapsing directories with `h`. You can then expand them again with `l` or `<CR>`. See [buffers.mappings.collapse_directory](#buffersmappingscollapse_directory) option.
 
-An option you might want to check out is [buffers.directories_first](#buffersdirectories_first), that controls whether directories are ordered first or last.
+There are also a couple of options you might want to check out:
+
+- [buffers.directories_first](#buffersdirectories_first), to control whether directories are ordered first or last.
+- [buffers.squash_directories](#bufferssquash_directories), to squash directories with a single directory child (enabled by default and toggleable with [buffers.mappings.toggle_squash](#buffersmappingstoggle_squash).
 
 > [!NOTE]
 > *Pinned* buffers will always be displayed on top as a flat list and won't be displayed along other buffers in directory trees.
@@ -1180,6 +1183,35 @@ vessel.opt.buffers.sort_directories = function(path_a, path_b)
     return path_a < path_b
 end
 ```
+
+#### buffers.squash_directories
+
+Whether to squash the directory structure when directories only have a single directory child.
+
+This option can be toggled directly from the buffer list window with [buffers.mappings.toggle_squash](#buffersmappingstoggle_squash).
+
+```lua
+vessel.opt.buffers.squash_directories = true
+```
+
+Example of a non-squashed directory structure (`/home/user` is the root directory in this case, which is always displayed):
+
+```
+ /home/user
+ └─ .dotfiles
+    └─ nvim
+       └─ lua
+          └─ init.lua
+```
+
+With `buffers.squash_directories` set to `true`.
+
+```
+ /home/user
+ └─ .dotfiles/nvim/lua
+    └─ init.lua
+```
+
 #### buffers.directories_first
 
 Whether directories should be put first or last in the buffer list or tree.
@@ -1314,6 +1346,17 @@ Create new tree group for the parent directory of the selected buffer or directl
 
 ```lua
 vessel.opt.buffers.mappings.toggle_group = { "g" }
+```
+
+#### buffers.mappings.toggle_squash
+
+Toggle [squash option](#bufferssquash_directories).
+
+> [!NOTE]
+> Has effect only in tree view mode.
+
+```lua
+vessel.opt.buffers.mappings.toggle_squash = { "_" }
 ```
 
 #### buffers.mappings.collapse_directory
@@ -1725,6 +1768,7 @@ The `meta` table has the following keys:
 | Key            | Description                                                                 |
 |----------------|-----------------------------------------------------------------------------|
 | `prefix`       | Decoration lines of the tree line being rendered.                           |
+| `root`         | Tree root path.                                                             |
 
 #### buffers.formatters.tree_directory
 
@@ -1736,16 +1780,22 @@ Controls how each directory is formatted in *tree view*. Takes the following fou
 
 | Parameter | Description                                                                                                      |
 |-----------|------------------------------------------------------------------------------------------------------------------|
-| `path`    | The path of the directory being formatted.                                                                       |
+| `path`    | The full path of the directory being formatted.                                                                  |
 | `context` | Table containing information about the current window/buffer. See the [context object](#context-object) section. |
 | `config`  | Table containing the complete configuration.                                                                     |
 | `meta`    | Table containing additional contextual information.                                                              |
 
 The `meta` table has the following keys:
 
-| Key            | Description                                                                 |
-|----------------|-----------------------------------------------------------------------------|
-| `prefix`       | Decoration lines of the tree line being rendered.                           |
+| Key              | Description                                                                 |
+|------------------|-----------------------------------------------------------------------------|
+| `prefix`         | Decoration lines of the tree line being rendered.                           |
+| `root`           | Tree root path.                                                             |
+| `rel_path        | Path relative to the tree root.                                             |
+| `collapsed`      | Whether the current directory is collapse.                                  |
+| `hidden_buffers` | Number of hidden buffers when the directory is collapsed.                   |
+| `squashed`       | Whether the directory is squashed.                                          |
+| `squashed_path`  | Relative path to the next buffer when the directory is squashed.            |
 
 #### buffers.formatters.root_directory
 

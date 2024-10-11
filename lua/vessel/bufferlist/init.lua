@@ -6,6 +6,8 @@ local logger = require("vessel.logger")
 local tree = require("vessel.bufferlist.tree")
 local util = require("vessel.util")
 
+-- For stateful squash preference
+local SQUASH
 -- For stateful sorting
 local SORT_FUNC
 -- Custom tree roots
@@ -390,6 +392,18 @@ function Bufferlist:_action_add_directory(map)
 	return newmap
 end
 
+--- Toggle squash option
+---@param map table
+function Bufferlist:_action_toggle_squash(map)
+	local selected = map[vim.fn.line(".")]
+	if not selected then
+		return
+	end
+	SQUASH = not SQUASH
+	local newmap = self:_refresh()
+	self:_follow_selected(selected, newmap)
+end
+
 --- Toggle unlisted buffes
 ---@param map table
 function Bufferlist:_action_toggle_unlisted(map)
@@ -547,6 +561,9 @@ function Bufferlist:_setup_mappings(map)
 		util.keymap("n", self.config.buffers.mappings.collapse_directory, function()
 			self:_action_collapse_directory(map)
 		end)
+		util.keymap("n", self.config.buffers.mappings.toggle_squash, function()
+			self:_action_toggle_squash(map)
+		end)
 	end
 end
 
@@ -657,10 +674,10 @@ end
 
 --- Format Buffer with the given formatter
 ---@param formatter function Formatter function
----@param buffer Buffer Buffer to format
+---@param data Buffer|string Buffer or path to format
 ---@param meta table Contextual info
-function Bufferlist:_format(formatter, buffer, meta)
-	local ok, line, matches = pcall(formatter, buffer, meta, self.context, self.config)
+function Bufferlist:_format(formatter, data, meta)
+	local ok, line, matches = pcall(formatter, data, meta, self.context, self.config)
 	if not ok or not line then
 		local msg
 		if not line then
@@ -760,44 +777,70 @@ function Bufferlist:_render_tree(map, start, buffers)
 	end
 
 	local i = start
-	local function _render_tree(tree, prefix, padding, is_last)
+	local function _render_tree(tree, root_dir, padding, is_last)
 		i = i + 1
 		local curr_padding = ""
 		local next_padding = padding
 		local lines = self.config.buffers.tree_lines
-		local path = vim.fs.joinpath(prefix, tree.path)
+		local full_path = vim.fs.joinpath(root_dir, tree.path)
 
 		if not tree.parent then
-			-- print root directory
+			-- print root directory !! root_dir == tree.path !!
 			local line, matches = self:_format(root_formatter, tree.path, { prefix = curr_padding })
 			self:_set_buf_line(map, i, line, matches, tree.path)
 		else
 			curr_padding = padding .. (is_last and lines[3] or lines[2])
 			next_padding = padding .. (is_last and lines[4] or lines[1])
-			local meta = { prefix = curr_padding }
+
+			local meta = { prefix = curr_padding, root = root_dir }
 			if not tree.buffer or tree.buffer.isdirectory then
-				if COLLAPSED[path] then
+				local parent_full_path
+				if tree.parent.parent then
+					parent_full_path = vim.fs.joinpath(root_dir, tree.parent.path)
+				else
+					parent_full_path = root_dir
+				end
+
+				meta.squashed = false
+				if SQUASH == nil then
+					SQUASH = self.config.buffers.squash_directories
+				end
+				if SQUASH then
+					local next = tree:fast_forward()
+					if next then
+						tree = next
+						meta.squashed = true
+						full_path = vim.fs.joinpath(root_dir, tree.path)
+					end
+				end
+
+				meta.collapsed = false
+				if COLLAPSED[full_path] then
 					meta.collapsed = true
 					meta.hidden_buffers = tree:count_buffers()
 				end
+
 				-- NOTE: directory nodes, when buffers, can be childless
-				local line, matches = self:_format(dir_formatter, tree.path, meta)
-				local data = tree.buffer or vim.fs.joinpath(prefix, tree.path)
-				self:_set_buf_line(map, i, line, matches, data)
+				meta.rel_path = tree.path
+				if meta.squashed then
+					meta.squashed_path = string.gsub(full_path, parent_full_path .. "/", "", 1)
+				end
+				local line, matches = self:_format(dir_formatter, full_path, meta)
+				self:_set_buf_line(map, i, line, matches, full_path)
 			else
 				local line, matches = self:_format(buf_formatter, tree.buffer, meta)
 				self:_set_buf_line(map, i, line, matches, tree.buffer)
 			end
 		end
 
-		if COLLAPSED[path] then
+		if COLLAPSED[full_path] then
 			return
 		end
 
 		local children = self:_sort(tree.children, dirs_fn, sort_dirs_fn, sort_buf_fn)
 
 		for k, child in ipairs(children) do
-			_render_tree(child, prefix, next_padding, k == #tree.children)
+			_render_tree(child, root_dir, next_padding, k == #tree.children)
 		end
 	end
 

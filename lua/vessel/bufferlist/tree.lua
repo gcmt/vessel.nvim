@@ -66,6 +66,26 @@ function Tree:insert(buffer, path)
 	return _insert(self, {}, vim.split(path, "/", { trimempty = true }))
 end
 
+--- Find first descendant directory that has multiple children
+--- "Eat up" each node that has only one directory child
+---@return Tree?
+function Tree:fast_forward()
+	---@param tree Tree
+	local function _next(tree)
+		if #tree.children == 1 and not tree.children[1].buffer then
+			return _next(tree.children[1])
+		elseif #tree.children > 0 then
+			return tree
+		end
+		return nil
+	end
+	local node = _next(self)
+	if node == self then
+		return nil
+	end
+	return node
+end
+
 --- Count buffers in the tree
 ---@return integer
 function Tree:count_buffers()

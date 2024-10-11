@@ -968,6 +968,34 @@ Function used to sort directories.
     end
 >
 ------------------------------------------------------------------------------
+buffers.squash_directories
+
+Whether to squash the directory structure when directories only have a single
+directory child.
+
+This option can be toggled directly from the buffer list window with
+'buffers.mappings.toggle_squash'.
+<
+    vessel.opt.buffers.squash_directories = true
+>
+
+Example of a non-squashed directory structure (/home/user is the root
+directory in this case, which is always displayed):
+<
+     /home/user
+     └─ .dotfiles
+	└─ nvim
+	   └─ lua
+	      └─ init.lua
+>
+
+With `'buffers.squash_directories' set to 'true'.
+<
+     /home/user
+     └─ .dotfiles/nvim/lua
+	└─ init.lua
+>
+------------------------------------------------------------------------------
 buffers.directories_first
 
 Whether directories should be put first or last in the buffer list or tree.
@@ -1081,6 +1109,16 @@ buffers.mappings.add_directory
 Add to the buffer list the directory of the buffer under cursor.
 <
     vessel.opt.buffers.mappings.add_directory = { "P" }
+>
+
+------------------------------------------------------------------------------
+buffers.mappings.toggle_squash
+
+Toggle squash option.
+
+NOTE: Has effect only in tree view mode.
+<
+    vessel.opt.buffers.mappings.toggle_squash = { "_" }
 >
 ------------------------------------------------------------------------------
 buffers.mappings.pin_increment

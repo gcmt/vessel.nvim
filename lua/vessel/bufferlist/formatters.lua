@@ -129,11 +129,16 @@ end
 ---@return string, table?
 function M.tree_directory_formatter(path, meta, context, config)
 	local prefix = { meta.prefix, config.buffers.highlights.tree_lines }
-	local dir = { vim.fs.basename(path), config.buffers.highlights.directory }
 	local hidden
 	if meta.collapsed then
 		local hidden_count = string.format(" [%d]", meta.hidden_buffers)
 		hidden = { hidden_count, config.buffers.highlights.hidden_count }
+	end
+	local dir
+	if meta.squashed then
+		dir = { meta.squashed_path, config.buffers.highlights.directory }
+	else
+		dir = { vim.fs.basename(path), config.buffers.highlights.directory }
 	end
 	return util.format(" %s%s%s", prefix, dir, hidden or "")
 end
