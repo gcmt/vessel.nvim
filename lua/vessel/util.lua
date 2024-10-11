@@ -12,7 +12,7 @@ M.modes = {
 
 --- Find next available buffer
 ---@param bufnr integer Buffer to replace
----@return integer
+---@return integer?
 function M.find_repl_buf(bufnr)
 	for _, b in pairs(vim.fn.getbufinfo()) do
 		if b.bufnr ~= bufnr and b.listed == 1 and vim.fn.getbufvar(b.bufnr, "&buftype") == "" then
