@@ -41,6 +41,7 @@ end
 ---@param max integer? Maximum line to get when reading from the filesystem
 ---@return string[]?, string?
 function FileStore:store(path, max)
+	max = max or -1
 	if self._store[path] and #self._store[path] >= max then
 		return self._store[path]
 	end
@@ -48,7 +49,7 @@ function FileStore:store(path, max)
 		self._store[path] = vim.api.nvim_buf_get_lines(vim.fn.bufnr(path), 0, -1, false)
 		return self._store[path], nil
 	end
-	local lines, err = _readfile(path, max or -1)
+	local lines, err = _readfile(path, max)
 	if not lines then
 		return nil, err
 	end
