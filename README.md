@@ -208,7 +208,7 @@ Once inside the window, the following mappings are available:
 | `P`          | Add to the buffer list the directory of the the buffer under cursor. See also [directory handler](#buffersdirectory_handler).           |
 | `<C-X>`      | Decrease the buffer position in the *pinned list* (moves the buffer up).                                                                |
 | `<C-A>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
-| `g`          | Create or destroy group under cursor. See [Buffer List Tree View](#buffer-list-tree-view).                                              |
+| `g`          | Create or delete group under cursor. See [Buffer List Tree View](#buffer-list-tree-view).                                               |
 | `h`          | Collapse the directory under cursor. If a buffer is selected, its parent directory will be collapsed.                                   |
 
 > [!NOTE]
@@ -236,18 +236,20 @@ You can switch to *pinned buffers* even from outside the buffer list window. Use
 
 ![TreeView](assets/treeview_dark.png "Buffer list tree view.")
 
-With *tree view* enabled, all buffers will be grouped and displayed as multiple directory trees, one for the *current working directory*, one for the *home directory*, and one for the *root directory*. *Tree view* can be enabled with the option [buffers.view](#buffersview).
+With *tree view* enabled, all buffers will be grouped and displayed as multiple directory trees, one for the *current working directory*, one for the *home directory*, and one for the *root directory*.
 
-You can create as many additional separate trees as you want by pressing `g` on a directory or buffer. A new tree root will be created for that directory and all the contained buffers will be grouped under that tree. Buffers will always be grouped by the most specific tree root that matches their path. Note that if you press `g` on a file, a new tree will be created for its parent directory instead.
+You can create as many additional separate trees as you want by pressing `g` on a directory or buffer. A new tree will be created for that directory and all the contained buffers will be grouped under that tree. Buffers will always be grouped by the most specific tree root path that matches their path. Note that if you press `g` on a file, a new tree will be created for its parent directory instead. You can delete a group by pressing `g` again on the group and buffers will be re-grouped automatically in other trees.
 
-You can delete a group by pressing `g` again on the group and buffers will be re-grouped automatically in other trees. You can customize the default `g` mapping with the option [buffers.mappings.toggle_group](#buffersmappingstoggle_group).
+To keep things organized you also have the possibility to hide buffers by collapsing directories with `h`. You can then expand them again with `l` or `<CR>`.
 
-To keep things organized you also have the possibility to hide buffers by collapsing directories with `h`. You can then expand them again with `l` or `<CR>`. See [buffers.mappings.collapse_directory](#buffersmappingscollapse_directory) option.
+Tree view options:
 
-There are also a couple of options you might want to check out:
-
-- [buffers.directories_first](#buffersdirectories_first), to control whether directories are ordered first or last.
-- [buffers.squash_directories](#bufferssquash_directories), to squash directories with a single directory child (enabled by default and toggleable with [buffers.mappings.toggle_squash](#buffersmappingstoggle_squash).
+- [buffers.view](#buffersview) to enable tree view.
+- [buffers.directories_first](#buffersdirectories_first) to control whether directories are ordered first or last (also works with *flat view*).
+- [buffers.squash_directories](#bufferssquash_directories) to squash directories that contain a single directory child.
+- [buffers.mappings.toggle_squash](#buffersmappingstoggle_squash) to toggle directory squashing.
+- [buffers.mappings.collapse_directory](#buffersmappingscollapse_directory) to customize the mapping for collapsing directories.
+- [buffers.mappings.toggle_group](#buffersmappingstoggle_group) to customize the mapping for creating groups.
 
 > [!NOTE]
 > *Pinned* buffers will always be displayed on top as a flat list and won't be displayed along other buffers in directory trees.
