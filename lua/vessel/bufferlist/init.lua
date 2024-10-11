@@ -7,6 +7,8 @@ local logger = require("vessel.logger")
 local tree = require("vessel.bufferlist.tree")
 local util = require("vessel.util")
 
+-- For stateful view preference
+local VIEW
 -- For stateful squash preference
 local SQUASH
 -- For stateful sorting
@@ -407,6 +409,22 @@ function Bufferlist:_action_toggle_squash(map)
 	self:_follow_selected(selected, newmap)
 end
 
+--- Toggle view option
+---@param map table
+function Bufferlist:_action_toggle_view(map)
+	local selected = map[vim.fn.line(".")]
+	if not selected then
+		return
+	end
+	if VIEW == "tree" then
+		VIEW = "flat"
+	else
+		VIEW = "tree"
+	end
+	local newmap = self:_refresh()
+	self:_follow_selected(selected, newmap)
+end
+
 --- Toggle unlisted buffes
 ---@param map table
 function Bufferlist:_action_toggle_unlisted(map)
@@ -548,6 +566,9 @@ function Bufferlist:_setup_mappings(map)
 	util.keymap("n", self.config.buffers.mappings.vsplit, function()
 		self:_action_edit(map, util.modes.VSPLIT)
 	end)
+	util.keymap("n", self.config.buffers.mappings.toggle_view, function()
+		self:_action_toggle_view(map)
+	end)
 	-- quick edit for the 9 buffers at the top of the list
 	if self.config.buffers.quickjump then
 		for i = 1, 9 do
@@ -557,7 +578,7 @@ function Bufferlist:_setup_mappings(map)
 		end
 	end
 	-- tree view-only mappings
-	if self.config.buffers.view == "tree" then
+	if VIEW == "tree" then
 		util.keymap("n", self.config.buffers.mappings.toggle_group, function()
 			self:_action_toggle_group(map)
 		end)
@@ -935,7 +956,9 @@ function Bufferlist:_render()
 		return {}
 	end
 
-	local view = self.config.buffers.view
+	if VIEW == nil then
+		VIEW = self.config.buffers.view
+	end
 
 	local pinned = vim.tbl_filter(function(buffer)
 		return buffer.pinpos > 0
@@ -957,7 +980,7 @@ function Bufferlist:_render()
 	end
 
 	local meta
-	if view == "tree" then
+	if VIEW == "tree" then
 		-- when in tree view mode, meta info makes sense only for pinned buffers
 		meta = _get_meta(pinned)
 	else
@@ -979,7 +1002,7 @@ function Bufferlist:_render()
 	end
 
 	-- render unpinned buffers
-	if view == "tree" then
+	if VIEW == "tree" then
 		self:_render_tree(map, i, unpinned)
 	else
 		local ok, err = pcall(table.sort, unpinned, self:_sort_buf_function())

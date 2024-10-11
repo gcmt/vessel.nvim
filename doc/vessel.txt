@@ -1114,7 +1114,6 @@ Add to the buffer list the directory of the buffer under cursor.
 <
     vessel.opt.buffers.mappings.add_directory = { "P" }
 >
-
 ------------------------------------------------------------------------------
 buffers.mappings.toggle_squash
 
@@ -1123,6 +1122,13 @@ Toggle squash option.
 NOTE: Has effect only in tree view mode.
 <
     vessel.opt.buffers.mappings.toggle_squash = { "_" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.toggle_view
+
+Toggle the option 'buffers.view'. Switches between "flat" and "tree" view.
+<
+    vessel.opt.buffers.mappings.toggle_view = { "m" }
 >
 ------------------------------------------------------------------------------
 buffers.mappings.pin_increment

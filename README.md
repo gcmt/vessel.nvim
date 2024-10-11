@@ -247,6 +247,7 @@ Tree view options:
 - [buffers.view](#buffersview) to enable tree view.
 - [buffers.directories_first](#buffersdirectories_first) to control whether directories are ordered first or last (also works with *flat view*).
 - [buffers.squash_directories](#bufferssquash_directories) to squash directories that contain a single directory child.
+- [buffers.mappings.toggle_view](#buffersmappingstoggle_view) to switch between *flat* and *tree* view.
 - [buffers.mappings.toggle_squash](#buffersmappingstoggle_squash) to toggle directory squashing.
 - [buffers.mappings.collapse_directory](#buffersmappingscollapse_directory) to customize the mapping for collapsing directories.
 - [buffers.mappings.toggle_group](#buffersmappingstoggle_group) to customize the mapping for creating groups.
@@ -1097,6 +1098,8 @@ Buffer list view mode. Can be one of:
 - `flat` Buffers displayed as a simple list.
 - `tree` Buffers displayed as directory a tree. Buffers will be grouped in different directory trees depending on the most specific path prefix match: one group for the current working directory, one for the home directory and one for the root directory.
 
+You can switch between the two view modes with [buffers.mappings.toggle_view](#buffersmappingstoggle_view).
+
 > [!NOTE]
 > In *tree view* mode, pinned buffers will still be displayed as a list.
 
@@ -1360,13 +1363,21 @@ vessel.opt.buffers.mappings.toggle_group = { "g" }
 
 #### buffers.mappings.toggle_squash
 
-Toggle [squash option](#bufferssquash_directories).
+Toggle [squash option](#bufferssquash_directories) option.
 
 > [!NOTE]
 > Has effect only in tree view mode.
 
 ```lua
 vessel.opt.buffers.mappings.toggle_squash = { "_" }
+```
+
+#### buffers.mappings.toggle_view
+
+Toggle [buffers.view](#buffersview) option. Switch between "flat" and "tree" view.
+
+```lua
+vessel.opt.buffers.mappings.toggle_view = { "m" }
 ```
 
 #### buffers.mappings.collapse_directory

@@ -206,6 +206,7 @@ return {
 			pin_increment = { "<c-a>", "<c-j>" },
 			pin_decrement = { "<c-x>", "<c-k>" },
 			collapse_directory = { "h" },
+			toggle_view = { "m" },
 			toggle_squash = { "_" },
 			toggle_group = { "g" },
 			toggle_pin = { "p" },
