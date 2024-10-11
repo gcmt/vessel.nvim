@@ -50,7 +50,11 @@ end
 ---@param filestore FileStore
 ---@param path string
 ---@param lnum integer
-function Preview:show(filestore, path, lnum)
+---@param filetype string?
+function Preview:show(filestore, path, lnum, filetype)
+	if self.bufnr == -1 then
+		return
+	end
 	if not path then
 		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
 		return
@@ -62,12 +66,17 @@ function Preview:show(filestore, path, lnum)
 		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines or {})
 		vim.fn.win_execute(self.winid, lnum)
 		vim.fn.win_execute(self.winid, "norm! zz")
+		if filetype then
+			vim.fn.setbufvar(self.bufnr, "&filetype", filetype)
+		end
 	end
 end
 
 --- Clear preview window buffer
 function Preview:clear()
-	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
+	if self.bufnr ~= -1 then
+		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
+	end
 end
 
 ---Setup window options

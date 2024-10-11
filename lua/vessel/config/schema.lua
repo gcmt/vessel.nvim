@@ -183,6 +183,7 @@ return {
 	["jumps.highlights.not_loaded"] = { "string" },
 
 	["buffers"] = { "table" },
+	["buffers.preview"] = { "boolean" },
 	["buffers.view"] = oneof("flat", "tree"),
 	["buffers.wrap_around"] = { "boolean" },
 	["buffers.not_found"] = { "string" },

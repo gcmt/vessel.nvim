@@ -179,7 +179,7 @@ Once inside the window, the following mappings are available:
 
 ![Preview Window](assets/preview_dark.png "Preview window.")
 
-By default both mark and jump lists have the preview window enabled. In this window you can see context of the line under cursor. To disable this feature you can use respectively the options [marks.preview](#markspreview) and [jumps.preview](#jumpspreview). The option [window.gravity](#windowgravity) controls how both the windows are positioned relative to each other.
+By default both mark and jump lists have the preview window enabled. In this window you can see context of the line under cursor. To disable this feature you can use respectively the options [marks.preview](#markspreview) and [jumps.preview](#jumpspreview). For the buffer list the preview window is disabled by default but it can be enabled with the option [buffers.preview](#bufferspreview). The option [window.gravity](#windowgravity) controls how both the windows are positioned relative to each other.
 
 See also [Preview Window Options](#preview-window-options).
 
@@ -1079,6 +1079,14 @@ vessel.opt.jumps.highlights.not_loaded = "Comment"
 ```
 
 ### Buffer List Options
+
+#### buffers.preview
+
+Enable or disable preview window. See the Preview Window Options section for how to customize it.
+
+```lua
+vessel.opt.buffers.preview = true
+```
 
 #### buffers.view
 

@@ -869,6 +869,14 @@ Highlight groups used by the default formatter.
 4.7 Buffer List Options                                 *vessel-buffers-options*
 
 ------------------------------------------------------------------------------
+buffers.preview
+
+Enable or disable preview window. See the Preview Window Options section for
+how to customize it.
+<
+    vessel.opt.buffers.preview = true
+>
+------------------------------------------------------------------------------
 buffers.view
 
 Buffer list view mode. Can be one of

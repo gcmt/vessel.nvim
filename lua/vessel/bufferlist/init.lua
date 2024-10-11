@@ -1,6 +1,7 @@
 ---@module "bufferlist"
 
 local Context = require("vessel.context")
+local FileStore = require("vessel.filestore")
 local Window = require("vessel.window")
 local logger = require("vessel.logger")
 local tree = require("vessel.bufferlist.tree")
@@ -58,6 +59,7 @@ end
 ---@field config table Gloabl config
 ---@field context Context Info about the current buffer/window
 ---@field window Window The main popup window
+---@field filestore FileStore File cache
 ---@field bufnr integer Where jumps will be displayed
 ---@field buffers table Buffer list
 ---@field show_unlisted boolean Show/hide unlisted buffers
@@ -77,6 +79,7 @@ function Bufferlist:new(config, filter_func)
 	buffers.config = config
 	buffers.context = Context:new()
 	buffers.window = Window:new(config, buffers.context)
+	buffers.filestore = FileStore:new()
 	buffers.bufnr = -1
 	buffers.buffers = {}
 	buffers.show_unlisted = false
@@ -100,7 +103,7 @@ function Bufferlist:open()
 			listed = listed + 1
 		end
 	end
-	local bufnr, ok = self.window:open(math.max(listed, 1), false)
+	local bufnr, ok = self.window:open(math.max(listed, 1), self.config.buffers.preview)
 	if ok then
 		self.bufnr = bufnr
 		vim.fn.setbufvar(bufnr, "&filetype", self.bufft)
@@ -597,6 +600,7 @@ function Bufferlist:_get_buffers()
 		buffer.filetype = vim.api.nvim_get_option_value("filetype", { buf = b.bufnr })
 
 		if self:_filter(buffer, self.context) then
+			self.filestore:store(buffer.path)
 			table.insert(buffers, buffer)
 		end
 
@@ -918,6 +922,7 @@ function Bufferlist:_render()
 	vim.fn.setbufvar(self.bufnr, "&modifiable", 1)
 	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
 	vim.api.nvim_buf_clear_namespace(self.bufnr, self.nsid, 1, -1)
+	local preview_aug = vim.api.nvim_create_augroup("VesselPreview", { clear = true })
 
 	if #self.buffers == 0 then
 		vim.fn.setbufline(self.bufnr, 1, self.config.buffers.not_found)
@@ -926,6 +931,7 @@ function Bufferlist:_render()
 		self.window:fit_content()
 		self.window:_set_buffer_data({})
 		vim.cmd("doau User VesselBufferlistChanged")
+		self.window.preview:clear()
 		return {}
 	end
 
@@ -998,6 +1004,24 @@ function Bufferlist:_render()
 	self.window:fit_content()
 	self.window:_set_buffer_data(map)
 	vim.cmd("doau User VesselBufferlistChanged")
+
+	if self.window.preview.bufnr ~= -1 then
+		-- Show the file under cursor content in the preview popup
+		vim.api.nvim_create_autocmd("CursorMoved", {
+			desc = "Write to the preview window on every movement",
+			group = preview_aug,
+			buffer = self.bufnr,
+			callback = function()
+				local selected = map[vim.fn.line(".")]
+				if type(selected) == "table" then
+					local ft = vim.fn.getbufvar(selected.nr, "&filetype")
+					self.window.preview:show(self.filestore, selected.path, 1, ft)
+				else
+					self.window.preview:clear()
+				end
+			end,
+		})
+	end
 
 	return map
 end

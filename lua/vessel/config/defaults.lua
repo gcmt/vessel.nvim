@@ -177,6 +177,7 @@ return {
 
 	--- bufferlist-related options
 	buffers = {
+		preview = false,
 		view = "flat",
 		wrap_around = true,
 		not_found = "Buffer list empty",
