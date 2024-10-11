@@ -775,7 +775,7 @@ function Bufferlist:_render_tree(map, start, buffers)
 			if not tree.buffer or tree.buffer.isdirectory then
 				if COLLAPSED[path] then
 					meta.collapsed = true
-					meta.hidden_buffers = tree:count()
+					meta.hidden_buffers = tree:count_buffers()
 				end
 				-- NOTE: directory nodes, when buffers, can be childless
 				local line, matches = self:_format(dir_formatter, tree.path, meta)

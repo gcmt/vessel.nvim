@@ -66,9 +66,9 @@ function Tree:insert(buffer, path)
 	return _insert(self, {}, vim.split(path, "/", { trimempty = true }))
 end
 
---- Count buffer in the tree
+--- Count buffers in the tree
 ---@return integer
-function Tree:count()
+function Tree:count_buffers()
 	---@param tree Tree
 	---@param acc integer Accumulator
 	local function _count(tree, acc)
