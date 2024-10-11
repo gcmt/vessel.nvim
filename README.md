@@ -1229,7 +1229,7 @@ Character used as separator between different [tree groups](#buffer-list-tree-vi
 The color can be set with the option [buffers.highlights.group_separator](#buffershighlights).
 
 ```lua
-vessel.opt.buffers.group_separator = ""
+vessel.opt.buffers.group_separator = "─"
 ```
 
 #### buffers.bufname_align

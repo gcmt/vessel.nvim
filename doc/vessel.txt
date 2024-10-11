@@ -1012,7 +1012,7 @@ to hide the separator.
 
 The color can be set with the option 'buffers.highlights.group_separator'.
 <
-    vessel.opt.buffers.group_separator = ""
+    vessel.opt.buffers.group_separator = "─"
 >
 ------------------------------------------------------------------------------
 buffers.bufname_align

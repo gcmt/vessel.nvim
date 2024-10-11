@@ -184,7 +184,7 @@ return {
 		quickjump = true,
 		show_pin_positions = true,
 		pin_separator = "─",
-		group_separator = "",
+		group_separator = "─",
 		sort_buffers = {
 			sorters.buffers.by_path,
 			sorters.buffers.by_basename,
