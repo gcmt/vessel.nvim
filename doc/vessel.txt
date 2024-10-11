@@ -1309,11 +1309,35 @@ Highlight groups used by the default formatter.
 5. Changelog                                                  *vessel-changelog*
 
 ------------------------------------------------------------------------------
+v2.2.0
+
+NEW
+
+- Added preview window for the bufferlist
+- Added ability to squash directories with a single child
+
+NEW OPTIONS
+
+- 'buffers.squash_directories': Squash directories.
+- 'buffers.mappings.toggle_squash': Toggle squashing.
+- 'buffers.mappings.toggle_view': Toggle view mode.
+
+CHANGES
+
+- Tree group separator visible by default.
+
+FIXES
+
+- Fixed tree getting tangled up in few occasions.
+- Fixed inability to delete directory bufefrs in tree view.
+- Various other minor fixes.
+
+------------------------------------------------------------------------------
 v2.1.0
 
 NEW FEATURES
 
-- Added ability to collapse directories in tree mode (bufferlist).
+- Added ability to collapse directories in tree view (bufferlist).
 - Added separators between tree groups (bufferlist).
 
 NEW OPTIONS
@@ -1334,7 +1358,7 @@ NEW FEATURES
 
 - Lines of buffers not in the neovim buffer list are read automatically
   without having the need to turn on any option.
-- Added tree mode for the buffer list.
+- Added tree view for the buffer list.
 
 NEW OPTIONS
 
