@@ -211,14 +211,6 @@ C               Clear the entire jump list.
 <C-I>           Move forward in the jump list (towards the top). As a count, you
                 can use the relative number displayed on the left column.
 
-r               Load the file under cursor in memory and add it to the buffer
-                list.
-
-R                Load all files in memory and add them to the buffer list.
-
-W                Load in memory all files inside the current working directory
-                 and add them to the buffer list.
-
 ------------------------------------------------------------------------------
 3.3 Buffer List Mappings                               *vessel-buffers-mappings*
 
@@ -262,7 +254,7 @@ P                Add to the buffer list the directory of the the buffer under
 <C-A>            Increase the buffer position in the pinned list (moves the
                  buffer down).
 
-g                Toggle group under cursor.
+g                Create or delete group under cursor.
 
 h                Collapse the directory under cursor. If a buffer is selected,
                  its parent directory will be collapsed.
@@ -307,6 +299,10 @@ the `setup` function or set via the `opt` interface object.
       require('vessel').view_jumps({ window = { max_height = 90 } })
     end)
 <
+
+All examples below assume you have required the vessel module with:
+<
+    local vessel = require("vessel")
 
 ------------------------------------------------------------------------------
 4.1 Common Options                                       *vessel-common-options*
@@ -971,7 +967,7 @@ buffers.sort_directories
 
 Function used to sort directories.
 <
-    buffers.sort_directories = function(path_a, path_b)
+    vessel.opt.buffers.sort_directories = function(path_a, path_b)
         return path_a < path_b
     end
 >
