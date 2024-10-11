@@ -1085,7 +1085,7 @@ vessel.opt.jumps.highlights.not_loaded = "Comment"
 Enable or disable preview window. See the Preview Window Options section for how to customize it.
 
 ```lua
-vessel.opt.buffers.preview = true
+vessel.opt.buffers.preview = false
 ```
 
 #### buffers.view

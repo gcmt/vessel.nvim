@@ -874,7 +874,7 @@ buffers.preview
 Enable or disable preview window. See the Preview Window Options section for
 how to customize it.
 <
-    vessel.opt.buffers.preview = true
+    vessel.opt.buffers.preview = false
 >
 ------------------------------------------------------------------------------
 buffers.view
