@@ -259,6 +259,8 @@ g                Create or delete group under cursor.
 h                Collapse the directory under cursor. If a buffer is selected,
                  its parent directory will be collapsed.
 
+m                Switch between "flat" and "tree" view modes.
+
 ==============================================================================
 4. Configuration                                          *vessel-configuration*
 

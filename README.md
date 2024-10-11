@@ -210,6 +210,7 @@ Once inside the window, the following mappings are available:
 | `<C-A>`      | Increase the buffer position in the *pinned list* (moves the buffer down).                                                              |
 | `g`          | Create or delete group under cursor. See [Buffer List Tree View](#buffer-list-tree-view).                                               |
 | `h`          | Collapse the directory under cursor. If a buffer is selected, its parent directory will be collapsed.                                   |
+| `m`          | Switch between "flat" and "tree" view modes.                                                                                            |
 
 > [!NOTE]
 > Don't be afraid to delete buffers. You can still re-open them later by simply toggling *unlisted buffers* and re-editing them. This can help keeping the buffer list clean and tidy. On the other end, by wiping out the buffer you won't be able to reopen it directly from the buffer list and you'll need to use other means. See `:help :bdelete` and `:help :bwipeout` for the specific effects that each command has on buffers.
