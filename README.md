@@ -236,18 +236,18 @@ You can switch to *pinned buffers* even from outside the buffer list window. Use
 
 ![TreeView](assets/treeview_dark.png "Buffer list tree view.")
 
-With *tree view* enabled, all buffers will be grouped and displayed as multiple directory trees, one for the *current working directory*, one for the *home directory*, and one for the *root directory*.
+With *tree view* enabled, all buffers will be grouped and displayed as multiple directory trees, one for the *current working directory*, one for the *home directory*, and one for the *root directory*. *Tree view* can be enabled with the option [buffers.view](#buffersview).
 
-You can create additional tree groups by pressing `g` on a directory or buffer. A new tree root will be created for that directory, or, in case a file is selected, its parent directory. All matching buffers will be grouped under that tree. Buffers will always be grouped by the most specific group that matches their path.
+You can create as many additional separate trees as you want by pressing `g` on a directory or buffer. A new tree root will be created for that directory and all the contained buffers will be grouped under that tree. Buffers will always be grouped by the most specific tree root that matches their path. Note that if you press `g` on a file, a new tree will be created for its parent directory instead.
 
-You can delete a group by pressing `g` again on the group and buffers will be regrouped automatically. You can customize the default `g` mapping with the option [buffers.mappings.toggle_group](#buffersmappingstoggle_group).
+You can delete a group by pressing `g` again on the group and buffers will be re-grouped automatically in other trees. You can customize the default `g` mapping with the option [buffers.mappings.toggle_group](#buffersmappingstoggle_group).
 
-To keep things organized, you can momentarily hide buffers by collapsing directories with `h`. You can expand them again with `l` or `<CR>`.
+To keep things organized you also have the possibility to hide buffers by collapsing directories with `h`. You can then expand them again with `l` or `<CR>`. See [buffers.mappings.collapse_directory](#buffersmappingscollapse_directory) option.
 
-You can enable tree view with the option [buffers.view](#buffersview).
+An option you might want to check out is [buffers.directories_first](#buffersdirectories_first), that controls whether directories are ordered first or last.
 
 > [!NOTE]
-> *Pinned* buffers will always be displayed on top as a flat list.
+> *Pinned* buffers will always be displayed on top as a flat list and won't be displayed along other buffers in directory trees.
 
 ## API
 
