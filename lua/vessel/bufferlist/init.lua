@@ -415,29 +415,32 @@ function Bufferlist:_action_delete(map, cmd, force)
 		return
 	end
 
-	if type(selected) == "string" then
-		-- TODO: delete all buffers for the directory
+	local bufpath = selected.path or selected
+	local bufnr = selected.bufnr or vim.fn.bufnr(bufpath)
+	local pinpos = selected.pinpos or -1
+
+	if bufnr == -1 then
 		return
 	end
 
 	-- windows containing the buffer we want to delete
 	local windows = {}
 	for _, win in pairs(vim.fn.getwininfo()) do
-		if win.bufnr == selected.nr then
+		if win.bufnr == bufnr then
 			table.insert(windows, win.winid)
 		end
 	end
 
-	local repl = util.find_repl_buf(selected.nr)
+	local repl = util.find_repl_buf(bufnr)
 	if not repl then
-		if selected.path == "" then
+		if bufpath == "" then
 			logger.info("can't delete last buffer")
 			return
 		end
 		repl = vim.api.nvim_create_buf(true, false)
 	end
 
-	local modified = vim.fn.getbufvar(selected.nr, "&modified", 0) == 1
+	local modified = vim.fn.getbufvar(bufnr, "&modified", 0) == 1
 	if not modified or force then
 		for _, win in pairs(windows) do
 			vim.api.nvim_win_set_buf(win, repl)
@@ -448,13 +451,13 @@ function Bufferlist:_action_delete(map, cmd, force)
 	-- effect when the buffer is displayed in a window
 	local winid = vim.fn.getwininfo()[1].winid
 	cmd = force and cmd .. "!" or cmd
-	local ok, err = pcall(vim.fn.win_execute, winid, cmd .. " " .. selected.nr)
+	local ok, err = pcall(vim.fn.win_execute, winid, cmd .. " " .. bufnr)
 	if not ok then
 		logger.warn(string.gsub(err, ".-:E%d+:%s+", ""))
 		return
 	end
 
-	table.remove(PINNED, selected.pinpos)
+	table.remove(PINNED, pinpos)
 	self:_refresh()
 end
 
