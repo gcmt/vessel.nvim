@@ -3,6 +3,7 @@
 local Context = require("vessel.context")
 local FileStore = require("vessel.filestore")
 local Window = require("vessel.window")
+local help = require("vessel.help")
 local logger = require("vessel.logger")
 local tree = require("vessel.bufferlist.tree")
 local util = require("vessel.util")
@@ -518,9 +519,32 @@ function Bufferlist:_action_cycle_sort(map)
 	self:_follow_selected(selected, newmap)
 end
 
+--- Render help inside the window
+---@param map table
+function Bufferlist:_action_show_help(map)
+	for k in pairs(map) do
+		map[k] = nil
+	end
+	local function close_handler()
+		self:_render()
+	end
+	help.render(
+		self.bufnr,
+		self.nsid,
+		"Buffer list help",
+		self.config.buffers.mappings,
+		require("vessel.bufferlist.helptext"),
+		close_handler
+	)
+	self.window:fit_content()
+end
+
 --- Setup mappings for the buffer list window
 ---@param map table
 function Bufferlist:_setup_mappings(map)
+	util.keymap("n", self.config.help_key, function()
+		self:_action_show_help(map)
+	end)
 	util.keymap("n", self.config.buffers.mappings.close, function()
 		self:_action_close()
 	end)

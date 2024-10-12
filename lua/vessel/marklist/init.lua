@@ -3,6 +3,7 @@
 local Context = require("vessel.context")
 local FileStore = require("vessel.filestore")
 local Window = require("vessel.window")
+local help = require("vessel.help")
 local logger = require("vessel.logger")
 local util = require("vessel.util")
 
@@ -483,9 +484,32 @@ function Marklist:_action_cycle_sort(map)
 	self:_follow_selected(selected, newmap)
 end
 
+--- Render help inside the window
+---@param map table
+function Marklist:_action_show_help(map)
+	for k in pairs(map) do
+		map[k] = nil
+	end
+	local function close_handler()
+		self:_render()
+	end
+	help.render(
+		self.bufnr,
+		self.nsid,
+		"Mark list help",
+		self.config.marks.mappings,
+		require("vessel.marklist.helptext"),
+		close_handler
+	)
+	self.window:fit_content()
+end
+
 --- Setup mappings for the mark window
 ---@param map table
 function Marklist:_setup_mappings(map)
+	util.keymap("n", self.config.help_key, function()
+		self:_action_show_help(map)
+	end)
 	util.keymap("n", self.config.marks.mappings.cycle_sort, function()
 		self:_action_cycle_sort(map)
 	end)

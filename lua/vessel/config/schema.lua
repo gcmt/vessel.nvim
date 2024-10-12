@@ -73,6 +73,7 @@ return {
 	["highlight_on_jump"] = { "boolean" },
 	["highlight_timeout"] = { "number" },
 	["jump_callback"] = { "function" },
+	["help_key"] = "string",
 
 	["window"] = { "table" },
 	["window.width"] = { "table", "function" },

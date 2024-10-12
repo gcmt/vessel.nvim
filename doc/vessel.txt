@@ -192,6 +192,7 @@ m{a-zA-Z}       Change the mark under cursor
 
 '{a-z-A-Z}      Jump directly to a mark
 
+H               Show help message
 
 ------------------------------------------------------------------------------
 Jump List Mappings                                       *vessel-jumps-mappings*
@@ -210,6 +211,8 @@ C               Clear the entire jump list.
 
 <C-I>           Move forward in the jump list (towards the top). As a count, you
                 can use the relative number displayed on the left column.
+
+H               Show help message
 
 ------------------------------------------------------------------------------
 3.3 Buffer List Mappings                               *vessel-buffers-mappings*
@@ -260,6 +263,8 @@ h                Collapse the directory under cursor. If a buffer is selected,
                  its parent directory will be collapsed.
 
 m                Switch between "flat" and "tree" view modes.
+
+H               Show help message
 
 ==============================================================================
 4. Configuration                                          *vessel-configuration*
@@ -335,7 +340,13 @@ This function takes two parameters: mode and context.
 >
     vessel.opt.jump_callback = <function>
 <
+------------------------------------------------------------------------------
+help_key
 
+Key used to show help mesage.
+<
+    vessel.opt.help_key = "H"
+>
 ------------------------------------------------------------------------------
 4.2 Command Options                                     *vessel-command-options*
 
