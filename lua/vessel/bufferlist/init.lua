@@ -645,7 +645,9 @@ function Bufferlist:_get_buffers()
 		buffer.filetype = vim.api.nvim_get_option_value("filetype", { buf = b.bufnr })
 
 		if self:_filter(buffer, self.context) then
-			self.filestore:store(buffer.path)
+			if not buffer.isdirectory then
+				self.filestore:store(buffer.path)
+			end
 			table.insert(buffers, buffer)
 		end
 
