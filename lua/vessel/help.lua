@@ -30,7 +30,7 @@ function M.render(bufnr, header, mappings, helptext, close_handler)
 		end
 	end
 
-	bufwriter:append(string.format("%s. Close with 'q'.", header))
+	bufwriter:append(string.format(" %s. Close with 'q'.", header))
 	bufwriter:append("")
 
 	for _, help in ipairs(helptext) do
@@ -42,7 +42,7 @@ function M.render(bufnr, header, mappings, helptext, close_handler)
 		end
 		local maps_fmt = "%-" .. max_mapping .. "s"
 		local maps = string.format(maps_fmt, mapping)
-		local line, matches = util.format("%s  %s", { maps, "Keyword" }, { help[2], "Normal" })
+		local line, matches = util.format(" %s  %s", { maps, "Keyword" }, { help[2], "Normal" })
 		bufwriter:append(line, matches)
 	end
 
