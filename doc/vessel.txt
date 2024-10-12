@@ -1348,12 +1348,32 @@ Highlight groups used by the default formatter.
 5. Changelog                                                  *vessel-changelog*
 
 ------------------------------------------------------------------------------
+v2.3.0
+
+NEW
+
+- Added help
+- Added ability to move groups up and down.
+- Added ability to move between groups with a key.
+
+NEW OPTIONS
+
+- 'buffers.mappings.move_group_up': Move current group up.
+- 'buffers.mappings.move_group_down': Move current group down.
+- 'buffers.mappings.next_group': Move to next group.
+- 'buffers.mappings.prev_group': Move to previous group.
+
+FIXES
+
+- Error when adding directory buffers
+
+------------------------------------------------------------------------------
 v2.2.0
 
 NEW
 
-- Added preview window for the bufferlist
-- Added ability to squash directories with a single child
+- Added preview window for the buffer list.
+- Added ability to squash directory structure.
 
 NEW OPTIONS
 
