@@ -120,7 +120,8 @@ function M.prettify_path(path, cwd)
 		end
 	end
 	if home then
-		return select(1, M.replstart(path, home, "~"))
+		local ret, _ = M.replstart(path, home, "~")
+		return ret
 	end
 	return path
 end

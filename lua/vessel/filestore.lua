@@ -1,5 +1,7 @@
 ---@modeul "filestore"
 
+local util = require("vessel.util")
+
 ---@class FileStore
 ---@field _store table
 local FileStore = {}
@@ -36,6 +38,38 @@ local function _readfile(path, max)
 	return lines, nil
 end
 
+--- Read directory content
+---@param path string
+---@return table?, string?
+local function _readdir(path)
+	local ok, fs = pcall(vim.uv.fs_scandir, path)
+	if not ok then
+		return nil, fs
+	end
+	local prev
+	local ret = {}
+	while true do
+		local ok, name, _ = pcall(vim.uv.fs_scandir_next, fs)
+		if not ok then
+			return nil, fs
+		end
+		if not name then
+			table.insert(ret, "└─ " .. prev)
+			break
+		end
+		if not prev then
+			table.insert(ret, util.prettify_path(path))
+		else
+			table.insert(ret, "├─ " .. prev)
+		end
+		prev = name
+	end
+	if #ret == 0 then
+		return { "Empty directory" }, nil
+	end
+	return ret, nil
+end
+
 --- Store file up to 'max' lines
 ---@param path string File to retrieve
 ---@param max integer? Maximum line to get when reading from the filesystem
@@ -49,8 +83,13 @@ function FileStore:store(path, max)
 		self._store[path] = vim.api.nvim_buf_get_lines(vim.fn.bufnr(path), 0, -1, false)
 		return self._store[path], nil
 	end
-	local lines, err = _readfile(path, max)
-	if not lines then
+	local lines, err
+	if vim.fn.isdirectory(path) == 1 then
+		lines, err = _readdir(path)
+	else
+		lines, err = _readfile(path, max)
+	end
+	if err then
 		return nil, err
 	end
 	self._store[path] = lines

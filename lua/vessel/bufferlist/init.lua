@@ -745,9 +745,7 @@ function Bufferlist:_get_buffers()
 		buffer.filetype = vim.api.nvim_get_option_value("filetype", { buf = b.bufnr })
 
 		if self:_filter(buffer, self.context) then
-			if not buffer.isdirectory then
-				self.filestore:store(buffer.path)
-			end
+			self.filestore:store(buffer.path)
 			table.insert(buffers, buffer)
 		end
 
@@ -1145,12 +1143,14 @@ function Bufferlist:_render()
 			buffer = self.bufnr,
 			callback = function()
 				local selected = map[vim.fn.line(".")]
+				local path, ft
 				if type(selected) == "table" then
-					local ft = vim.fn.getbufvar(selected.nr, "&filetype")
-					self.window.preview:show(self.filestore, selected.path, 1, ft)
+					path = selected.path
+					ft = vim.fn.getbufvar(selected.nr, "&filetype")
 				else
-					self.window.preview:clear()
+					path = selected
 				end
+				self.window.preview:show(self.filestore, path, 1, ft)
 			end,
 		})
 	end
