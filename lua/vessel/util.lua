@@ -112,24 +112,6 @@ function M.prettify_path(path, cwd)
 	return path
 end
 
---- Set highlight matches on the given line
----@param matches table {hlgroup, startpos, endpos}
----@param line integer 1-indexed
----@param bufnr integer
----@param nsid integer
-function M.set_matches(matches, line, bufnr, nsid)
-	for _, hl in pairs(matches) do
-		vim.api.nvim_buf_add_highlight(
-			bufnr,
-			nsid,
-			hl.hlgroup,
-			line - 1,
-			hl.startpos - 1,
-			hl.endpos
-		)
-	end
-end
-
 ---Remove trailing slashes from the given path
 ---@param path string
 ---@return string

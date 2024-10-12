@@ -1,5 +1,6 @@
 ---@module "bufferlist"
 
+local BufWriter = require("vessel.bufwriter")
 local Context = require("vessel.context")
 local FileStore = require("vessel.filestore")
 local Window = require("vessel.window")
@@ -57,7 +58,6 @@ function Buffer:new(bufnr)
 end
 
 ---@class Bufferlist
----@field nsid integer Namespace id for highlighting
 ---@field bufft string Buffer filetype
 ---@field config table Gloabl config
 ---@field context Context Info about the current buffer/window
@@ -77,7 +77,6 @@ Bufferlist.__index = Bufferlist
 function Bufferlist:new(config, filter_func)
 	local buffers = {}
 	setmetatable(buffers, Bufferlist)
-	buffers.nsid = vim.api.nvim_create_namespace("__vessel__")
 	buffers.bufft = "bufferlist"
 	buffers.config = config
 	buffers.context = Context:new()
@@ -530,7 +529,6 @@ function Bufferlist:_action_show_help(map)
 	end
 	help.render(
 		self.bufnr,
-		self.nsid,
 		"Buffer list help",
 		self.config.buffers.mappings,
 		require("vessel.bufferlist.helptext"),
@@ -741,18 +739,6 @@ function Bufferlist:_format(formatter, data, meta)
 	return line, matches
 end
 
---- Set buffer line and setup highlighting
----@param map table
----@param lnum integer
----@param line string
----@param matches table
----@param data any
-function Bufferlist:_set_buf_line(map, lnum, line, matches, data)
-	map[lnum] = data
-	vim.fn.setbufline(self.bufnr, lnum, line)
-	util.set_matches(matches or {}, lnum, self.bufnr, self.nsid)
-end
-
 --- Sort buffers and directories
 ---@param list any[]
 ---@param dir_fn function Function for filtering directories
@@ -807,11 +793,10 @@ function Bufferlist:_sort_buf_function()
 end
 
 --- Render buffer list as a tree
+---@param bufwriter BufWriter
 ---@param map table
----@param start integer Line after which start rendering
 ---@param buffers Buffer[] Buffer list
----@return integer Last rendered line
-function Bufferlist:_render_tree(map, start, buffers)
+function Bufferlist:_render_tree(bufwriter, map, buffers)
 	local root_formatter = self.config.buffers.formatters.tree_root
 	local buf_formatter = self.config.buffers.formatters.tree_buffer
 	local dir_formatter = self.config.buffers.formatters.tree_directory
@@ -827,9 +812,7 @@ function Bufferlist:_render_tree(map, start, buffers)
 		return sort_fn(a.buffer, b.buffer)
 	end
 
-	local i = start
 	local function _render_tree(tree, root_dir, padding, is_last)
-		i = i + 1
 		local curr_padding = ""
 		local next_padding = padding
 		local lines = self.config.buffers.tree_lines
@@ -838,7 +821,8 @@ function Bufferlist:_render_tree(map, start, buffers)
 		if not tree.parent then
 			-- print root directory !! root_dir == tree.path !!
 			local line, matches = self:_format(root_formatter, tree.path, { prefix = curr_padding })
-			self:_set_buf_line(map, i, line, matches, tree.path)
+			bufwriter:append(line, matches)
+			map[bufwriter.lnum] = tree.path
 		else
 			curr_padding = padding .. (is_last and lines[3] or lines[2])
 			next_padding = padding .. (is_last and lines[4] or lines[1])
@@ -877,10 +861,12 @@ function Bufferlist:_render_tree(map, start, buffers)
 					meta.squashed_path = string.gsub(full_path, parent_full_path .. "/", "", 1)
 				end
 				local line, matches = self:_format(dir_formatter, full_path, meta)
-				self:_set_buf_line(map, i, line, matches, full_path)
+				bufwriter:append(line, matches)
+				map[bufwriter.lnum] = full_path
 			else
 				local line, matches = self:_format(buf_formatter, tree.buffer, meta)
-				self:_set_buf_line(map, i, line, matches, tree.buffer)
+				bufwriter:append(line, matches)
+				map[bufwriter.lnum] = tree.buffer
 			end
 		end
 
@@ -910,72 +896,60 @@ function Bufferlist:_render_tree(map, start, buffers)
 		local ok, err = pcall(_render_tree, t, t.path, "", false)
 		if not ok then
 			logger.err(string.gsub(tostring(err), "^.-:%d+:%s+", ""))
-			return i
+			return
 		end
 		if k ~= #trees then
-			i = self:_render_separator(
-				i,
+			self:_render_separator(
+				bufwriter,
 				self.config.buffers.group_separator,
 				self.config.buffers.highlights.group_separator
 			)
 		end
 	end
-
-	return i
 end
 
 --- Render a flat buffer list
+---@param bufwriter BufWriter
 ---@param map table
----@param start integer Line after which start rendering
 ---@param buffers Buffer[] Buffer list
 ---@param meta table Contextual info to pass to formatters
----@return integer Last rendered line
-function Bufferlist:_render_flat(map, start, buffers, meta)
+function Bufferlist:_render_flat(bufwriter, map, buffers, meta)
 	local formatter = self.config.buffers.formatters.buffer
-	local i = start
 	for _, buffer in pairs(buffers) do
 		if self._show_unlisted or buffer.listed then
-			i = i + 1
-			meta.current_line = i
+			meta.current_line = bufwriter.lnum
 			local line, matches, err = self:_format(formatter, buffer, meta)
 			if err then
 				logger.err(err)
-				return i
+				return
 			end
-			self:_set_buf_line(map, i, line, matches, buffer)
+			bufwriter:append(line, matches)
+			map[bufwriter.lnum] = buffer
 		end
 	end
-	return i
 end
 
 --- Render a separator line between pinned and unpinned buffers
----@param start integer Line after which start rendering
+---@param bufwriter BufWriter
 ---@param sep integer Separator character
----@return integer Last rendered line
-function Bufferlist:_render_separator(start, sep, hlgroup)
-	if sep == "" then
-		return start
+function Bufferlist:_render_separator(bufwriter, sep, hlgroup)
+	if sep ~= "" then
+		local separator = string.rep(sep, vim.fn.winwidth(0))
+		local match = { hlgroup = hlgroup, startpos = 1, endpos = -1 }
+		bufwriter:append(separator, { match })
 	end
-	local i = start + 1
-	vim.fn.setbufline(self.bufnr, i, string.rep(sep, vim.fn.winwidth(0)))
-	local match = { hlgroup = hlgroup, startpos = 1, endpos = -1 }
-	util.set_matches({ match }, i, self.bufnr, self.nsid)
-	return i
 end
 
 --- Render the buffer list in the given buffer
 ---@return table Table Maps each line to the buffer displayed on it
 function Bufferlist:_render()
-	vim.fn.setbufvar(self.bufnr, "&modifiable", 1)
-	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
-	vim.api.nvim_buf_clear_namespace(self.bufnr, self.nsid, 1, -1)
+	local bufwriter = BufWriter:new(self.bufnr):init()
 	local preview_aug = vim.api.nvim_create_augroup("VesselPreview", { clear = true })
 
 	if #self.buffers == 0 then
-		vim.fn.setbufline(self.bufnr, 1, self.config.buffers.not_found)
-		vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
-		self:_setup_mappings({})
+		bufwriter:append(self.config.buffers.not_found):freeze()
 		self.window:fit_content()
+		self:_setup_mappings({})
 		self.window:_set_buffer_data({})
 		vim.cmd("doau User VesselBufferlistChanged")
 		self.window.preview:clear()
@@ -1016,12 +990,12 @@ function Bufferlist:_render()
 	local map = {}
 
 	-- render pinned buffers first
-	local i = self:_render_flat(map, 0, pinned, meta)
+	self:_render_flat(bufwriter, map, pinned, meta)
 
 	-- render the separator only if there are unpinned visible buffers
-	if i > 0 and unpinned_listed_count > 0 then
-		i = self:_render_separator(
-			i,
+	if bufwriter.lnum > 0 and unpinned_listed_count > 0 then
+		self:_render_separator(
+			bufwriter,
 			self.config.buffers.pin_separator,
 			self.config.buffers.highlights.pin_separator
 		)
@@ -1029,7 +1003,7 @@ function Bufferlist:_render()
 
 	-- render unpinned buffers
 	if VIEW == "tree" then
-		self:_render_tree(map, i, unpinned)
+		self:_render_tree(bufwriter, map, unpinned)
 	else
 		local ok, err = pcall(table.sort, unpinned, self:_sort_buf_function())
 		if not ok then
@@ -1045,10 +1019,10 @@ function Bufferlist:_render()
 		end
 		local sort_buf_fn = self:_sort_buf_function()
 		unpinned = self:_sort(unpinned, dirs_fn, sort_dirs_fn, sort_buf_fn)
-		self:_render_flat(map, i, unpinned, meta)
+		self:_render_flat(bufwriter, map, unpinned, meta)
 	end
 
-	vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
+	bufwriter:freeze()
 	self:_setup_mappings(map)
 	self.window:fit_content()
 	self.window:_set_buffer_data(map)

@@ -1,4 +1,6 @@
 ---@module "jumplist
+
+local BufWriter = require("vessel.bufwriter")
 local Context = require("vessel.context")
 local FileStore = require("vessel.filestore")
 local Window = require("vessel.window")
@@ -49,7 +51,6 @@ end
 --- even though getjumplist() returns the last jumplist index + 1, that is, len(getjumplist()).
 ---
 ---@class Jumplist
----@field nsid integer Namespace id for highlighting
 ---@field bufft string Buffer filetype
 ---@field config table Gloabl config
 ---@field context Context Info about the current buffer/window
@@ -68,7 +69,6 @@ Jumplist.__index = Jumplist
 function Jumplist:new(config, filter_func)
 	local jumps = {}
 	setmetatable(jumps, Jumplist)
-	jumps.nsid = vim.api.nvim_create_namespace("__vessel__")
 	jumps.bufft = "jumplist"
 	jumps.config = config
 	jumps.context = Context:new()
@@ -212,7 +212,6 @@ function Jumplist:_action_show_help(map)
 	end
 	help.render(
 		self.bufnr,
-		self.nsid,
 		"Jump list help",
 		self.config.jumps.mappings,
 		require("vessel.jumplist.helptext"),
@@ -378,25 +377,16 @@ end
 --- Render the jump list in the given buffer
 ---@return table Table mapping each line to the jump displayed on it
 function Jumplist:_render()
-	vim.fn.setbufvar(self.bufnr, "&modifiable", 1)
-	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
-	vim.api.nvim_buf_clear_namespace(self.bufnr, self.nsid, 1, -1)
+	local bufwriter = BufWriter:new(self.bufnr):init()
 	local preview_aug = vim.api.nvim_create_augroup("VesselPreview", { clear = true })
 
 	if #self.jumps == 0 then
-		vim.fn.setbufline(self.bufnr, 1, self.config.jumps.not_found)
-		vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
-
-		self:_setup_mappings({})
+		bufwriter:append(self.config.jumps.not_found):freeze()
 		self.window:fit_content()
+		self:_setup_mappings({})
 		self.window:_set_buffer_data({})
-
 		vim.cmd("doau User VesselJumplistChanged")
-
-		if self.window.preview.bufnr ~= -1 then
-			self.window.preview:clear()
-		end
-
+		self.window.preview:clear()
 		return {}
 	end
 
@@ -404,15 +394,13 @@ function Jumplist:_render()
 	local formatter = self.config.jumps.formatters.jump
 	local meta = _get_meta(self.jumps)
 
-	local i = 0
 	for _, jump in ipairs(self.jumps) do
-		i = i + 1
-		meta.current_line = i
+		meta.current_line = bufwriter.lnum + 1
 		local ok, line, matches = pcall(formatter, jump, meta, self.context, self.config)
 		if not ok or not line then
 			local msg
 			if not line then
-				msg = string.format("line %s: string expected, got nil", i)
+				msg = string.format("line %s: string expected, got nil", bufwriter.lnum)
 			else
 				msg = string.gsub(tostring(line), "^.*:%s+", "")
 			end
@@ -420,15 +408,11 @@ function Jumplist:_render()
 			logger.err("formatter error: %s", msg)
 			return {}
 		end
-		map[i] = jump
-		vim.fn.setbufline(self.bufnr, i, line)
-		if matches then
-			util.set_matches(matches, i, self.bufnr, self.nsid)
-		end
+		bufwriter:append(line, matches)
+		map[bufwriter.lnum] = jump
 	end
 
-	vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
-
+	bufwriter:freeze()
 	self:_setup_mappings(map)
 	self.window:fit_content()
 	util.cursor(meta.current_jump_line)

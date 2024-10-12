@@ -1,5 +1,6 @@
 ---@module "marklist"
 
+local BufWriter = require("vessel.bufwriter")
 local Context = require("vessel.context")
 local FileStore = require("vessel.filestore")
 local Window = require("vessel.window")
@@ -36,7 +37,6 @@ function Mark:new(letter)
 end
 
 ---@class Marklist
----@field nsid integer Namespace id for highlighting
 ---@field bufft string Buffer filetype
 ---@field config table Gloabl config
 ---@field context Context Info about the current buffer/window
@@ -55,7 +55,6 @@ Marklist.__index = Marklist
 function Marklist:new(config, filter_func)
 	local marks = {}
 	setmetatable(marks, Marklist)
-	marks.nsid = vim.api.nvim_create_namespace("__vessel__")
 	marks.bufft = "marklist"
 	marks.config = config
 	marks.context = Context:new()
@@ -495,7 +494,6 @@ function Marklist:_action_show_help(map)
 	end
 	help.render(
 		self.bufnr,
-		self.nsid,
 		"Mark list help",
 		self.config.marks.mappings,
 		require("vessel.marklist.helptext"),
@@ -624,25 +622,16 @@ end
 --- Render the marks
 ---@return table Table mapping each line to the mark displayed on it
 function Marklist:_render()
-	vim.fn.setbufvar(self.bufnr, "&modifiable", 1)
-	vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
-	vim.api.nvim_buf_clear_namespace(self.bufnr, self.nsid, 1, -1)
+	local bufwriter = BufWriter:new(self.bufnr):init()
 	local preview_aug = vim.api.nvim_create_augroup("VesselPreview", { clear = true })
 
 	if next(self.marks) == nil then
-		vim.fn.setbufline(self.bufnr, 1, self.config.marks.not_found)
-		vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
-
-		self:_setup_mappings({})
+		bufwriter:append(self.config.marks.not_found):freeze()
 		self.window:fit_content()
+		self:_setup_mappings({})
 		self.window:_set_buffer_data({})
-
 		vim.cmd("doau User VesselMarklistChanged")
-
-		if self.window.preview.bufnr ~= -1 then
-			self.window.preview:clear()
-		end
-
+		self.window.preview:clear()
 		return {}
 	end
 
@@ -655,7 +644,6 @@ function Marklist:_render()
 		return {}
 	end
 
-	local i = 0
 	local map = {}
 	local meta, groups_meta = self:_get_meta(self.marks)
 
@@ -677,12 +665,8 @@ function Marklist:_render()
 			return {}
 		end
 		if line then
-			i = i + 1
-			map[i] = path
-			vim.fn.setbufline(self.bufnr, i, line)
-			if matches then
-				util.set_matches(matches, i, self.bufnr, self.nsid)
-			end
+			bufwriter:append(line, matches)
+			map[bufwriter.lnum] = path
 		end
 
 		local k = 0
@@ -702,7 +686,7 @@ function Marklist:_render()
 			if not ok or not line then
 				local msg
 				if not line then
-					msg = string.format("line %s: string expected, got nil", i)
+					msg = string.format("line %s: string expected, got nil", bufwriter.lnum)
 				else
 					msg = string.gsub(tostring(line), "^.*:%s+", "")
 				end
@@ -710,19 +694,14 @@ function Marklist:_render()
 				logger.err("formatter error: %s", msg)
 				return {}
 			end
-			i = i + 1
-			map[i] = mark
-			vim.fn.setbufline(self.bufnr, i, line)
-			if matches then
-				util.set_matches(matches, i, self.bufnr, self.nsid)
-			end
+			bufwriter:append(line, matches)
+			map[bufwriter.lnum] = mark
 		end
 	end
 
-	vim.fn.setbufvar(self.bufnr, "&modifiable", 0)
-
-	self:_setup_mappings(map)
+	bufwriter:freeze()
 	self.window:fit_content()
+	self:_setup_mappings(map)
 	self.window:_set_buffer_data(map)
 	vim.cmd("doau User VesselMarklistChanged")
 
