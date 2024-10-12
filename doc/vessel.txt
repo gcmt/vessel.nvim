@@ -1188,6 +1188,20 @@ Move current group down.
     vessel.opt.buffers.mappings.move_group_down = { "}" }
 >
 ------------------------------------------------------------------------------
+buffers.mappings.prev_group
+
+Move to previous group.
+<
+    vessel.opt.buffers.mappings.prev_group = { "[" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.next_group
+
+Move to next group.
+<
+    vessel.opt.buffers.mappings.next_group = { "]" }
+>
+------------------------------------------------------------------------------
 buffers.mappings.collapse_directory
 
 Collapse directory under cursor and hide all of its content. If a buffer is

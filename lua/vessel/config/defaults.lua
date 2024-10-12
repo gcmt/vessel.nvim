@@ -206,6 +206,8 @@ return {
 			cycle_sort = { "<space>" },
 			move_group_up = { "{" },
 			move_group_down = { "}" },
+			prev_group = { "[" },
+			next_group = { "]" },
 			pin_increment = { "<c-a>" },
 			pin_decrement = { "<c-x>" },
 			collapse_directory = { "h" },

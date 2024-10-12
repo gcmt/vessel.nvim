@@ -284,6 +284,54 @@ function Bufferlist:_action_edit(map, mode, line)
 	end
 end
 
+--- Move to next/prev group
+---@param map table
+---@param backwards boolean
+function Bufferlist:_action_next_group(map, backwards)
+	local selected = map[vim.fn.line(".")]
+	if not selected then
+		return
+	end
+
+	local path
+	if type(selected) == "string" then
+		path = selected
+	else
+		path = selected.path
+	end
+
+	-- Find group under cursor. If a buffer is selected, check parent
+	-- directories instead
+	local current_pos
+	while not current_pos and path ~= "/" do
+		for i, group in ipairs(TREE_GROUPS) do
+			if path == group then
+				current_pos = i
+				break
+			end
+		end
+		path = vim.fs.dirname(path)
+	end
+
+	if not current_pos then
+		return
+	end
+
+	local next_pos = current_pos + (backwards and -1 or 1)
+	local next_group = TREE_GROUPS[next_pos]
+
+	if not next_group then
+		return
+	end
+
+	for i, entry in pairs(map) do
+		if type(entry) == "string" and entry == next_group then
+			util.cursor(i, 1)
+			break
+		end
+	end
+end
+
 --- Move group position
 ---@param map table
 ---@param increment integer (1 or -1)
@@ -657,6 +705,12 @@ function Bufferlist:_setup_mappings(map)
 		end)
 		util.keymap("n", self.config.buffers.mappings.move_group_down, function()
 			self:_action_move_group(map, 1)
+		end)
+		util.keymap("n", self.config.buffers.mappings.prev_group, function()
+			self:_action_next_group(map, true)
+		end)
+		util.keymap("n", self.config.buffers.mappings.next_group, function()
+			self:_action_next_group(map, false)
 		end)
 	end
 end

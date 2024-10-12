@@ -257,6 +257,8 @@ Tree view options:
 - [buffers.mappings.toggle_group](#buffersmappingstoggle_group) to customize the mapping for creating groups.
 - [buffers.mappings.move_group_down](#buffersmappingsmove_group_down) to move the current group down.
 - [buffers.mappings.move_group_up](#buffersmappingsmove_group_up) to move the current group up.
+- [buffers.mappings.prev_group](#buffersmappingsprev_group) to move to the previous group.
+- [buffers.mappings.next_group](#buffersmappingsnext_group) to move to the next group.
 
 > [!NOTE]
 > *Pinned* buffers will always be displayed on top as a flat list and won't be displayed along other buffers in directory trees.
@@ -1427,6 +1429,22 @@ Move current group down.
 
 ```lua
 vessel.opt.buffers.mappings.move_group_down = { "}" }
+```
+
+#### buffers.mappings.prev_group
+
+Move to previous group.
+
+```lua
+vessel.opt.buffers.mappings.prev_group = { "[" }
+```
+
+#### buffers.mappings.next_group
+
+Move to next group.
+
+```lua
+vessel.opt.buffers.mappings.next_group = { "]" }
 ```
 
 #### buffers.mappings.pin_increment
