@@ -51,7 +51,7 @@ local function _readdir(path)
 	while true do
 		local ok, name, _ = pcall(vim.uv.fs_scandir_next, fs)
 		if not ok then
-			return nil, fs
+			return nil, name
 		end
 		if not name then
 			table.insert(ret, "└─ " .. prev)
