@@ -690,7 +690,7 @@ vessel.opt.preview.min_height = 21
 
 #### marks.preview
 
-Enable or disable preview window. See the [Preview Window Options](#preview-window-options) section for how to customize it.
+Enable or disable preview window.
 
 ```lua
 vessel.opt.marks.preview = true
@@ -976,7 +976,7 @@ vessel.opt.marks.mappings.cycle_sort = { "<SPACE>" }
 
 #### jumps.preview
 
-Enable or disable preview window. See the [Preview Window Options](#preview-window-options) section for how to customize it.
+Enable or disable preview window.
 
 ```lua
 vessel.opt.jumps.preview = true
@@ -1103,7 +1103,7 @@ vessel.opt.jumps.highlights.not_loaded = "Comment"
 
 #### buffers.preview
 
-Enable or disable preview window. See the Preview Window Options section for how to customize it.
+Enable or disable preview window.
 
 ```lua
 vessel.opt.buffers.preview = false
