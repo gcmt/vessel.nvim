@@ -486,6 +486,7 @@ end
 --- Render help inside the window
 ---@param map table
 function Marklist:_action_show_help(map)
+	self.window.preview:clear()
 	for k in pairs(map) do
 		map[k] = nil
 	end
