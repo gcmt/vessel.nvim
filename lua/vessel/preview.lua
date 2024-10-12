@@ -43,6 +43,7 @@ function Preview:default_opts()
 		win = -1,
 		relative = "win",
 		anchor = "NW",
+		focusable = true,
 	})
 end
 

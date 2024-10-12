@@ -56,21 +56,13 @@ end
 function Window:_setup_window()
 	util.reset_window(self.winid)
 	local wininfo = vim.fn.getwininfo(self.winid)
-	local bufnr = wininfo[1].bufnr
 	local winnr = wininfo[1].winnr
 	vim.fn.setwinvar(winnr, "&cursorline", self.config.window.cursorline)
 	vim.fn.setwinvar(winnr, "&number", self.config.window.number)
 	vim.fn.setwinvar(winnr, "&relativenumber", self.config.window.relativenumber)
-	local aug = vim.api.nvim_create_augroup("VesselPopup", { clear = true })
-	vim.api.nvim_create_autocmd("BufLeave", {
-		group = aug,
-		desc = "Close the window when switching to another buffer",
-		buffer = bufnr,
-		callback = function()
-			self:_close_window()
-		end,
-		once = true,
-	})
+	if vim.fn.exists("&winfixbuf") == 1 then
+		vim.fn.setwinvar(winnr, "&winfixbuf", 1)
+	end
 end
 
 --- Set the buffer-local variable with info about the buffer content
