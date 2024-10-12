@@ -43,7 +43,7 @@ local function format_path(path, meta, config)
 	if config.buffers.bufpath_style == "relcwd" then
 		return util.prettify_path(path)
 	elseif config.buffers.bufpath_style == "relhome" then
-		return select(1, string.gsub(path, "^" .. os.getenv("HOME") .. "/", "~/", 1))
+		return select(1, util.replstart(path, os.getenv("HOME") .. "/", "~/"))
 	elseif config.buffers.bufpath_style == "short" then
 		return meta.suffixes[path]
 	elseif config.buffers.bufpath_style == "full" then

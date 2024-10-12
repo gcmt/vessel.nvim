@@ -163,12 +163,12 @@ function M.make_trees(buffers, groups)
 
 	for _, buffer in ipairs(buffers) do
 		if buffer.path == "" then
-			_groups[cwd]:insert(buffer, string.gsub(buffer.path, cwd, "", 1))
+			_groups[cwd]:insert(buffer, util.replstart(buffer.path, cwd, ""))
 			goto continue
 		end
 		for _, prefix in ipairs(prefixes) do
 			if vim.startswith(buffer.path, util.trim_path(prefix) .. "/") then
-				_groups[prefix]:insert(buffer, string.gsub(buffer.path, prefix, "", 1))
+				_groups[prefix]:insert(buffer, util.replstart(buffer.path, prefix, ""))
 				goto continue
 			end
 		end

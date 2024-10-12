@@ -93,6 +93,19 @@ function M.cursorline(timeout)
 	end, timeout)
 end
 
+--- Plain text replacement at the start of a string
+---@param s string Source string
+---@param target string The string to replace
+---@param repl string Replacement string
+--@return string, boolean
+function M.replstart(s, target, repl)
+	local startpos, endpos = string.find(s, target, 1, true)
+	if not startpos or startpos > 1 then
+		return s, false
+	end
+	return string.sub(s, 1, startpos - 1) .. repl .. string.sub(s, endpos + 1), true
+end
+
 --- Strip $HOME or CWD from the given path
 ---@param path string
 ---@param cwd string?
@@ -101,13 +114,13 @@ function M.prettify_path(path, cwd)
 	cwd = cwd or vim.fn.getcwd()
 	local home = os.getenv("HOME")
 	if cwd ~= home then
-		local ret, count = string.gsub(path, "^" .. cwd .. "/", "", 1)
-		if count > 0 then
+		local ret, ok = M.replstart(path, cwd .. "/", "")
+		if ok then
 			return ret
 		end
 	end
 	if home then
-		return select(1, string.gsub(path, "^" .. home, "~", 1))
+		return select(1, M.replstart(path, home, "~"))
 	end
 	return path
 end

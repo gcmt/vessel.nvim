@@ -84,7 +84,7 @@ function M.header_formatter(path, meta, context, config)
 	if config.marks.path_style == "relcwd" then
 		path = util.prettify_path(path)
 	elseif config.marks.path_style == "relhome" then
-		path = string.gsub(path, "^" .. os.getenv("HOME") .. "/", "~/", 1)
+		path = util.replstart(path, os.getenv("HOME") .. "/", "~/")
 	elseif config.marks.path_style == "short" then
 		path = meta.suffixes[path]
 	else

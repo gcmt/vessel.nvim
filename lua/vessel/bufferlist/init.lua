@@ -960,7 +960,7 @@ function Bufferlist:_render_tree(bufwriter, map, buffers)
 				-- NOTE: directory nodes, when buffers, can be childless
 				meta.rel_path = tree.path
 				if meta.squashed then
-					meta.squashed_path = string.gsub(full_path, parent_full_path .. "/", "", 1)
+					meta.squashed_path = util.replstart(full_path, parent_full_path .. "/", "")
 				end
 				local line, matches = self:_format(dir_formatter, full_path, meta)
 				bufwriter:append(line, matches)
