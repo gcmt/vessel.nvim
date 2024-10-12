@@ -246,22 +246,24 @@ You can create as many additional separate trees as you want by pressing `g` on 
 
 To keep things organized you also have the possibility to hide buffers by collapsing directories with `h`. You can then expand them again with `l` or `<CR>`.
 
-Tree view options:
-
-- [buffers.view](#buffersview) to enable tree view.
-- [buffers.directories_first](#buffersdirectories_first) to control whether directories are ordered first or last (also works with *flat view*).
-- [buffers.squash_directories](#bufferssquash_directories) to squash directories that contain a single directory child.
-- [buffers.mappings.toggle_view](#buffersmappingstoggle_view) to switch between *flat* and *tree* view.
-- [buffers.mappings.toggle_squash](#buffersmappingstoggle_squash) to toggle directory squashing.
-- [buffers.mappings.collapse_directory](#buffersmappingscollapse_directory) to customize the mapping for collapsing directories.
-- [buffers.mappings.toggle_group](#buffersmappingstoggle_group) to customize the mapping for creating groups.
-- [buffers.mappings.move_group_down](#buffersmappingsmove_group_down) to move the current group down.
-- [buffers.mappings.move_group_up](#buffersmappingsmove_group_up) to move the current group up.
-- [buffers.mappings.prev_group](#buffersmappingsprev_group) to move to the previous group.
-- [buffers.mappings.next_group](#buffersmappingsnext_group) to move to the next group.
-
 > [!NOTE]
 > *Pinned* buffers will always be displayed on top as a flat list and won't be displayed along other buffers in directory trees.
+
+Below all options specific for *tree view*:
+
+| Option                                                                     | Description                                                                                     |
+|----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| [buffers.view](#buffersview)                                               | Set the default view: "flat" or "tree".                                                         |
+| [buffers.directories_first](#buffersdirectories_first)                     | Whether directories are ordered first or last (also works with *flat view*).                    |
+| [buffers.squash_directories](#bufferssquash_directories)                   | Squash directories that contain a single directory child.                                       |
+| [buffers.mappings.toggle_view](#buffersmappingstoggle_view)                | Switch between *flat* and *tree* view.                                                          |
+| [buffers.mappings.toggle_squash](#buffersmappingstoggle_squash)            | Toggle directory squashing.                                                                     |
+| [buffers.mappings.collapse_directory](#buffersmappingscollapse_directory)  | Collapse directories.                                                                           |
+| [buffers.mappings.toggle_group](#buffersmappingstoggle_group)              | Create or delete tree groups.                                                                   |
+| [buffers.mappings.move_group_down](#buffersmappingsmove_group_down)        | Move the current tree group down.                                                               |
+| [buffers.mappings.move_group_up](#buffersmappingsmove_group_up)            | Move the current tree group up.                                                                 |
+| [buffers.mappings.prev_group](#buffersmappingsprev_group)                  | Move to the previous group.                                                                     |
+| [buffers.mappings.next_group](#buffersmappingsnext_group)                  | Move to the next group.                                                                         |
 
 ## API
 
