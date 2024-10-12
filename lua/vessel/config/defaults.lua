@@ -204,8 +204,10 @@ return {
 		tree_lines = { "│  ", "├─ ", "└─ ", "   " },
 		mappings = {
 			cycle_sort = { "<space>" },
-			pin_increment = { "<c-a>", "<c-j>" },
-			pin_decrement = { "<c-x>", "<c-k>" },
+			move_group_up = { "{" },
+			move_group_down = { "}" },
+			pin_increment = { "<c-a>" },
+			pin_decrement = { "<c-x>" },
 			collapse_directory = { "h" },
 			toggle_view = { "m" },
 			toggle_squash = { "_" },

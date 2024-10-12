@@ -129,37 +129,46 @@ end
 
 --- Return buffers grouped in multiple trees
 ---@param buffers Buffer[]
----@param custom_groups string[]
+---@param groups string[] Order must be preserved
 ---@return table
-function M.make_trees(buffers, custom_groups)
-	local groups = {}
-	for _, g in pairs(custom_groups) do
-		groups[g] = Tree:new(g)
+function M.make_trees(buffers, groups)
+	local _groups = {}
+	for _, g in pairs(groups) do
+		_groups[g] = Tree:new(g)
 	end
 
 	local cwd = vim.fn.getcwd()
 	local home = os.getenv("HOME") or "/home"
 
 	-- therse groups are always going to be present
-	groups[cwd] = Tree:new(cwd)
-	groups[home] = Tree:new(home)
-	groups["/"] = Tree:new("/")
+	if not _groups[cwd] then
+		_groups[cwd] = Tree:new(cwd)
+		table.insert(groups, cwd)
+	end
+	if not _groups[home] then
+		_groups[home] = Tree:new(home)
+		table.insert(groups, home)
+	end
+	if not _groups["/"] then
+		_groups["/"] = Tree:new("/")
+		table.insert(groups, "/")
+	end
 
 	-- Sort groups from most specific to less specific. The buffer needs to be
 	-- captured by the most specific match
-	local prefixes = vim.tbl_keys(groups)
+	local prefixes = vim.tbl_keys(_groups)
 	table.sort(prefixes, function(a, b)
 		return a > b
 	end)
 
 	for _, buffer in ipairs(buffers) do
 		if buffer.path == "" then
-			groups[cwd]:insert(buffer, string.gsub(buffer.path, cwd, "", 1))
+			_groups[cwd]:insert(buffer, string.gsub(buffer.path, cwd, "", 1))
 			goto continue
 		end
 		for _, prefix in ipairs(prefixes) do
 			if vim.startswith(buffer.path, util.trim_path(prefix) .. "/") then
-				groups[prefix]:insert(buffer, string.gsub(buffer.path, prefix, "", 1))
+				_groups[prefix]:insert(buffer, string.gsub(buffer.path, prefix, "", 1))
 				goto continue
 			end
 		end
@@ -167,8 +176,8 @@ function M.make_trees(buffers, custom_groups)
 	end
 
 	local ret = {}
-	for _, prefix in ipairs(prefixes) do
-		table.insert(ret, groups[prefix])
+	for _, path in ipairs(groups) do
+		table.insert(ret, _groups[path])
 	end
 
 	return ret

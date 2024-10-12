@@ -1174,6 +1174,20 @@ NOTE: Has effect only in tree view mode.
     vessel.opt.buffers.mappings.toggle_group = { "g" }
 >
 ------------------------------------------------------------------------------
+buffers.mappings.move_group_up
+
+Move current group up.
+<
+    vessel.opt.buffers.mappings.move_group_up = { "{" }
+>
+------------------------------------------------------------------------------
+buffers.mappings.move_group_down
+
+Move current group down.
+<
+    vessel.opt.buffers.mappings.move_group_down = { "}" }
+>
+------------------------------------------------------------------------------
 buffers.mappings.collapse_directory
 
 Collapse directory under cursor and hide all of its content. If a buffer is

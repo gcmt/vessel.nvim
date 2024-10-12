@@ -22,5 +22,7 @@ return {
 		"toggle_group",
 		"Create or delete group for directory under cursor or buffer parent directory.",
 	},
+	{ "move_group_up", "Move group up." },
+	{ "move_group_down", "Move group down." },
 	{ "close", "Close main window." },
 }

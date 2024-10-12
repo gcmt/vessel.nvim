@@ -255,6 +255,8 @@ Tree view options:
 - [buffers.mappings.toggle_squash](#buffersmappingstoggle_squash) to toggle directory squashing.
 - [buffers.mappings.collapse_directory](#buffersmappingscollapse_directory) to customize the mapping for collapsing directories.
 - [buffers.mappings.toggle_group](#buffersmappingstoggle_group) to customize the mapping for creating groups.
+- [buffers.mappings.move_group_down](#buffersmappingsmove_group_down) to move the current group down.
+- [buffers.mappings.move_group_up](#buffersmappingsmove_group_up) to move the current group up.
 
 > [!NOTE]
 > *Pinned* buffers will always be displayed on top as a flat list and won't be displayed along other buffers in directory trees.
@@ -1409,6 +1411,22 @@ Add to the buffer list the directory of the buffer under cursor.
 
 ```lua
 vessel.opt.buffers.mappings.add_directory = { "P" }
+```
+
+#### buffers.mappings.move_group_up
+
+Move current group up.
+
+```lua
+vessel.opt.buffers.mappings.move_group_up = { "{" }
+```
+
+#### buffers.mappings.move_group_down
+
+Move current group down.
+
+```lua
+vessel.opt.buffers.mappings.move_group_down = { "}" }
 ```
 
 #### buffers.mappings.pin_increment

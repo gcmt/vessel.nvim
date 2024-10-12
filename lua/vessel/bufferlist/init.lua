@@ -284,6 +284,48 @@ function Bufferlist:_action_edit(map, mode, line)
 	end
 end
 
+--- Move group position
+---@param map table
+---@param increment integer (1 or -1)
+function Bufferlist:_action_move_group(map, increment)
+	local selected = map[vim.fn.line(".")]
+	if not selected then
+		return
+	end
+
+	local path
+	if type(selected) == "string" then
+		path = selected
+	else
+		path = selected.path
+	end
+
+	-- Find group under cursor. If a buffer is selected, check parent
+	-- directories instead
+	local group_pos
+	while not group_pos and path ~= "/" do
+		for i, group in ipairs(TREE_GROUPS) do
+			if path == group then
+				group_pos = i
+				break
+			end
+		end
+		path = vim.fs.dirname(path)
+	end
+
+	if not group_pos then
+		return
+	end
+
+	local new_pos = group_pos + increment
+	if new_pos >= 1 and new_pos <= #TREE_GROUPS then
+		table.insert(TREE_GROUPS, new_pos, table.remove(TREE_GROUPS, group_pos))
+	end
+
+	local newmap = self:_refresh()
+	self:_follow_selected(selected, newmap)
+end
+
 --- Increment/decrement pin position
 --- If the buffer is not pinned, add it to pinned list
 ---@param map table
@@ -610,6 +652,12 @@ function Bufferlist:_setup_mappings(map)
 		util.keymap("n", self.config.buffers.mappings.toggle_squash, function()
 			self:_action_toggle_squash(map)
 		end)
+		util.keymap("n", self.config.buffers.mappings.move_group_up, function()
+			self:_action_move_group(map, -1)
+		end)
+		util.keymap("n", self.config.buffers.mappings.move_group_down, function()
+			self:_action_move_group(map, 1)
+		end)
 	end
 end
 
@@ -889,16 +937,23 @@ function Bufferlist:_render_tree(bufwriter, map, buffers)
 	end
 
 	local trees = tree.make_trees(_buffers, TREE_GROUPS)
+
 	trees = vim.tbl_filter(function(t)
 		return not t:is_leaf()
 	end, trees)
-	for k, t in ipairs(trees) do
+
+	TREE_GROUPS = {}
+	for _, t in ipairs(trees) do
+		table.insert(TREE_GROUPS, t.path)
+	end
+
+	for i, t in ipairs(trees) do
 		local ok, err = pcall(_render_tree, t, t.path, "", false)
 		if not ok then
 			logger.err(string.gsub(tostring(err), "^.-:%d+:%s+", ""))
 			return
 		end
-		if k ~= #trees then
+		if i ~= #trees then
 			self:_render_separator(
 				bufwriter,
 				self.config.buffers.group_separator,

@@ -206,6 +206,8 @@ return {
 
 	["buffers.mappings"] = { "table" },
 	["buffers.mappings.cycle_sort"] = listof("string"),
+	["buffers.mappings.move_group_up"] = listof("string"),
+	["buffers.mappings.move_group_down"] = listof("string"),
 	["buffers.mappings.pin_increment"] = listof("string"),
 	["buffers.mappings.pin_decrement"] = listof("string"),
 	["buffers.mappings.toggle_view"] = listof("string"),
