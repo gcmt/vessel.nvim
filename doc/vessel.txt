@@ -192,7 +192,7 @@ m{a-zA-Z}       Change the mark under cursor
 
 '{a-z-A-Z}      Jump directly to a mark
 
-H               Show help message
+?               Show help message
 
 ------------------------------------------------------------------------------
 Jump List Mappings                                       *vessel-jumps-mappings*
@@ -212,7 +212,7 @@ C               Clear the entire jump list.
 <C-I>           Move forward in the jump list (towards the top). As a count, you
                 can use the relative number displayed on the left column.
 
-H               Show help message
+?               Show help message
 
 ------------------------------------------------------------------------------
 3.3 Buffer List Mappings                               *vessel-buffers-mappings*
@@ -264,7 +264,7 @@ h                Collapse the directory under cursor. If a buffer is selected,
 
 m                Switch between "flat" and "tree" view modes.
 
-H               Show help message
+?               Show help message
 
 ==============================================================================
 4. Configuration                                          *vessel-configuration*
