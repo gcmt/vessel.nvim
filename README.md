@@ -563,7 +563,7 @@ vessel.opt.commands.view_buffers = "Buffers"
 Key used to show help message.
 
 ```lua
-vessel.opt.help_key = "H"
+vessel.opt.help_key = "?"
 ```
 
 ### Window Options

@@ -345,7 +345,7 @@ help_key
 
 Key used to show help mesage.
 <
-    vessel.opt.help_key = "H"
+    vessel.opt.help_key = "?"
 >
 ------------------------------------------------------------------------------
 4.2 Command Options                                     *vessel-command-options*

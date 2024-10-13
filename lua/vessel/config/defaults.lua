@@ -55,7 +55,7 @@ return {
 	highlight_on_jump = false,
 	highlight_timeout = 250,
 	jump_callback = jump_callback,
-	help_key = "H",
+	help_key = "?",
 
 	--- floating window options
 	window = {
