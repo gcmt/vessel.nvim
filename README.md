@@ -1275,6 +1275,17 @@ Building blocks of the tree in [tree view](#buffersview) mode. All must have equ
 vessel.opt.buffers.tree_lines = { "│  ", "├─ ", "└─ ", "   " }
 ```
 
+#### buffers.tree_folder_icons
+
+Icons used besides directory names in [tree view](#buffersview) mode. First item is for open directories, while the second item is for collapsed directories.
+
+> [!NOTE]
+> Has effect only in [tree view](#buffersview) mode.
+
+```lua
+vessel.opt.buffers.tree_folder_icons = { "", "" }
+```
+
 #### buffers.pin_separator
 
 Character used as separator between the *pinned list* and the rest of the buffers. Use an empty string to hide the separator. Its color is controlled by the option [buffers.highlights.pin_separator](#buffershighlights).

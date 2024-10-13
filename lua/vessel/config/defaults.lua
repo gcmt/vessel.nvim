@@ -202,6 +202,7 @@ return {
 		formatter_spacing = " ",
 		directory_handler = directory_handler,
 		tree_lines = { "│  ", "├─ ", "└─ ", "   " },
+		tree_folder_icons = { "", "" },
 		mappings = {
 			cycle_sort = { "<space>" },
 			move_group_up = { "{" },

@@ -203,6 +203,7 @@ return {
 	["buffers.bufpath_style"] = oneof("full", "short", "relhome", "relcwd", "hide"),
 	["buffers.directory_handler"] = { "function" },
 	["buffers.tree_lines"] = listof("string", false, 4),
+	["buffers.tree_folder_icons"] = listof("string", false, 2),
 
 	["buffers.mappings"] = { "table" },
 	["buffers.mappings.cycle_sort"] = listof("string"),

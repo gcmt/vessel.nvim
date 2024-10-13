@@ -130,15 +130,17 @@ end
 function M.tree_directory_formatter(path, meta, context, config)
 	local prefix = { meta.prefix, config.buffers.highlights.tree_lines }
 	local hidden
+	local icon = config.buffers.tree_folder_icons[1]
 	if meta.collapsed then
+		icon = config.buffers.tree_folder_icons[2]
 		local hidden_count = string.format(" [%d]", meta.hidden_buffers)
 		hidden = { hidden_count, config.buffers.highlights.hidden_count }
 	end
 	local dir
 	if meta.squashed then
-		dir = { meta.squashed_path, config.buffers.highlights.directory }
+		dir = { icon .. meta.squashed_path, config.buffers.highlights.directory }
 	else
-		dir = { vim.fs.basename(path), config.buffers.highlights.directory }
+		dir = { icon .. vim.fs.basename(path), config.buffers.highlights.directory }
 	end
 	return util.format(" %s%s%s", prefix, dir, hidden or "")
 end
@@ -154,6 +156,7 @@ function M.tree_root_formatter(path, meta, context, config)
 	if path == "~" then
 		path = os.getenv("HOME") or path
 	end
+	path = config.buffers.tree_folder_icons[1] .. path
 	return util.format(" %s%s", prefix, { path, config.buffers.highlights.tree_root })
 end
 

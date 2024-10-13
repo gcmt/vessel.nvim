@@ -1041,6 +1041,16 @@ NOTE: Has effect only in tree view mode.
     vessel.opt.buffers.tree_lines = { "│  ", "├─ ", "└─ ", "   " }
 >
 ------------------------------------------------------------------------------
+buffers.tree_folder_icons
+
+Icons used besides directory names in tree view mode. First item is for open
+directories, while the second item is for collapsed directories.
+
+NOTE: Has effect only in tree view mode.
+<
+    vessel.opt.buffers.tree_folder_icons = { "", "" }
+>
+------------------------------------------------------------------------------
 buffers.pin_separator
 
 Character used as separator between the *pinned list* and the rest of the
