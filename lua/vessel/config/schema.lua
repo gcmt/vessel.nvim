@@ -73,10 +73,10 @@ return {
 	["highlight_on_jump"] = { "boolean" },
 	["highlight_timeout"] = { "number" },
 	["jump_callback"] = { "function" },
-	["help_key"] = "string",
+	["help_key"] = { "string" },
 
 	["window"] = { "table" },
-	["window.width"] = { "table", "function" },
+	["window.width"] = { "number", "function" },
 	["window.gravity"] = oneof("center", "top"),
 	["window.max_height"] = { "number" },
 	["window.cursorline"] = { "boolean" },
