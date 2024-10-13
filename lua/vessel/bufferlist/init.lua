@@ -541,7 +541,7 @@ function Bufferlist:_action_delete(map, cmd, force)
 	end
 
 	local bufpath = selected.path or selected
-	local bufnr = selected.bufnr or vim.fn.bufnr(bufpath)
+	local bufnr = selected.nr or vim.fn.bufnr(bufpath)
 	local pinpos = selected.pinpos or -1
 
 	if bufnr == -1 then
