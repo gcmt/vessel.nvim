@@ -76,7 +76,7 @@ return {
 	["help_key"] = { "string" },
 
 	["window"] = { "table" },
-	["window.width"] = { "number", "function" },
+	["window.width"] = { "table", "function" }, -- function or list of 2 numbers
 	["window.gravity"] = oneof("center", "top"),
 	["window.max_height"] = { "number" },
 	["window.cursorline"] = { "boolean" },
