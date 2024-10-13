@@ -51,6 +51,9 @@ function M.keymap(mode, lhs, callback, opts)
 		for _, mapping in pairs(lhs) do
 			if mapping ~= "" then
 				vim.keymap.set(mode, mapping, function()
+					if string.match(string.lower(mapping), "mouse") then
+						vim.cmd('exec "norm! \\<leftmouse>"')
+					end
 					callback(mapping)
 				end, opts)
 			end
