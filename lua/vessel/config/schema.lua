@@ -148,6 +148,7 @@ return {
 	["marks.mappings.keepj_split"] = listof("string"),
 	["marks.mappings.vsplit"] = listof("string"),
 	["marks.mappings.keepj_vsplit"] = listof("string"),
+	["marks.mappings.cycle_sort"] = listof("string"),
 
 	["jumps"] = { "table" },
 	["jumps.preview"] = { "boolean" },
