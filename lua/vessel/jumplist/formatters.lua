@@ -41,7 +41,7 @@ function M.jump_formatter(jump, meta, context, config)
 		col = "  " .. string.format(col_fmt, jump.col)
 	end
 
-	local path_fmt = "%-" .. meta.max_suffix .. "s"
+	local path_fmt = "%-" .. math.min(meta.max_suffix, 99) .. "s"
 	local path = string.format(path_fmt, meta.suffixes[jump.bufpath])
 
 	local line_hl

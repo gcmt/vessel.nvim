@@ -20,10 +20,10 @@ local function format_bufname(path, meta, config)
 	local bname_fmt = "%s"
 	if config.buffers.bufname_style == "unique" then
 		name = meta.suffixes[path] or path
-		bname_fmt = align .. meta.max_suffix .. "s"
+		bname_fmt = align .. math.min(meta.max_suffix, 99) .. "s"
 	elseif config.buffers.bufname_style == "basename" then
 		name = vim.fs.basename(path)
-		bname_fmt = align .. meta.max_basename .. "s"
+		bname_fmt = align .. math.min(meta.max_basename, 99) .. "s"
 	elseif config.buffers.bufname_style == "hide" then
 		name = ""
 	end
