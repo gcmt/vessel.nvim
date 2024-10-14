@@ -8,6 +8,7 @@ local util = require("vessel.util")
 ---@field wininfo table
 ---@field bufnr integer
 ---@field winid integer
+---@field last_path string?
 local Preview = {}
 Preview.__index = Preview
 
@@ -22,6 +23,7 @@ function Preview:new(config)
 	preview.wininfo = {}
 	preview.bufnr = -1
 	preview.winid = -1
+	preview.last_path = nil
 	return preview
 end
 
@@ -56,21 +58,30 @@ function Preview:show(filestore, path, lnum, filetype)
 	if self.bufnr == -1 then
 		return
 	end
+
 	if not path then
 		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, {})
 		return
 	end
+
 	local lines, err = filestore:getfile(path, true)
 	if err then
 		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, { err })
-	else
-		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines or {})
-		vim.fn.win_execute(self.winid, lnum)
-		vim.fn.win_execute(self.winid, "norm! zz")
-		if filetype then
-			vim.fn.setbufvar(self.bufnr, "&filetype", filetype)
-		end
+		return
 	end
+
+	if self.last_path ~= path then
+		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines or {})
+	end
+
+	vim.fn.win_execute(self.winid, lnum)
+	vim.fn.win_execute(self.winid, "norm! zz")
+
+	if filetype then
+		vim.fn.setbufvar(self.bufnr, "&filetype", filetype)
+	end
+
+	self.last_path = path
 end
 
 --- Clear preview window buffer
