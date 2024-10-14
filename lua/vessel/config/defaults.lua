@@ -74,6 +74,7 @@ return {
 
 	--- preview floating window options
 	preview = {
+		debounce = 40,
 		position = "right",
 		min_height = 21, -- lines
 		width = 50, -- percentage of the main popup

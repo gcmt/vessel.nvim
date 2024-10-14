@@ -2,59 +2,12 @@
 
 local util = require("vessel.util")
 
----@class Preview
----@field config table
----@field buffer_name string
----@field wininfo table
----@field bufnr integer
----@field winid integer
----@field last_path string?
-local Preview = {}
-Preview.__index = Preview
-
---- Create new Preview instance
----@param config table
----@return Preview
-function Preview:new(config)
-	local preview = {}
-	setmetatable(preview, Preview)
-	preview.buffer_name = "__vessel_preview__"
-	preview.config = config
-	preview.wininfo = {}
-	preview.bufnr = -1
-	preview.winid = -1
-	preview.last_path = nil
-	return preview
-end
-
---- Create buffer for the preview window
----@return integer
-function Preview:_create_buffer()
-	local bufnr = vim.fn.bufnr(self.buffer_name)
-	if bufnr == -1 then
-		bufnr = vim.api.nvim_create_buf(false, false)
-		vim.api.nvim_buf_set_name(bufnr, self.buffer_name)
-	end
-	return bufnr
-end
-
---- Return options for the preview window
----@return table
-function Preview:default_opts()
-	return vim.tbl_extend("force", self.config.preview.options, {
-		win = -1,
-		relative = "win",
-		anchor = "NW",
-		focusable = true,
-	})
-end
-
 --- Show file content in the preview window
 ---@param filestore FileStore
 ---@param path string
 ---@param lnum integer
 ---@param filetype string?
-function Preview:show(filestore, path, lnum, filetype)
+local function show(self, filestore, path, lnum, filetype)
 	if self.bufnr == -1 then
 		return
 	end
@@ -82,6 +35,54 @@ function Preview:show(filestore, path, lnum, filetype)
 	end
 
 	self.last_path = path
+end
+
+---@class Preview
+---@field config table
+---@field buffer_name string
+---@field wininfo table
+---@field bufnr integer
+---@field winid integer
+---@field last_path string?
+local Preview = {}
+Preview.__index = Preview
+
+--- Create new Preview instance
+---@param config table
+---@return Preview
+function Preview:new(config)
+	local preview = {}
+	setmetatable(preview, Preview)
+	preview.buffer_name = "__vessel_preview__"
+	preview.config = config
+	preview.wininfo = {}
+	preview.bufnr = -1
+	preview.winid = -1
+	preview.last_path = nil
+	preview.show = util.debounce(config.preview.debounce, show)
+	return preview
+end
+
+--- Create buffer for the preview window
+---@return integer
+function Preview:_create_buffer()
+	local bufnr = vim.fn.bufnr(self.buffer_name)
+	if bufnr == -1 then
+		bufnr = vim.api.nvim_create_buf(false, false)
+		vim.api.nvim_buf_set_name(bufnr, self.buffer_name)
+	end
+	return bufnr
+end
+
+--- Return options for the preview window
+---@return table
+function Preview:default_opts()
+	return vim.tbl_extend("force", self.config.preview.options, {
+		win = -1,
+		relative = "win",
+		anchor = "NW",
+		focusable = true,
+	})
 end
 
 --- Clear preview window buffer

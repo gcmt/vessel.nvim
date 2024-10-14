@@ -654,6 +654,14 @@ vessel.opt.preview.options.style = "minimal"
 vessel.opt.preview.options.border = "single"
 ```
 
+#### preview.debounce
+
+Debounce delay of the preview window, in milliseconds.
+
+```lua
+vessel.opt.preview.debounce = 40
+```
+
 #### preview.position
 
 Whether to position the preview popup on the right side or on the bottom side of the main popup window. Can be either `right` or `bottom`.

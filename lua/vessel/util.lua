@@ -10,6 +10,21 @@ M.modes = {
 	TAB = 4,
 }
 
+--- Debounce function
+---@param ms integer Delay in milliseconds
+---@param callback function Function to debounce
+---@return function
+function M.debounce(ms, callback)
+	local id = -1
+	return function(...)
+		local args = { ... }
+		vim.fn.timer_stop(id)
+		id = vim.fn.timer_start(ms, function()
+			callback(unpack(args))
+		end)
+	end
+end
+
 --- Find next available buffer
 ---@param bufnr integer Buffer to replace
 ---@return integer?

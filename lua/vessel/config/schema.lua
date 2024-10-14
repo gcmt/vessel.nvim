@@ -92,6 +92,7 @@ return {
 	["preview.width"] = { "number" },
 	["preview.width_threshold"] = { "number" },
 	["preview.min_height"] = { "number" },
+	["preview.debounce"] = { "number" },
 
 	["preview.options"] = { "table" },
 	["preview.options.style"] = { "string" },
