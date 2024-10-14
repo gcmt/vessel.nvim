@@ -306,11 +306,10 @@ the `setup` function or set via the `opt` interface object.
       require('vessel').view_jumps({ window = { max_height = 90 } })
     end)
 <
-
 All examples below assume you have required the vessel module with:
-<
+>
     local vessel = require("vessel")
-
+<
 ------------------------------------------------------------------------------
 4.1 Common Options                                       *vessel-common-options*
 
@@ -344,9 +343,9 @@ This function takes two parameters: mode and context.
 help_key
 
 Key used to show help mesage.
-<
-    vessel.opt.help_key = "?"
 >
+    vessel.opt.help_key = "?"
+<
 ------------------------------------------------------------------------------
 4.2 Command Options                                     *vessel-command-options*
 
@@ -390,7 +389,7 @@ With the preview window enabled:
   preview window.
 - 'top': When the preview window height is higher than the main popup window
   height, the top margin of both windows will be aligned.
-
+`
 >
     vessel.opt.window.gravity = "center"
 <
@@ -465,9 +464,9 @@ Control how the preview popup looks. These options are passed directly to the
 preview.debounce
 
 Debounce delay of the preview window, in milliseconds.
-<
-    vessel.opt.preview.debounce = 40
 >
+    vessel.opt.preview.debounce = 40
+<
 ------------------------------------------------------------------------------
 preview.position
 
@@ -506,38 +505,38 @@ marks.preview
 
 Enable or disable preview window. See the Preview Window Options section for
 how to customize it.
-<
-    vessel.opt.marks.preview = true
 >
+    vessel.opt.marks.preview = true
+<
 ------------------------------------------------------------------------------
 marks.locals, maks.globals
 
 The pool of marks the plugin chooses from when automatically picking the
 letter for you.
-<
+>
     vessel.opt.marks.locals = "abcdefghijklmnopqrstuvwxyz"
     vessel.opt.marks.globals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
->
+<
 ------------------------------------------------------------------------------
 marks.sort_groups
 
 Function used to sort groups. A group is a set of marks belonging to the same
 file.
-<
+>
     vessel.opt.marks.sort_groups = function(a, b)
 	return a > b
     end
->
+<
 ------------------------------------------------------------------------------
 marks.sort_marks
 
 List of functions used to sort marks in the each groups. First item is the
 function used by default the first time you open the window. See also
 marks.mappings.cycle_sort
-<
+>
     local sorters = require("vessel.config.sorters")
     vessel.opt.marks.sort_marks = { sorters.marks.by_lnum, sorters.marks.by_mark }
->
+<
 
 Available sorters are:
 
@@ -552,14 +551,14 @@ values:
   cycling between these function, or empty string for no feedback
 
 Example function:
-<
+>
     function sort_by_lnum()
       local fn = function(a, b)
 	return a.lnum < b.lnum
       end
       return fn, "sorting by line number"
     end
->
+<
 ------------------------------------------------------------------------------
 marks.path_style
 
@@ -570,47 +569,47 @@ Controls the style of the file path header. Can be one of:
 - 'relcwd' Relative to the current working directory
 
 NOTE: Has effect only when using default formatters.
-<
-    vessel.opt.marks.path_style = "relcwd"
 >
+    vessel.opt.marks.path_style = "relcwd"
+<
 ------------------------------------------------------------------------------
 marks.toggle_mark
 
 Enable/disable unsetting a mark when trying to mark an alredy marked line.
-<
-    vessel.opt.marks.toggle_mark = true
 >
+    vessel.opt.marks.toggle_mark = true
+<
 ------------------------------------------------------------------------------
 marks.use_backtick
 
 Use backtick instead of apostrophe for jumping to marks. See ':help mark-motions'.
-<
-    vessel.opt.marks.use_backtick = false
 >
+    vessel.opt.marks.use_backtick = false
+<
 ------------------------------------------------------------------------------
 marks.not_found
 
 Message used when the mark list is empty.
-<
-    vessel.opt.marks.not_found = "No marks found"
 >
+    vessel.opt.marks.not_found = "No marks found"
+<
 ------------------------------------------------------------------------------
 marks.move_to_first_mark
 
 Position the cursor on the first line of a mark group.
-<
-    vessel.opt.marks.move_to_first_mark = true
 >
+    vessel.opt.marks.move_to_first_mark = true
+<
 ------------------------------------------------------------------------------
 marks.move_to_closest_mark, marks.proximity_threshold
 
 Position the cursor on the closest mark relative to the current position in
 the buffer. If a mark is farther from the cursor than `proximity_threshold`
 lines, it won't be considered.
-<
+>
     vessel.opt.marks.move_to_closest_mark = true
     vessel.opt.marks.proximity_threshold = 50
->
+<
 ------------------------------------------------------------------------------
 marks.force_header
 
@@ -618,9 +617,9 @@ Force displaying the group header (file path) even when there is just one
 group.
 
 NOTE: Has effect only when using default formatters.
-<
-    vessel.opt.marks.force_header = false
 >
+    vessel.opt.marks.force_header = false
+<
 ------------------------------------------------------------------------------
 marks.decorations
 
@@ -628,42 +627,42 @@ Decorations used as prefix to each formatted mark. Last item is for last
 entries in each group.
 
 NOTE: Has effect only when using default formatters.
-<
-    vessel.opt.marks.decorations = { "├ ", "└ " }
 >
+    vessel.opt.marks.decorations = { "├ ", "└ " }
+<
 ------------------------------------------------------------------------------
 marks.show_colnr
 
 Show/hide mark column number.
 
 NOTE: Has effect only when using default formatters.
-<
-    vessel.opt.marks.show_colnr = false
 >
+    vessel.opt.marks.show_colnr = false
+<
 ------------------------------------------------------------------------------
 marks.strip_lines
 
 Strip leading white spaces from lines.
 
 NOTE: Has effect only when using default formatters.
-<
-    vessel.opt.marks.strip_lines = true
 >
+    vessel.opt.marks.strip_lines = true
+<
 ------------------------------------------------------------------------------
 marks.formatters.mark, marks.formatters.header
 
 Functions used to format each mark / group header line.
-<
+>
     vessel.opt.marks.formatters.mark = <function>
     vessel.opt.marks.formatters.header = <function>
->
+<
 ------------------------------------------------------------------------------
 marks.highlights.*
 
 Highlight groups used by default formatters.
 
 NOTE: Have effect only when using the default formatters.
-<
+>
     vessel.opt.marks.highlights.path = "Directory"
     vessel.opt.marks.highlights.not_loaded = "Comment"
     vessel.opt.marks.highlights.decorations = "NonText"
@@ -671,100 +670,100 @@ NOTE: Have effect only when using the default formatters.
     vessel.opt.marks.highlights.lnum = "LineNr"
     vessel.opt.marks.highlights.col = "LineNr"
     vessel.opt.marks.highlights.line = "Normal"
->
+<
 ------------------------------------------------------------------------------
 marks.mappings.close
 
 Close the mark list window.
-<
-    vessel.opt.marks.mappings.close = { "q", "<esc>" }
 >
+    vessel.opt.marks.mappings.close = { "q", "<esc>" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.delete
 
 Delete the mark under cursor.
-<
-    vessel.opt.marks.mappings.delete = { "d" }
 >
+    vessel.opt.marks.mappings.delete = { "d" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.next_group
 
 Move to the next group header.
-<
-    vessel.opt.marks.mappings.next_group = { "<c-j>" }
 >
+    vessel.opt.marks.mappings.next_group = { "<c-j>" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.prev_group
 
 Move to the previous group header.
-<
-    vessel.opt.marks.mappings.prev_group = { "<c-k>" }
 >
+    vessel.opt.marks.mappings.prev_group = { "<c-k>" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.jump
 
 Jump to the mark (or path) under cursor.
-<
-    vessel.opt.marks.mappings.jump = { "l", "<cr>" }
 >
+    vessel.opt.marks.mappings.jump = { "l", "<cr>" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.keepj_jump
 
 Jump to the mark under cursor (does not change the jump list).
-<
-    vessel.opt.marks.mappings.keepj_jump = { "o" }
 >
+    vessel.opt.marks.mappings.keepj_jump = { "o" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.tab
 
 Open the mark under cursor in a new tab.
-<
-    vessel.opt.marks.mappings.tab = { "t" }
 >
+    vessel.opt.marks.mappings.tab = { "t" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.keepj_tab
 
 Open the mark under cursor in a new tab (does not change the jump list).
-<
-    vessel.opt.marks.mappings.keepj_tab = { "T" }
 >
+    vessel.opt.marks.mappings.keepj_tab = { "T" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.split
 
 Open the mark under cursor in a horizontal.
-<
-    vessel.opt.marks.mappings.split = { "s" }
 >
+    vessel.opt.marks.mappings.split = { "s" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.keepj_split
 
 Open the mark under cursor in a horizontal split (does not change the jump
 list).
-<
-    vessel.opt.marks.mappings.keepj_split = { "S" }
 >
+    vessel.opt.marks.mappings.keepj_split = { "S" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.vsplit
 
 Open the mark under cursor in a vertical split.
-<
-    vessel.opt.marks.mappings.vsplit = { "v" }
 >
+    vessel.opt.marks.mappings.vsplit = { "v" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.keepj_vsplit
 
 Open the mark under cursor in a vertical split with (does not change the jump
 list).
-<
-    vessel.opt.marks.mappings.keepj_vsplit = { "V" }
 >
+    vessel.opt.marks.mappings.keepj_vsplit = { "V" }
+<
 ------------------------------------------------------------------------------
 marks.mappings.cycle_sort
 
 Cycle sorting functions. See also marks.sort_marks
-<
-    vessel.opt.marks.mappings.cycle_sort = { "<SPACE>" }
 >
+    vessel.opt.marks.mappings.cycle_sort = { "<SPACE>" }
+<
 ------------------------------------------------------------------------------
 4.6 Jump List Options                                     *vessel-jumps-options*
 
@@ -773,37 +772,37 @@ jumps.preview
 
 Enable or disable preview window. See the Preview Window Options section for
 how to customize it.
-<
-    vessel.opt.jumps.preview = true
 >
+    vessel.opt.jumps.preview = true
+<
 ------------------------------------------------------------------------------
 jumps.real_positions
 
 Display real jump entries positions. There might be gaps when filters are applied to the list.
-<
-    vessel.opt.jumps.real_positions = false
 >
+    vessel.opt.jumps.real_positions = false
+<
 ------------------------------------------------------------------------------
 jumps.strip_lines
 
 Strip leading white spaces from lines.
-<
-    vessel.opt.jumps.strip_lines = false
 >
+    vessel.opt.jumps.strip_lines = false
+<
 ------------------------------------------------------------------------------
 jumps.filter_empty_lines
 
 Filter jump entries that point to empty lines.
-<
-    vessel.opt.jumps.filter_empty_lines = true
 >
+    vessel.opt.jumps.filter_empty_lines = true
+<
 ------------------------------------------------------------------------------
 jumps.not_found
 
 Message used when the jump list is empty.
-<
-    vessel.opt.jumps.not_found = "Jump list empty"
 >
+    vessel.opt.jumps.not_found = "Jump list empty"
+<
 ------------------------------------------------------------------------------
 jumps.indicator
 
@@ -811,67 +810,67 @@ Prefix used for each formatted jump entry. First item is the line of the
 current position in the jump list.
 
 NOTE: Has effect only when using the default formatter.
-<
-    vessel.opt.jumps.indicator = { " ", " " }
 >
+    vessel.opt.jumps.indicator = { " ", " " }
+<
 ------------------------------------------------------------------------------
 jumps.show_colnr
 
 Show/hide jump entries column numbers.
 
 NOTE: Has effect only when using the default formatter.
-<
-    vessel.opt.jumps.show_colnr = false
 >
+    vessel.opt.jumps.show_colnr = false
+<
 ------------------------------------------------------------------------------
 jumps.formatters.jump
 
 Function used to format each jump entry line.
-<
-    vessel.opt.jumps.formatters.jump = <function>
 >
+    vessel.opt.jumps.formatters.jump = <function>
+<
 ------------------------------------------------------------------------------
 jumps.mappings.ctrl_o
 
 Mapping used to move backwards in the jump list (to the bottom of the window).
 Takes a count.
-<
-    vessel.opt.jumps.mappings.ctrl_o = "<c-o>"
 >
+    vessel.opt.jumps.mappings.ctrl_o = "<c-o>"
+<
 ------------------------------------------------------------------------------
 jumps.mappings.ctrl_i
 
 Mapping used to move forwards in the jump list (to the top of the window).
 Takes a count.
-<
-    vessel.opt.jumps.mappings.ctrl_i = "<c-i>"
 >
+    vessel.opt.jumps.mappings.ctrl_i = "<c-i>"
+<
 ------------------------------------------------------------------------------
 jumps.mappings.jump
 
 Jump to the entry under cursor.
-<
-    vessel.opt.jumps.mappings.jump = { "l", "<cr>" }
 >
+    vessel.opt.jumps.mappings.jump = { "l", "<cr>" }
+<
 ------------------------------------------------------------------------------
 jumps.mappings.close
 
 Close the jump list window.
-<
-    vessel.opt.jumps.mappings.close = { "q", "<esc>" }
 >
+    vessel.opt.jumps.mappings.close = { "q", "<esc>" }
+<
 ------------------------------------------------------------------------------
 jumps.mappings.clear
 
 Clear the jump list. Executes `:clearjumps`.
-<
-    vessel.opt.jumps.mappings.clear = { "C" }
 >
+    vessel.opt.jumps.mappings.clear = { "C" }
+<
 ------------------------------------------------------------------------------
 jumps.highlights.*
 
 Highlight groups used by the default formatter.
-<
+>
     vessel.opt.jumps.highlights.indicator = "Comment"
     vessel.opt.jumps.highlights.pos = "LineNr"
     vessel.opt.jumps.highlights.current_pos = "CursorLineNr"
@@ -879,7 +878,7 @@ Highlight groups used by the default formatter.
     vessel.opt.jumps.highlights.lnum = "LineNr"
     vessel.opt.jumps.highlights.col = "LineNr"
     vessel.opt.jumps.highlights.line = "Normal"
->
+<
 
 ------------------------------------------------------------------------------
 4.7 Buffer List Options                                 *vessel-buffers-options*
@@ -889,48 +888,48 @@ buffers.preview
 
 Enable or disable preview window. See the Preview Window Options section for
 how to customize it.
-<
-    vessel.opt.buffers.preview = false
 >
+    vessel.opt.buffers.preview = false
+<
 ------------------------------------------------------------------------------
 buffers.view
 
 Buffer list view mode. Can be one of
 - 'flat' Buffers displayed as a simple list
 - 'tree' Buffers displayed as a tree
-<
-    vessel.opt.buffers.view = "flat"
 >
+    vessel.opt.buffers.view = "flat"
+<
 ------------------------------------------------------------------------------
 buffers.wrap_around
 
 When navigating to next/previous buffers in the pinned list with the API or
 <plug> mappings, wrap around the list when reaching its start or end.
-<
-    vessel.opt.buffers.wrap_around = true
 >
+    vessel.opt.buffers.wrap_around = true
+<
 ------------------------------------------------------------------------------
 buffers.not_found
 
 Message used when the buffer list is empty
-<
-    vessel.opt.buffers.not_found = "Buffer list empty"
 >
+    vessel.opt.buffers.not_found = "Buffer list empty"
+<
 ------------------------------------------------------------------------------
 buffers.unnamed_label
 
 Label used for unnamed buffers.
-<
-    vessel.opt.buffers.unnamed_label = "[no name]"
 >
+    vessel.opt.buffers.unnamed_label = "[no name]"
+<
 ------------------------------------------------------------------------------
 buffers.quickjump
 
 Remap numbers `[1-9]` in normal mode to quickly edit the 9 buffers at the top
 of the window.
-<
-    vessel.opt.buffers.quickjump = true
 >
+    vessel.opt.buffers.quickjump = true
+<
 ------------------------------------------------------------------------------
 buffers.directory_handler
 
@@ -940,9 +939,9 @@ the buffer. Can be useful to open up your favorite file explorer or fuzzy
 finder.
 
 This function takes two parameters: `path` and context
-<
-    vessel.opt.buffers.directory_handler = <function>
 >
+    vessel.opt.buffers.directory_handler = <function>
+<
 ------------------------------------------------------------------------------
 buffers.sort_buffers
 
@@ -950,7 +949,7 @@ List of functions used to sort buffers. First item is the function used by
 default the first time you open the window.
 
 See also buffers.mappings.cycle_sort
-<
+>
     local sorters = require("vessel.config.sorters")
     vessel.opt.buffers.sort_buffers = {
 	sorters.buffers.by_path,
@@ -958,7 +957,7 @@ See also buffers.mappings.cycle_sort
 	sorters.buffers.by_lastused,
 	sorters.buffers.by_changes,
     }
->
+<
 Available sorters are:
 - 'sorters.buffers.by_path' Sort by buffer directory.
 - 'sorters.buffers.by_basename' Sort by buffer basename.
@@ -974,23 +973,23 @@ values:
   cycling between these function, or empty string for no feedback
 
 Example sorter function:
-<
+>
     function sort_by_basename()
 	local fn = function(a, b)
 	    return vim.fs.basename(a.path) < vim.fs.basename(b.path)
 	end
 	return fn, "sorting by basename"
     end
->
+<
 ------------------------------------------------------------------------------
 buffers.sort_directories
 
 Function used to sort directories.
-<
+>
     vessel.opt.buffers.sort_directories = function(path_a, path_b)
         return path_a < path_b
     end
->
+<
 ------------------------------------------------------------------------------
 buffers.squash_directories
 
@@ -999,33 +998,31 @@ directory child.
 
 This option can be toggled directly from the buffer list window with
 'buffers.mappings.toggle_squash'.
-<
-    vessel.opt.buffers.squash_directories = true
 >
-
+    vessel.opt.buffers.squash_directories = true
+<
 Example of a non-squashed directory structure (/home/user is the root
 directory in this case, which is always displayed):
-<
+>
      /home/user
      └─ .dotfiles
 	└─ nvim
 	   └─ lua
 	      └─ init.lua
->
-
-With `'buffers.squash_directories' set to 'true'.
 <
+With `'buffers.squash_directories' set to 'true'.
+>
      /home/user
      └─ .dotfiles/nvim/lua
 	└─ init.lua
->
+<
 ------------------------------------------------------------------------------
 buffers.directories_first
 
 Whether directories should be put first or last in the buffer list or tree.
-<
-    buffers.directories_first = false
 >
+    buffers.directories_first = false
+<
 ------------------------------------------------------------------------------
 buffers.show_pin_positions
 
@@ -1035,18 +1032,18 @@ Useful when line numbers are not enabled for the window or the
 buffers.quickjump option is enabled.
 
 NOTE: Has effect only when using the default formatter.
-<
-    vessel.opt.buffers.show_pin_positions = true
 >
+    vessel.opt.buffers.show_pin_positions = true
+<
 ------------------------------------------------------------------------------
 buffers.tree_lines
 
 Building blocks of the tree in tree view mode. All must have equal length.
 
 NOTE: Has effect only in tree view mode.
-<
-    vessel.opt.buffers.tree_lines = { "│  ", "├─ ", "└─ ", "   " }
 >
+    vessel.opt.buffers.tree_lines = { "│  ", "├─ ", "└─ ", "   " }
+<
 ------------------------------------------------------------------------------
 buffers.tree_folder_icons
 
@@ -1054,18 +1051,18 @@ Icons used besides directory names in tree view mode. First item is for open
 directories, while the second item is for collapsed directories.
 
 NOTE: Has effect only in tree view mode.
-<
-    vessel.opt.buffers.tree_folder_icons = { "", "" }
 >
+    vessel.opt.buffers.tree_folder_icons = { "", "" }
+<
 ------------------------------------------------------------------------------
 buffers.pin_separator
 
 Character used as separator between the *pinned list* and the rest of the
 buffers. Use an empty string to hide the separator. Its color is controlled by
 the option buffers.highlights.pin_separator
-<
-    vessel.opt.buffers.pin_separator = "─"
 >
+    vessel.opt.buffers.pin_separator = "─"
+<
 ------------------------------------------------------------------------------
 buffers.group_separator
 
@@ -1073,9 +1070,9 @@ Character used as separator between different tree groups. Use an empty string
 to hide the separator.
 
 The color can be set with the option 'buffers.highlights.group_separator'.
-<
-    vessel.opt.buffers.group_separator = "─"
 >
+    vessel.opt.buffers.group_separator = "─"
+<
 ------------------------------------------------------------------------------
 buffers.bufname_align
 
@@ -1085,9 +1082,9 @@ How to align the buffer name. Can be one of:
 - 'none' No alignment
 
 NOTE: Has effect only when using the default formatter.
-<
-    vessel.opt.buffers.bufname_align = "left"
 >
+    vessel.opt.buffers.bufname_align = "left"
+<
 ------------------------------------------------------------------------------
 buffers.bufname_style
 
@@ -1097,9 +1094,9 @@ Buffer name style. Can be one of:
 - 'hide' Hide bufname completely
 
 NOTE: Has effect only when using the default formatter.
-<
-    vessel.opt.buffers.bufname_style = "unique"
 >
+    vessel.opt.buffers.bufname_style = "unique"
+<
 ------------------------------------------------------------------------------
 buffers.bufpath_style
 
@@ -1111,55 +1108,55 @@ Buffer path style. Can be one of:
 - 'hide' Hide buffer path completely
 
 NOTE: Has effect only when using the default formatter.
-<
-    vessel.opt.buffers.bufpath_style = "relcwd"
 >
+    vessel.opt.buffers.bufpath_style = "relcwd"
+<
 ------------------------------------------------------------------------------
 buffers.formatter_spacing
 
 Spacing between formatted items (line numbers, bufname and bufpath).
 
 NOTE: Has effect only when using the default formatter.
-<
-    vessel.opt.buffers.formatter_spacing =  " "
 >
+    vessel.opt.buffers.formatter_spacing =  " "
+<
 ------------------------------------------------------------------------------
 buffers.mappings.cycle_sort
 
 Cycle sorting functions. See also buffers.sort_buffers,
-<
-    vessel.opt.buffers.mappings.cycle_sort = { "<space>" }
 >
+    vessel.opt.buffers.mappings.cycle_sort = { "<space>" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.toggle_pin
 
 Toggle pinned status on the buffer under cursor.
-<
-    vessel.opt.buffers.mappings.toggle_pin = { "p" }
 >
+    vessel.opt.buffers.mappings.toggle_pin = { "p" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.add_directory
 
 Add to the buffer list the directory of the buffer under cursor.
-<
-    vessel.opt.buffers.mappings.add_directory = { "P" }
 >
+    vessel.opt.buffers.mappings.add_directory = { "P" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.toggle_squash
 
 Toggle squash option.
 
 NOTE: Has effect only in tree view mode.
-<
-    vessel.opt.buffers.mappings.toggle_squash = { "_" }
 >
+    vessel.opt.buffers.mappings.toggle_squash = { "_" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.toggle_view
 
 Toggle the option 'buffers.view'. Switches between "flat" and "tree" view.
-<
-    vessel.opt.buffers.mappings.toggle_view = { "m" }
 >
+    vessel.opt.buffers.mappings.toggle_view = { "m" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.pin_increment
 
@@ -1167,9 +1164,9 @@ Move the buffer under cursor down in the pinned list. The buffer is pinned
 if not already in the pinned list.
 
 NOTE: Incrementing the position essentially moves the buffer down.
-<
-    vessel.opt.buffers.mappings.pin_increment = { "<c-a>" }
 >
+    vessel.opt.buffers.mappings.pin_increment = { "<c-a>" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.pin_decrement
 
@@ -1177,9 +1174,9 @@ Move the buffer under cursor up in the pinned list. The buffer is pinned if
 not already in the pinned list.
 
 NOTE: Decrementing the position essentially moves the buffer up.
-<
-    vessel.opt.buffers.mappings.pin_decrement = { "<c-x>" }
 >
+    vessel.opt.buffers.mappings.pin_decrement = { "<c-x>" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.toggle_group
 
@@ -1187,84 +1184,83 @@ Create new tree group for the parent directory of the selected buffer or
 directly for the selected directory.
 
 NOTE: Has effect only in tree view mode.
-<
-    vessel.opt.buffers.mappings.toggle_group = { "g" }
 >
+    vessel.opt.buffers.mappings.toggle_group = { "g" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.move_group_up
 
 Move current group up.
-<
-    vessel.opt.buffers.mappings.move_group_up = { "{" }
 >
+    vessel.opt.buffers.mappings.move_group_up = { "{" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.move_group_down
 
 Move current group down.
-<
-    vessel.opt.buffers.mappings.move_group_down = { "}" }
 >
+    vessel.opt.buffers.mappings.move_group_down = { "}" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.prev_group
 
 Move to previous group.
-<
-    vessel.opt.buffers.mappings.prev_group = { "[" }
 >
+    vessel.opt.buffers.mappings.prev_group = { "[" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.next_group
 
 Move to next group.
-<
-    vessel.opt.buffers.mappings.next_group = { "]" }
 >
+    vessel.opt.buffers.mappings.next_group = { "]" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.collapse_directory
 
 Collapse directory under cursor and hide all of its content. If a buffer is
 selected instead, its parent directory will be collapsed. To expand
 a collapsed directory, use the the normal mapping 'buffer.mappings.edit'.
-.
 
 NOTE: Works only in tree view mode.
-<
-    vessel.opt.buffers.collapse_directory = { "h" }
 >
+    vessel.opt.buffers.collapse_directory = { "h" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.toggle_unlisted
 
 Toggle unlisted buffers.
-<
-    vessel.opt.buffers.mappings.toggle_unlisted = { "a" }
 >
+    vessel.opt.buffers.mappings.toggle_unlisted = { "a" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.edit
 
 Edit the buffer under cursor.
-<
-    vessel.opt.buffers.mappings.edit = { "l", "<cr>" }
 >
+    vessel.opt.buffers.mappings.edit = { "l", "<cr>" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.tab
 
 Edit the buffer under cursor in a new tab.
-<
-    vessel.opt.buffers.mappings.tab = { "t" }
 >
+    vessel.opt.buffers.mappings.tab = { "t" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.split
 
 Edit the buffer under cursor in a horizontal split.
-<
-    vessel.opt.buffers.mappings.split = { "s" }
 >
+    vessel.opt.buffers.mappings.split = { "s" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.vsplit
 
 Edit buffer under cursor in a vertical split.
-<
-    vessel.opt.buffers.mappings.vsplit = { "v" }
 >
+    vessel.opt.buffers.mappings.vsplit = { "v" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.delete
 
@@ -1272,82 +1268,82 @@ Executes ':bdelete' on the buffer under cursor (fails with unsaved changes).
 
 Basically sets the buffer unlisted. The buffer can then be re-openend by
 toggling unlisted buffers with buffers.mappings.toggle_unlisted.
-<
-    vessel.opt.buffers.mappings.delete = { "d" }
 >
+    vessel.opt.buffers.mappings.delete = { "d" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.force_delete
 
 Executes ':bdelete!' on the buffer under cursor.
 
 CAUTION: All unsaved changes will be lost!
-<
-    vessel.opt.buffers.mappings.force_delete = { "D" }
 >
+    vessel.opt.buffers.mappings.force_delete = { "D" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.wipe
 
 Executes ':bwipeout' buffer under cursor (fails with unsaved changes).
-<
-    vessel.opt.buffers.mappings.wipe = { "w" }
 >
+    vessel.opt.buffers.mappings.wipe = { "w" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.force_wipe
 
 Executes ':bwipeout!' on the buffer under cursor.
 
 CAUTION: All unsaved changes will be lost!
-<
-    vessel.opt.buffers.mappings.force_wipe = { "W" }
 >
+    vessel.opt.buffers.mappings.force_wipe = { "W" }
+<
 ------------------------------------------------------------------------------
 buffers.mappings.close
 
 Close the buffer list window.
-<
-    vessel.opt.buffers.mappings.close = { "q", "<esc>" }
 >
+    vessel.opt.buffers.mappings.close = { "q", "<esc>" }
+<
 ------------------------------------------------------------------------------
 buffers.formatters.buffer
 
 Function used to format each buffer entry line.
 
 NOTE: Used when buffers.view == "flat"
-<
-    vessel.opt.buffers.formatters.buffer = <function>
 >
+    vessel.opt.buffers.formatters.buffer = <function>
+<
 ------------------------------------------------------------------------------
 buffers.formatters.tree_root
 
 Function used to format each tree root directory.
 
 NOTE: Used when buffers.view == "tree"
-<
-    vessel.opt.buffers.formatters.tree_root = <function>
 >
+    vessel.opt.buffers.formatters.tree_root = <function>
+<
 ------------------------------------------------------------------------------
 buffers.formatters.tree_directory
 
 Function used to format each tree directory node.
 
 NOTE: Used when buffers.view == "tree"
-<
-    vessel.opt.buffers.formatters.tree_directory = <function>
 >
+    vessel.opt.buffers.formatters.tree_directory = <function>
+<
 ------------------------------------------------------------------------------
 buffers.formatters.tree_buffer
 
 Function used to format each tree buffer leave.
 
 NOTE: Used when buffers.view == "tree"
-<
-    vessel.opt.buffers.formatters.tree_buffer = <function>
 >
+    vessel.opt.buffers.formatters.tree_buffer = <function>
+<
 ------------------------------------------------------------------------------
 buffers.highlights.*
 
 Highlight groups used by the default formatter.
-<
+>
     vessel.opt.buffers.highlights.bufname = "Normal"
     vessel.opt.buffers.highlights.bufpath = "Comment"
     vessel.opt.buffers.highlights.unlisted = "Comment"
@@ -1359,7 +1355,7 @@ Highlight groups used by the default formatter.
     vessel.opt.buffers.highlights.tree_root = "Keyword"
     vessel.opt.buffers.highlights.tree_lines = "Comment"
     vessel.opt.buffers.highlights.hidden_count = "Comment"
->
+<
 
 ==============================================================================
 5. Changelog                                                  *vessel-changelog*
