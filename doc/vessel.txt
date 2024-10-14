@@ -1379,9 +1379,9 @@ CHANGES
 
 FIXES
 
-- Fixed tree view getting tangled up when handling paths with magical charcters.
+- Fixed tree view getting tangled up when handling paths with magical characters.
 - Fixed inability to set marks.mappings.cycle_sort option.
-- Fixed errro when trying to delete last unnamed buffer.
+- Fixed error when trying to delete last unnamed buffer.
 - Allow mouse mappings.
 - Added debounce delay to the preview window.
 
