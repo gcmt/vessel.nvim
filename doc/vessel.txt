@@ -1361,6 +1361,31 @@ Highlight groups used by the default formatter.
 5. Changelog                                                  *vessel-changelog*
 
 ------------------------------------------------------------------------------
+v2.4.0
+
+NEW
+
+- Preview window now also shows directory content.
+- Directory icons in tree view mode.
+
+NEW OPTION
+
+- 'buffers.tree_folder_icons': Set tree directory icons
+- 'preview.debounce': Set preview window delay
+
+CHANGES
+
+- Changed default help key from H to ?
+
+FIXES
+
+- Fixed tree view getting tangled up when handling paths with magical charcters.
+- Fixed inability to set marks.mappings.cycle_sort option.
+- Fixed errro when trying to delete last unnamed buffer.
+- Allow mouse mappings.
+- Added debounce delay to the preview window.
+
+------------------------------------------------------------------------------
 v2.3.0
 
 NEW
