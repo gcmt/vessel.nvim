@@ -1,11 +1,11 @@
 ---@module "schema"
 
 local logger = require("vessel.logger")
-local util = require("vessel.util")
 
---- Check if a list contains only values of the given type
+--- Allow list of the given type
 ---@param typ string
----@param len integer?
+---@param allow_empty boolean? Allow empty string
+---@param len integer? Allow list of specific length
 ---@return table
 local function listof(typ, allow_empty, len)
 	local qty = len and " " .. len or ""
@@ -36,12 +36,18 @@ local function listof(typ, allow_empty, len)
 	return { fn, msg }
 end
 
---- Check if a value is in the choices table
+-- Allow any of the given types
+-- ... string
+-- return table
+local function typeof(...)
+	return { ... }
+end
+
+--- Allow any of the given values
 ---@param ... any
 ---@return table
 local function oneof(...)
 	local t = { ... }
-	local msg = "one of " .. util.join("|", ...)
 	local fn = function(val)
 		for _, v in pairs(t) do
 			if v == val then
@@ -50,7 +56,7 @@ local function oneof(...)
 		end
 		return false
 	end
-	return { fn, msg }
+	return { fn, "one of " .. table.concat(t, "|") }
 end
 
 --- Pass validation but give message about deprecation
@@ -65,78 +71,79 @@ end
 
 return {
 
+	__typeof = typeof,
 	__listof = listof,
 	__oneof = oneof,
 
 	["verbosity"] = oneof(0, 1, 2, 3, 4, 5),
 	["lazy_load_buffers"] = deprecated("lazy_load_buffers"),
-	["highlight_on_jump"] = { "boolean" },
-	["highlight_timeout"] = { "number" },
-	["jump_callback"] = { "function" },
-	["help_key"] = { "string" },
+	["highlight_on_jump"] = typeof("boolean"),
+	["highlight_timeout"] = typeof("number"),
+	["jump_callback"] = typeof("function"),
+	["help_key"] = typeof("string"),
 
-	["window"] = { "table" },
-	["window.width"] = { "table", "function" }, -- function or list of 2 numbers
+	["window"] = typeof("table"),
+	["window.width"] = typeof("table", "function"), -- function or list of 2 numbers
 	["window.gravity"] = oneof("center", "top"),
-	["window.max_height"] = { "number" },
-	["window.cursorline"] = { "boolean" },
-	["window.number"] = { "boolean" },
-	["window.relativenumber"] = { "boolean" },
+	["window.max_height"] = typeof("number"),
+	["window.cursorline"] = typeof("boolean"),
+	["window.number"] = typeof("boolean"),
+	["window.relativenumber"] = typeof("boolean"),
 
-	["window.options"] = { "table" },
-	["window.options.style"] = { "string" },
-	["window.options.border"] = { "string" },
+	["window.options"] = typeof("table"),
+	["window.options.style"] = typeof("string"),
+	["window.options.border"] = typeof("string"),
 
-	["preview"] = { "table" },
+	["preview"] = typeof("table"),
 	["preview.position"] = oneof("right", "bottom"),
-	["preview.width"] = { "number" },
-	["preview.width_threshold"] = { "number" },
-	["preview.min_height"] = { "number" },
-	["preview.debounce"] = { "number" },
+	["preview.width"] = typeof("number"),
+	["preview.width_threshold"] = typeof("number"),
+	["preview.min_height"] = typeof("number"),
+	["preview.debounce"] = typeof("number"),
 
-	["preview.options"] = { "table" },
-	["preview.options.style"] = { "string" },
-	["preview.options.border"] = { "string" },
+	["preview.options"] = typeof("table"),
+	["preview.options.style"] = typeof("string"),
+	["preview.options.border"] = typeof("string"),
 
-	["create_commands"] = { "boolean" },
+	["create_commands"] = typeof("boolean"),
 
-	["commands"] = { "table" },
-	["commands.view_marks"] = { "string" },
-	["commands.view_jumps"] = { "string" },
-	["commands.view_buffers"] = { "string" },
+	["commands"] = typeof("table"),
+	["commands.view_marks"] = typeof("string"),
+	["commands.view_jumps"] = typeof("string"),
+	["commands.view_buffers"] = typeof("string"),
 
-	["marks"] = { "table" },
-	["marks.preview"] = { "boolean" },
-	["marks.locals"] = { "string" },
-	["marks.globals"] = { "string" },
+	["marks"] = typeof("table"),
+	["marks.preview"] = typeof("boolean"),
+	["marks.locals"] = typeof("string"),
+	["marks.globals"] = typeof("string"),
 	["marks.sort_marks"] = listof("function", false),
-	["marks.sort_groups"] = "function",
-	["marks.toggle_mark"] = { "boolean" },
-	["marks.use_backtick"] = { "boolean" },
-	["marks.not_found"] = { "string" },
-	["marks.move_to_first_mark"] = { "boolean" },
-	["marks.move_to_closest_mark"] = { "boolean" },
-	["marks.proximity_threshold"] = { "number" },
-	["marks.force_header"] = { "boolean" },
+	["marks.sort_groups"] = typeof("function"),
+	["marks.toggle_mark"] = typeof("boolean"),
+	["marks.use_backtick"] = typeof("boolean"),
+	["marks.not_found"] = typeof("string"),
+	["marks.move_to_first_mark"] = typeof("boolean"),
+	["marks.move_to_closest_mark"] = typeof("boolean"),
+	["marks.proximity_threshold"] = typeof("number"),
+	["marks.force_header"] = typeof("boolean"),
 	["marks.decorations"] = listof("string", false, 2),
-	["marks.show_colnr"] = { "boolean" },
-	["marks.strip_lines"] = { "boolean" },
+	["marks.show_colnr"] = typeof("boolean"),
+	["marks.strip_lines"] = typeof("boolean"),
 	["marks.path_style"] = oneof("full", "short", "relhome", "relcwd"),
 
-	["marks.formatters"] = { "table" },
-	["marks.formatters.mark"] = { "function" },
-	["marks.formatters.header"] = { "function" },
+	["marks.formatters"] = typeof("table"),
+	["marks.formatters.mark"] = typeof("function"),
+	["marks.formatters.header"] = typeof("function"),
 
-	["marks.highlights"] = { "table" },
-	["marks.highlights.path"] = { "string" },
-	["marks.highlights.not_loaded"] = { "string" },
-	["marks.highlights.decorations"] = { "string" },
-	["marks.highlights.mark"] = { "string" },
-	["marks.highlights.lnum"] = { "string" },
-	["marks.highlights.col"] = { "string" },
-	["marks.highlights.line"] = { "string" },
+	["marks.highlights"] = typeof("table"),
+	["marks.highlights.path"] = typeof("string"),
+	["marks.highlights.not_loaded"] = typeof("string"),
+	["marks.highlights.decorations"] = typeof("string"),
+	["marks.highlights.mark"] = typeof("string"),
+	["marks.highlights.lnum"] = typeof("string"),
+	["marks.highlights.col"] = typeof("string"),
+	["marks.highlights.line"] = typeof("string"),
 
-	["marks.mappings"] = { "table" },
+	["marks.mappings"] = typeof("table"),
 	["marks.mappings.close"] = listof("string"),
 	["marks.mappings.delete"] = listof("string"),
 	["marks.mappings.next_group"] = listof("string"),
@@ -151,20 +158,20 @@ return {
 	["marks.mappings.keepj_vsplit"] = listof("string"),
 	["marks.mappings.cycle_sort"] = listof("string"),
 
-	["jumps"] = { "table" },
-	["jumps.preview"] = { "boolean" },
-	["jumps.real_positions"] = { "boolean" },
-	["jumps.strip_lines"] = { "boolean" },
-	["jumps.filter_empty_lines"] = { "boolean" },
-	["jumps.not_found"] = { "string" },
+	["jumps"] = typeof("table"),
+	["jumps.preview"] = typeof("boolean"),
+	["jumps.real_positions"] = typeof("boolean"),
+	["jumps.strip_lines"] = typeof("boolean"),
+	["jumps.filter_empty_lines"] = typeof("boolean"),
+	["jumps.not_found"] = typeof("string"),
 	["jumps.not_loaded"] = deprecated("jumps.not_loaded"),
 	["jumps.indicator"] = listof("string", false, 2),
-	["jumps.show_colnr"] = { "boolean" },
+	["jumps.show_colnr"] = typeof("boolean"),
 	["jumps.autoload_filter"] = deprecated("jumps.autoload_filter"),
 
-	["jumps.mappings"] = { "table" },
-	["jumps.mappings.ctrl_o"] = { "string" },
-	["jumps.mappings.ctrl_i"] = { "string" },
+	["jumps.mappings"] = typeof("table"),
+	["jumps.mappings.ctrl_o"] = typeof("string"),
+	["jumps.mappings.ctrl_i"] = typeof("string"),
 	["jumps.mappings.jump"] = listof("string"),
 	["jumps.mappings.close"] = listof("string"),
 	["jumps.mappings.clear"] = listof("string"),
@@ -172,42 +179,42 @@ return {
 	["jumps.mappings.load_all"] = deprecated("jumps.mappings.load_all"),
 	["jumps.mappings.load_cwd"] = deprecated("jumps.mappings.load_cwd"),
 
-	["jumps.formatters"] = { "table" },
-	["jumps.formatters.jump"] = { "function" },
+	["jumps.formatters"] = typeof("table"),
+	["jumps.formatters.jump"] = typeof("function"),
 
-	["jumps.highlights"] = { "table" },
-	["jumps.highlights.indicator"] = { "string" },
-	["jumps.highlights.pos"] = { "string" },
-	["jumps.highlights.current_pos"] = { "string" },
-	["jumps.highlights.path"] = { "string" },
-	["jumps.highlights.lnum"] = { "string" },
-	["jumps.highlights.col"] = { "string" },
-	["jumps.highlights.line"] = { "string" },
-	["jumps.highlights.not_loaded"] = { "string" },
+	["jumps.highlights"] = typeof("table"),
+	["jumps.highlights.indicator"] = typeof("string"),
+	["jumps.highlights.pos"] = typeof("string"),
+	["jumps.highlights.current_pos"] = typeof("string"),
+	["jumps.highlights.path"] = typeof("string"),
+	["jumps.highlights.lnum"] = typeof("string"),
+	["jumps.highlights.col"] = typeof("string"),
+	["jumps.highlights.line"] = typeof("string"),
+	["jumps.highlights.not_loaded"] = typeof("string"),
 
-	["buffers"] = { "table" },
-	["buffers.preview"] = { "boolean" },
+	["buffers"] = typeof("table"),
+	["buffers.preview"] = typeof("boolean"),
 	["buffers.view"] = oneof("flat", "tree"),
-	["buffers.wrap_around"] = { "boolean" },
-	["buffers.not_found"] = { "string" },
-	["buffers.unnamed_label"] = { "string" },
-	["buffers.quickjump"] = { "boolean" },
-	["buffers.show_pin_positions"] = { "boolean" },
-	["buffers.pin_separator"] = { "string" },
-	["buffers.group_separator"] = { "string" },
-	["buffers.formatter_spacing"] = { "string" },
+	["buffers.wrap_around"] = typeof("boolean"),
+	["buffers.not_found"] = typeof("string"),
+	["buffers.unnamed_label"] = typeof("string"),
+	["buffers.quickjump"] = typeof("boolean"),
+	["buffers.show_pin_positions"] = typeof("boolean"),
+	["buffers.pin_separator"] = typeof("string"),
+	["buffers.group_separator"] = typeof("string"),
+	["buffers.formatter_spacing"] = typeof("string"),
 	["buffers.sort_buffers"] = listof("function", false),
-	["buffers.sort_directories"] = { "function" },
-	["buffers.directories_first"] = { "boolean" },
-	["buffers.squash_directories"] = { "boolean" },
+	["buffers.sort_directories"] = typeof("function"),
+	["buffers.directories_first"] = typeof("boolean"),
+	["buffers.squash_directories"] = typeof("boolean"),
 	["buffers.bufname_align"] = oneof("none", "left", "right"),
 	["buffers.bufname_style"] = oneof("basename", "unique", "hide"),
 	["buffers.bufpath_style"] = oneof("full", "short", "relhome", "relcwd", "hide"),
-	["buffers.directory_handler"] = { "function" },
+	["buffers.directory_handler"] = typeof("function"),
 	["buffers.tree_lines"] = listof("string", false, 4),
 	["buffers.tree_folder_icons"] = listof("string", false, 2),
 
-	["buffers.mappings"] = { "table" },
+	["buffers.mappings"] = typeof("table"),
 	["buffers.mappings.cycle_sort"] = listof("string"),
 	["buffers.mappings.move_group_up"] = listof("string"),
 	["buffers.mappings.move_group_down"] = listof("string"),
@@ -232,22 +239,22 @@ return {
 	["buffers.mappings.wipe"] = listof("string"),
 	["buffers.mappings.force_wipe"] = listof("string"),
 
-	["buffers.formatters"] = { "table" },
-	["buffers.formatters.buffer"] = { "function" },
-	["buffers.formatters.tree_root"] = { "function" },
-	["buffers.formatters.tree_buffer"] = { "function" },
-	["buffers.formatters.tree_directory"] = { "function" },
+	["buffers.formatters"] = typeof("table"),
+	["buffers.formatters.buffer"] = typeof("function"),
+	["buffers.formatters.tree_root"] = typeof("function"),
+	["buffers.formatters.tree_buffer"] = typeof("function"),
+	["buffers.formatters.tree_directory"] = typeof("function"),
 
-	["buffers.highlights"] = { "table" },
-	["buffers.highlights.bufname"] = { "string" },
-	["buffers.highlights.bufpath"] = { "string" },
-	["buffers.highlights.unlisted"] = { "string" },
-	["buffers.highlights.directory"] = { "string" },
-	["buffers.highlights.modified"] = { "string" },
-	["buffers.highlights.pin_position"] = { "string" },
-	["buffers.highlights.pin_separator"] = { "string" },
-	["buffers.highlights.group_separator"] = { "string" },
-	["buffers.highlights.tree_root"] = { "string" },
-	["buffers.highlights.tree_lines"] = { "string" },
-	["buffers.highlights.hidden_count"] = { "string" },
+	["buffers.highlights"] = typeof("table"),
+	["buffers.highlights.bufname"] = typeof("string"),
+	["buffers.highlights.bufpath"] = typeof("string"),
+	["buffers.highlights.unlisted"] = typeof("string"),
+	["buffers.highlights.directory"] = typeof("string"),
+	["buffers.highlights.modified"] = typeof("string"),
+	["buffers.highlights.pin_position"] = typeof("string"),
+	["buffers.highlights.pin_separator"] = typeof("string"),
+	["buffers.highlights.group_separator"] = typeof("string"),
+	["buffers.highlights.tree_root"] = typeof("string"),
+	["buffers.highlights.tree_lines"] = typeof("string"),
+	["buffers.highlights.hidden_count"] = typeof("string"),
 }
