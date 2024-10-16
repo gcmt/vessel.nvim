@@ -1881,7 +1881,7 @@ The `meta` table has the following keys:
 |------------------|-----------------------------------------------------------------------------|
 | `prefix`         | Decoration lines of the tree line being rendered.                           |
 | `root`           | Tree root path.                                                             |
-| `rel_path        | Path relative to the tree root.                                             |
+| `rel_path`        | Path relative to the tree root.                                             |
 | `collapsed`      | Whether the current directory is collapse.                                  |
 | `hidden_buffers` | Number of hidden buffers when the directory is collapsed.                   |
 | `squashed`       | Whether the directory is squashed.                                          |
