@@ -114,9 +114,21 @@ function Bufferlist:open()
 	end
 end
 
+--- Rumove from the pinned list unlisted and wipedout buffers
+function Bufferlist:prune_pinned_list()
+	local valid = {}
+	for _, nr in ipairs(PINNED) do
+		if vim.fn.bufexists(nr) == 1 and vim.fn.buflisted(nr) == 1 then
+			table.insert(valid, nr)
+		end
+	end
+	PINNED = valid
+end
+
 --- Return pinned buffer list
 ---@return table
 function Bufferlist:get_pinned_list()
+	self:prune_pinned_list()
 	return PINNED
 end
 
@@ -124,6 +136,7 @@ end
 ---@param bufnr integer
 ---@return integer?
 function Bufferlist:get_pinned_next(bufnr)
+	self:prune_pinned_list()
 	for i, nr in ipairs(PINNED) do
 		if nr == bufnr then
 			local index = i + 1
@@ -143,6 +156,7 @@ end
 ---@param bufnr integer
 ---@return integer?
 function Bufferlist:get_pinned_prev(bufnr)
+	self:prune_pinned_list()
 	for i, nr in ipairs(PINNED) do
 		if nr == bufnr then
 			local index = i - 1
