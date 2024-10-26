@@ -1361,6 +1361,14 @@ Highlight groups used by the default formatter.
 5. Changelog                                                  *vessel-changelog*
 
 ------------------------------------------------------------------------------
+v2.4.1
+
+FIXES
+
+- Fixed pinned list getting out of sync when deleting buffers from outside the
+  buffer list window.
+
+------------------------------------------------------------------------------
 v2.4.0
 
 NEW
