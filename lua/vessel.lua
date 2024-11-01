@@ -157,6 +157,9 @@ function M.setup(opts)
 		vim.api.nvim_create_user_command(config.commands.view_jumps, function(_)
 			M.view_jumps()
 		end, { nargs = 0 })
+		vim.api.nvim_create_user_command(config.commands.view_buffers, function(_)
+			M.view_buffers()
+		end, { nargs = 0 })
 	end
 end
 
