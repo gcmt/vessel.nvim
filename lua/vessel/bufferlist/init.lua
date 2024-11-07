@@ -1090,6 +1090,7 @@ function Bufferlist:_render()
 		return a.pinpos < b.pinpos
 	end)
 
+	local visible = {}
 	local unpinned = {}
 	local unpinned_listed_count = 0
 	for _, buffer in pairs(self.buffers) do
@@ -1099,6 +1100,9 @@ function Bufferlist:_render()
 			end
 			table.insert(unpinned, buffer)
 		end
+		if self._show_unlisted or buffer.listed then
+			table.insert(visible, buffer)
+		end
 	end
 
 	local meta
@@ -1106,7 +1110,7 @@ function Bufferlist:_render()
 		-- when in tree view mode, meta info makes sense only for pinned buffers
 		meta = _get_meta(pinned)
 	else
-		meta = _get_meta(self.buffers)
+		meta = _get_meta(visible)
 	end
 
 	local map = {}
