@@ -24,7 +24,9 @@ local function show(self, filestore, path, lnum, filetype)
 	end
 
 	if self.last_path ~= path then
-		vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines or {})
+		if vim.fn.bufexists(self.bufnr) then
+			vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, lines or {})
+		end
 	end
 
 	vim.fn.win_execute(self.winid, lnum)
