@@ -748,7 +748,7 @@ function Bufferlist:_get_buffers()
 		end
 
 		local buffer = Buffer:new(b.bufnr)
-		buffer.path = b.name
+		buffer.path = vim.fs.joinpath(vim.fs.dirname(b.name), vim.fs.basename(b.name))
 		buffer.listed = b.listed == 1
 		buffer.modified = b.changed == 1
 		buffer.changedtick = b.changedtick
