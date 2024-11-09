@@ -137,7 +137,8 @@ function M.make_trees(buffers, groups)
 		_groups[g] = Tree:new(g)
 	end
 
-	local cwd = vim.fn.getcwd()
+	local _cwd = vim.fn.getcwd()
+	local cwd = vim.fs.joinpath(vim.fs.dirname(_cwd), vim.fs.basename(_cwd))
 	local home = os.getenv("HOME") or "/home"
 
 	-- therse groups are always going to be present
@@ -167,7 +168,10 @@ function M.make_trees(buffers, groups)
 			goto continue
 		end
 		for _, prefix in ipairs(prefixes) do
-			if vim.startswith(buffer.path, util.trim_path(prefix) .. "/") then
+			local _dirname = vim.fs.dirname(buffer.path)
+			local _basename = vim.fs.basename(buffer.path)
+			local buffer_path = vim.fs.joinpath(_dirname, _basename)
+			if vim.startswith(buffer_path, util.trim_path(prefix) .. "/") then
 				_groups[prefix]:insert(buffer, util.replstart(buffer.path, prefix, ""))
 				goto continue
 			end
