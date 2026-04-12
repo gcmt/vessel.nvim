@@ -37,10 +37,19 @@ local function listof(typ, allow_empty, len)
 end
 
 -- Allow any of the given types
--- ... string
--- return table
+---@param ... any
+---@return table
 local function typeof(...)
-	return { ... }
+	local t = { ... }
+	local fn = function(val)
+		for _, v in pairs(t) do
+			if v == type(val) then
+				return true
+			end
+		end
+		return false
+	end
+	return { fn, "type: " .. table.concat(t, "|") }
 end
 
 --- Allow any of the given values
@@ -56,7 +65,7 @@ local function oneof(...)
 		end
 		return false
 	end
-	return { fn, "one of " .. table.concat(t, "|") }
+	return { fn, "value: " .. table.concat(t, "|") }
 end
 
 --- Pass validation but give message about deprecation
