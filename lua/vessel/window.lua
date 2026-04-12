@@ -215,7 +215,6 @@ function Window:_get_popup_options(height, show_preview)
 		end
 	end
 
-	prev.win = self.winid
 	return main, prev
 end
 
@@ -240,6 +239,7 @@ function Window:open(height, show_preview)
 	end
 
 	if show_preview then
+		prev_opts.win = self.winid
 		self.preview:open(prev_opts)
 	end
 

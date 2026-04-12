@@ -80,7 +80,7 @@ end
 ---@return table
 function Preview:default_opts()
 	return vim.tbl_extend("force", self.config.preview.options, {
-		win = -1,
+		win = nil,
 		relative = "win",
 		anchor = "NW",
 		focusable = true,
